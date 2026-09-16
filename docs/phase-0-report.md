@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 12 |
-| FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 51 |
+| PASS | 13 |
+| FALLBACK-ADOPTED | 1 |
+| IN-PROGRESS | 49 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -33,7 +33,7 @@
 | V-A02 | IN-PROGRESS | — | |
 | V-A03 | PASS | `xtask/resp-server/` · `fixtures/protocol/` (316 samples / 12 categories) · 15 tests | RESP2/3 encoder incl. streamed+push+attribute; scripted delivery; 1 GiB streamer; hostile corpus每类≥20 |
 | V-A04 | PASS | `xtask/src/fault.rs` · 8 tests | TCP 代理：客户端/服务端定点切断、blackhole、慢速、分片、单字节损坏、拒连；FS：只读/填充 |
-| V-A05 | IN-PROGRESS | — | 15/17 绿；cluster/sentinel 脚本已在本机修复并验证，**待下一次 CI 实跑确认 17/17** |
+| V-A05 | PASS | CI run 35053565259 · `.github/workflows/ci.yml` · `ci/*.sh` | **17/17 全绿**：三平台 build+lint 与 test、5 个 digest-pinned server、cluster、sentinel、4 个 gate |
 | V-A06 | PASS | `xtask/src/measure.rs` · 8 tests · `cargo run -p xtask -- measure-baseline` | 计数 allocator（live/peak/calls）+ RSS 采样 + 预算表；heap 与 RSS 分列不混计 |
 
 ## Track B · 协议与执行内核
@@ -52,7 +52,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-C01 | IN-PROGRESS | — | |
+| V-C01 | FALLBACK-ADOPTED(ADR-026) | `docs/spikes/SPIKE-001.md` · `crates/pr-repl/src/buffer.rs` · 20 tests | Reedline 不满足 (b)：undo 在私有 `Editor` 上；且 mid-codepoint 光标会在库内 panic。采用预命名回退：自有 grapheme LineBuffer + EditTransaction |
 | V-C02 | IN-PROGRESS | — | |
 | V-C03 | IN-PROGRESS | — | |
 | V-C04 | IN-PROGRESS | — | |
@@ -159,3 +159,4 @@
 | 2026-09-16 | V-B07 → PASS（prc 参数契约）；177 tests 全绿 |
 | 2026-09-16 | CI run 35048391825：15/17 绿。cluster/sentinel 脚本首跑失败，已记入 V-G01/V-G02 |
 | 2026-09-16 | V-G01 / V-G02 → PASS：两个 topology 根因定位并修复；新增 `pr-routing` slot/hash-tag 实现与 8 个实跑测试；196 tests 全绿 |
+| 2026-09-16 | **CI 17/17 全绿** → V-A05 PASS；SPIKE-001 结论：Reedline 不达标，V-C01 走 ADR-026 回退并实现自有 LineBuffer；216 tests 全绿 |
