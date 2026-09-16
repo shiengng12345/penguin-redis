@@ -92,13 +92,21 @@ mod platform {
     use std::os::windows::ffi::OsStrExt as _;
     use std::path::Path;
     use windows_sys::Win32::Foundation::{HANDLE, HLOCAL, LocalFree};
+    // `ConvertSidToStringSidW` lives in `Security::Authorization`, not `Security`, even though
+    // it reads like it belongs with the other `Sid` names. Getting this wrong is invisible on
+    // macOS and Linux — the whole module is `#[cfg(windows)]` — and it broke three Windows CI
+    // jobs at once. Cross-checking it locally is not available either: blake3 and ring have
+    // build scripts that need a Windows-targeting C compiler, so `cargo check --target
+    // x86_64-pc-windows-msvc` cannot get far enough to typecheck this file. The `build+lint
+    // (windows-latest)` job is the only thing that sees it, which means it has to be read
+    // after pushing rather than assumed.
     use windows_sys::Win32::Security::Authorization::{
-        ConvertSecurityDescriptorToStringSecurityDescriptorW,
+        ConvertSecurityDescriptorToStringSecurityDescriptorW, ConvertSidToStringSidW,
         ConvertStringSecurityDescriptorToSecurityDescriptorW, GetNamedSecurityInfoW,
         SDDL_REVISION_1, SE_FILE_OBJECT, SetNamedSecurityInfoW,
     };
     use windows_sys::Win32::Security::{
-        ACL, ConvertSidToStringSidW, DACL_SECURITY_INFORMATION, GetTokenInformation,
+        ACL, DACL_SECURITY_INFORMATION, GetTokenInformation,
         PROTECTED_DACL_SECURITY_INFORMATION, PSECURITY_DESCRIPTOR, TOKEN_QUERY, TOKEN_USER,
         TokenUser,
     };

@@ -40,12 +40,37 @@ fn main() -> std::process::ExitCode {
             if ok {
                 std::process::ExitCode::SUCCESS
             } else {
+                // Name the case and the layer, and print both sides. A run that only says
+                // "FAILURES" leaves whoever reads the CI log with nothing but the fact that
+                // something diverged, and the generated report is in a temporary directory
+                // that the job throws away.
+                explain_failures(&report);
                 std::process::ExitCode::FAILURE
             }
         }
         Err(e) => {
             eprintln!("differential: {e}");
             std::process::ExitCode::FAILURE
+        }
+    }
+}
+
+/// Print every layer that diverged without being declared, on stderr.
+fn explain_failures(report: &Report) {
+    use differential::compare::LayerVerdict as L;
+    for c in &report.cases {
+        for (layer, verdict) in [
+            ("1 argv bytes", &c.layers.argv_bytes),
+            ("2 reply bytes", &c.layers.reply_bytes),
+            ("3 final state", &c.layers.final_state),
+            ("4 output and exit", &c.layers.output_and_exit),
+        ] {
+            if let L::UnexpectedDifference { baseline, penguin } = verdict {
+                eprintln!("---- {} layer {layer}: undeclared difference", c.case_id);
+                eprintln!("     request : {}", c.request.join(" "));
+                eprintln!("     baseline: {baseline}");
+                eprintln!("     penguin : {penguin}");
+            }
         }
     }
 }

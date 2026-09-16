@@ -40,6 +40,41 @@ and the passthrough cost nothing measurable", not "startup got 2 ms faster". The
 The debug figures are the ones CI asserts. That is the conservative direction: a debug build
 is larger and slower, so a debug build that fits proves a release build does.
 
+## 2026-09-16, third measurement — TLS（V-G04）与 SSH（V-G03）都已链接
+
+上一节自己写着「这两项落地时必须重测」。它们落地了，所以这一节存在。
+
+| 字段 | 值 |
+|---|---|
+| 硬件 | Apple M3 · 24 GB |
+| OS | macOS 26.5.2（aarch64） |
+| 工具链 | rustc 1.97.1 (8bab26f4f 2026-07-14)，由 `rust-toolchain.toml` 固定 |
+| commit | `bdc15b2` |
+| 依赖锁 | `Cargo.lock` sha256 `7a8f27ca7770932b…`，281 个 package |
+| 并发负载 | **有**：V-H05 的 8 小时 soak 正在同一台机器上跑（见下） |
+
+| measurement | budget (§24.6) | debug | release | headroom (release) | vs 第二次 |
+|---|---|---|---|---|---|
+| `prc --help` p50 | — | 4.11 ms | 2.09 ms | — | +0.32 ms |
+| `prc --help` p95 | ≤ 100 ms | 8.15 ms | 5.12 ms | **94.9 ms** | +3.21 ms |
+| idle REPL RSS | ≤ 30 MiB | 5.2 MiB | 4.5 MiB | **25.5 MiB** | +0.2 MiB |
+| idle TUI RSS | ≤ 60 MiB | 7.2 MiB | 6.1 MiB | **53.9 MiB** | −0.1 MiB |
+| catalog alone RSS | — | 5.1 MiB | 4.5 MiB | — | ±0 |
+| `prc` binary | — | 5.70 MiB | 1.85 MiB | — | **+0.16 MiB** |
+
+**只有一个数字是可以直接解读的：二进制 +0.16 MiB。** 那是 rustls 0.23 + `ring` 加上 SSH 那条
+路径的代价，它与机器忙不忙无关。
+
+**时间数字这次不干净，必须说清楚。** p95 从 1.91 ms 涨到 5.12 ms，看起来像 TLS 让启动变慢了
+2.7 倍——但 TLS 栈在 `--help` 路径上一行都不执行，而这次测量是在 soak 占着 CPU 的情况下做的。
+正确的结论是「这一列本次不可比」，不是「启动变慢了」。干净的复测在下一节，soak 跑完之后补。
+把一个知道有污染的数字写成结论，比不写更糟：后面的人会拿它当基线去对比。
+
+RSS 的变化（+0.2 MiB / −0.1 MiB）小于同一台空闲笔记本上的 run-to-run 抖动，读作「没有可测量的
+变化」。
+
+**上一节的「尚未链接」注记到此清空**：TLS 与 SSH 都在里面了，没有留待将来吃掉的 headroom。
+
 ## What is linked, and what is not
 
 Linked: `tokio`, `rusqlite` (bundled SQLite), `keyring`, `crossterm`, `ratatui`, `blake3`,
@@ -54,10 +89,11 @@ is deliberately small and Phase 1 replaces it.
 interop test subject, and `ci/check-redis-rs-is-dev-only.sh` resolves the real link graph to
 keep it one. So the headroom below does not have to hold room for it.
 
-**Still not linked**, because the choice has not been made: the TLS stack (V-G04) and the
-controlled SSH path (V-G03). The headroom above — now 98 ms and 25.7 MiB — is what those have
-to fit inside, and this table must be re-measured when they land. Recording the headroom
-rather than only the pass/fail is the point: it is the number a later decision is made from.
+**Now linked, and measured**: the TLS stack (rustls 0.23 + `ring`, ADR-032, V-G04) and the
+controlled SSH path (V-G03). They were the outstanding claim on the headroom; the third
+measurement above is what they actually cost — **+0.16 MiB of binary and nothing measurable
+anywhere else**. Recording the headroom rather than only the pass/fail is what made that
+answerable: 94.9 ms and 25.5 MiB are still free.
 
 ## Why `--help` is cheap, structurally
 
