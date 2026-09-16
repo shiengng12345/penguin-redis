@@ -41,9 +41,14 @@ done
 for job in topology shared-files ssh-tunnels differential; do
   grep -qE "^  $job:" "$wf" || bad "$wf has no '$job' job"
 done
+# The soak has its own workflow: it runs for hours and ci.yml cancels superseded runs.
+[ -f .github/workflows/soak.yml ] || bad ".github/workflows/soak.yml is missing"
 if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-  concl="$(gh run list --workflow=ci.yml --branch=main --limit=1 --json conclusion \
-            --jq '.[0].conclusion' 2>/dev/null || true)"
+  # The latest *completed* run. `.[0]` alone picks up a queued run, whose conclusion is null,
+  # and the check then reported "no run" while several were in flight.
+  concl="$(gh run list --workflow=ci.yml --branch=main --limit=20 \
+            --json conclusion,status \
+            --jq '[.[] | select(.status == "completed")][0].conclusion' 2>/dev/null || true)"
   case "$concl" in
     success) pass "the latest CI run on main concluded success" ;;
     "")      warn "gh returned no run for ci.yml on main" ;;

@@ -1,0 +1,67 @@
+name: Soak
+
+# V-H05 / PERF-04 (v2.1 §32.1 Soak). Its own workflow for two reasons: it runs for five and a
+# half hours, and `ci.yml` cancels superseded runs — which would kill this one the moment
+# anybody pushed.
+#
+# §32.1 asks for eight hours. A GitHub-hosted runner kills any job at six, so this runs the
+# longest window the platform allows and the full eight-hour evidence comes from a machine that
+# can host it (`benches/soak/README.md` records it, with its JSONL). The analysis, its
+# thresholds and its exit code are the same in both places — what differs is the length of the
+# window, and that difference is written down rather than rounded off.
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: soak
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  RUST_BACKTRACE: 1
+  CARGO_INCREMENTAL: 0
+
+jobs:
+  soak:
+    name: soak (5h30m, the longest a hosted runner allows)
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      - name: the growth detector's own tests
+        # Run first. A soak whose analysis is broken is five hours spent producing a number
+        # nobody can trust, and the failure would only show up at the end.
+        run: cargo test -p soak --test growth
+      - name: start Redis
+        # The same digest the rest of the topology fixtures pin (redis 7.4.11).
+        run: |
+          docker run -d --name soak-redis -p 6379:6379 \
+            redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7
+          for _ in $(seq 1 30); do
+            docker exec soak-redis redis-cli ping 2>/dev/null | grep -q PONG && break
+            sleep 1
+          done
+          docker exec soak-redis redis-cli ping | grep -q PONG
+      - name: soak
+        run: |
+          cargo run --release -p soak -- \
+            --hours 5.5 --out soak-metrics.jsonl --redis 127.0.0.1:6379
+      - name: keep the samples
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: soak-metrics
+          path: soak-metrics.jsonl
+      - name: stop Redis
+        if: always()
+        run: docker rm -f soak-redis || true
