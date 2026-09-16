@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 26 |
+| PASS | 28 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 36 |
+| IN-PROGRESS | 34 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -92,8 +92,8 @@
 | V-F02 | PASS | `crates/pr-intelligence/src/analyser.rs` · 11 tests（含 3 个 proptest） | 宽容分析器与权威 tokenizer 的 argv 等价性 property；span 恒在范围内且 analyse 不 panic；按 span 替换后参数个数不变、替换落在正确位置（ASSIST-081） |
 | V-F03 | PASS | `crates/pr-repl/` · 26 tests | 权威 tokenizer 对齐 `sdssplitargs`；全 256 字节 quote 往返；`:` 本地命令独立 grammar（重复选项报错、零 shell 展开） |
 | V-F04 | IN-PROGRESS | — | |
-| V-F05 | IN-PROGRESS | — | |
-| V-F06 | IN-PROGRESS | — | |
+| V-F05 | PASS | `crates/pr-intelligence/src/broker.rs` · 11 tests | 到达时校验 revision+scope+序号；过期结果丢弃且**不显示**；焦点跟 `CandidateId` 不跟索引（ASSIST-028）；候选消失时焦点不静默落到别处 |
+| V-F06 | PASS | `crates/pr-intelligence/src/scope.rs` · 14 tests | 六元组 scope（profile UUID + 服务身份 + DB + auth/policy/**topology** epoch）；逐项验证任一变化都不泄漏；field 绑定 parent key；schema hint 不主张存在性 |
 | V-F07 | IN-PROGRESS | — | |
 | V-F08 | IN-PROGRESS | — | |
 | V-F09 | IN-PROGRESS | — | |
@@ -169,3 +169,4 @@
 | 2026-09-16 | V-E03 / V-D07 → PASS（有界 result store、catalog 权威性）；370 tests 全绿 |
 | 2026-09-16 | V-B03 → PASS（`--pipe` 逐帧策略，BLOCKER #1 验证完成）；384 tests 全绿 |
 | 2026-09-16 | V-F02 → PASS（双解析器等价性 property）；395 tests 全绿 |
+| 2026-09-16 | V-F05 / V-F06 → PASS（异步 broker、observation scope 隔离）；420 tests 全绿 |

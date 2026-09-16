@@ -5,5 +5,9 @@
 //! (ADR-015).
 
 pub mod analyser;
+pub mod broker;
+pub mod scope;
 
 pub use analyser::{Analysis, QuoteMode, Span, analyse, submittable};
+pub use broker::{Accepted, Broker, Candidate, Dropped, Stamp};
+pub use scope::{Observation, ObservationScope, ObservationStore, Origin};
