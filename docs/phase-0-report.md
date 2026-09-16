@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 8 |
+| PASS | 9 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 55 |
+| IN-PROGRESS | 54 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -90,7 +90,7 @@
 |---|---|---|---|
 | V-F01 | IN-PROGRESS | — | |
 | V-F02 | IN-PROGRESS | — | |
-| V-F03 | IN-PROGRESS | — | |
+| V-F03 | PASS | `crates/pr-repl/` · 26 tests | 权威 tokenizer 对齐 `sdssplitargs`；全 256 字节 quote 往返；`:` 本地命令独立 grammar（重复选项报错、零 shell 展开） |
 | V-F04 | IN-PROGRESS | — | |
 | V-F05 | IN-PROGRESS | — | |
 | V-F06 | IN-PROGRESS | — | |
@@ -155,3 +155,4 @@
 | 2026-09-16 | V-E01 → PASS（pr-json occurrence DOM，SPIKE-004）；workspace 85 tests 全绿 |
 | 2026-09-16 | V-A01 / V-A04 / V-A06 → PASS（PTY harness、故障注入、资源测量）；111 tests 全绿 |
 | 2026-09-16 | V-B02 → PASS（增量 RESP decoder）；首次 CI 实跑暴露 4 个真实问题并修复；134 tests 全绿 |
+| 2026-09-16 | V-F03 → PASS（quoting + 本地命令 grammar）；第二轮 CI 暴露 5 个问题并修复；Cluster/Sentinel 起停脚本落地；160 tests 全绿 |

@@ -367,6 +367,9 @@ mod tests {
         let mut c = CommandBuilder::new("sh");
         c.arg("-c");
         c.arg(script);
+        // A CI runner may have no TERM and no terminfo database, so tests read the window
+        // size from termios via `stty` rather than from `tput`.
+        c.env("TERM", "xterm-256color");
         c
     }
 
@@ -400,8 +403,9 @@ mod tests {
     #[test]
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn reports_terminal_size_to_the_child() {
-        let s = PtySession::spawn(sh("printf 'cols=%s' \"$(tput cols)\""), 100, 30).unwrap();
-        s.wait_for(b"cols=100", Duration::from_secs(5)).unwrap();
+        // `stty size` prints "<rows> <cols>" straight from termios.
+        let s = PtySession::spawn(sh("stty size"), 100, 30).unwrap();
+        s.wait_for(b"30 100", Duration::from_secs(10)).unwrap();
         assert_eq!(s.size(), (100, 30));
     }
 
@@ -409,10 +413,9 @@ mod tests {
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn resize_is_visible_to_the_child() {
         // UX-07 / ASSIST-067: resize must actually reach the process under test.
-        let mut s =
-            PtySession::spawn(sh("sleep 0.3; printf 'cols=%s' \"$(tput cols)\""), 80, 24).unwrap();
+        let mut s = PtySession::spawn(sh("sleep 0.5; stty size"), 80, 24).unwrap();
         s.resize(40, 12).unwrap();
-        s.wait_for(b"cols=40", Duration::from_secs(5)).unwrap();
+        s.wait_for(b"12 40", Duration::from_secs(10)).unwrap();
         assert_eq!(s.size(), (40, 12));
         assert!(
             s.recording()

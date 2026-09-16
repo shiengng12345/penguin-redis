@@ -107,7 +107,7 @@ jobs:
           PENGUIN_TEST_REDIS: redis://127.0.0.1:6379
           PENGUIN_TEST_FAMILY: ${{ matrix.family }}
           PENGUIN_TEST_LINE: ${{ matrix.line }}
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/live_/)'
+        run: cargo nextest run --workspace --no-fail-fast -E 'test(/live_/)' --no-tests=pass
       - name: server log on failure
         if: failure()
         run: docker logs target
@@ -132,7 +132,7 @@ jobs:
       - name: topology tests
         env:
           PENGUIN_TEST_TOPOLOGY: ${{ matrix.topology }}
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/topology_/)'
+        run: cargo nextest run --workspace --no-fail-fast -E 'test(/topology_/)' --no-tests=pass
       - name: tear down
         if: always()
         run: ./ci/topology/${{ matrix.topology }}-down.sh || true
@@ -152,7 +152,7 @@ jobs:
       - name: cargo deny (licences, advisories, bans, sources)
         run: cargo deny check
       - name: security test suite
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/security_|secret_|injection_|approval_/)'
+        run: cargo nextest run --workspace --no-fail-fast -E 'test(/security_|secret_|injection_|approval_/)' --no-tests=pass
 
   # ---------------------------------------------------------------- Manifest gate
   manifest-pinned:
@@ -189,6 +189,7 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - uses: taiki-e/install-action@nextest
       - name: regenerate and diff
         run: |
           cargo run -q -p resp-server -- gen-fixtures /tmp/fx

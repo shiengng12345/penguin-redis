@@ -6,9 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-repl"
+description = "Penguin Redis — pr-repl: authoritative request tokenizer, local command grammar"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+bytes = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

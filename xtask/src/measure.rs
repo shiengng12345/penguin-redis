@@ -372,6 +372,12 @@ mod tests {
         assert_eq!(budgets::IDLE_TUI_RSS.max_heap_bytes, 60 * 1024 * 1024);
     }
 
+    /// Platforms where [`rss_bytes`] is expected to succeed. Read through a function so the
+    /// assertion below is not a compile-time constant on any single target.
+    fn should_report_rss() -> bool {
+        cfg!(any(target_os = "linux", target_os = "macos"))
+    }
+
     #[test]
     fn rss_is_available_on_this_platform_or_honestly_absent() {
         // The contract is that it never fabricates: Some(>0) or None.
@@ -379,9 +385,9 @@ mod tests {
             Some(v) => assert!(v > 0, "RSS must be positive if reported"),
             None => {
                 // On linux/macos this arm means the platform source failed, which is a real
-                // failure of the instrument rather than an acceptable outcome.
-                #[cfg(any(target_os = "linux", target_os = "macos"))]
-                panic!("linux/macos must be able to report RSS");
+                // failure of the instrument rather than an acceptable outcome. Elsewhere,
+                // `None` is the documented contract.
+                assert!(!should_report_rss(), "this platform must report RSS");
             }
         }
     }
