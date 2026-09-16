@@ -5,9 +5,16 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Penguin Redis — pr-security"
+description = "Penguin Redis — pr-security: TrustIdentity, ApprovalToken, policy"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+bytes = { workspace = true }
+blake3 = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

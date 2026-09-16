@@ -36,6 +36,9 @@ impl RequestOrigin {
 /// Effect classification, owned by the local signed catalog (ADR-030).
 ///
 /// A server may *add* availability information but may never downgrade these (V-D07).
+// A flag set, not a state machine: each bool is an independent catalog-assigned property,
+// and collapsing them into an enum would lose commands that are several at once.
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
 pub struct Effects {
     /// Reads data.
