@@ -374,6 +374,11 @@ version = "0.0.0"
 [[package]]
 name = "pr-protocol"
 version = "0.0.0"
+dependencies = [
+ "bytes",
+ "proptest",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-render"

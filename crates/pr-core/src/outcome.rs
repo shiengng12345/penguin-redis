@@ -193,7 +193,10 @@ impl ExecutionOutcome {
             return ExitCode::ResultUnknown;
         }
         if let Reply::Partial(children) = &self.reply {
-            if children.iter().any(|c| c.exit_code() == ExitCode::ResultUnknown) {
+            if children
+                .iter()
+                .any(|c| c.exit_code() == ExitCode::ResultUnknown)
+            {
                 return ExitCode::ResultUnknown;
             }
             if children.iter().any(|c| c.exit_code() != ExitCode::Success) {
@@ -201,7 +204,10 @@ impl ExecutionOutcome {
             }
             return ExitCode::Success;
         }
-        if matches!(self.effects, EffectsCertainty::EffectsPossible | EffectsCertainty::KnownPartial) {
+        if matches!(
+            self.effects,
+            EffectsCertainty::EffectsPossible | EffectsCertainty::KnownPartial
+        ) {
             return ExitCode::ResultUnknown;
         }
         // 2. Policy refusal.
@@ -237,20 +243,33 @@ mod tests {
     use super::*;
 
     fn o(d: Delivery, r: Reply, e: EffectsCertainty) -> ExecutionOutcome {
-        ExecutionOutcome { delivery: d, reply: r, effects: e, render: RenderStatus::Rendered }
+        ExecutionOutcome {
+            delivery: d,
+            reply: r,
+            effects: e,
+            render: RenderStatus::Rendered,
+        }
     }
 
     #[test]
     fn unknown_after_send_outranks_cancellation() {
         // STATE-01 / R42: 130 must never hide a possibly-applied write.
-        let out = o(Delivery::UnknownAfterSend, Reply::None, EffectsCertainty::EffectsPossible);
+        let out = o(
+            Delivery::UnknownAfterSend,
+            Reply::None,
+            EffectsCertainty::EffectsPossible,
+        );
         assert_eq!(out.exit_code(), ExitCode::ResultUnknown);
         assert!(out.is_uncertain());
     }
 
     #[test]
     fn cancelled_before_send_is_130() {
-        let out = o(Delivery::CancelledBeforeSend, Reply::None, EffectsCertainty::NoCommandSent);
+        let out = o(
+            Delivery::CancelledBeforeSend,
+            Reply::None,
+            EffectsCertainty::NoCommandSent,
+        );
         assert_eq!(out.exit_code(), ExitCode::Cancelled);
         assert!(!out.is_uncertain());
     }
@@ -263,7 +282,11 @@ mod tests {
             Reply::Error(ServerError::parse(b"ERR partial")),
             EffectsCertainty::EffectsPossible,
         );
-        assert_eq!(out.exit_code(), ExitCode::ResultUnknown, "effects uncertainty outranks the error code");
+        assert_eq!(
+            out.exit_code(),
+            ExitCode::ResultUnknown,
+            "effects uncertainty outranks the error code"
+        );
         let clean = o(
             Delivery::Sent,
             Reply::Error(ServerError::parse(b"WRONGTYPE Operation against a key")),
@@ -283,13 +306,21 @@ mod tests {
 
     #[test]
     fn policy_denial_is_5_and_sends_nothing() {
-        let out = o(Delivery::DeniedByPolicy, Reply::None, EffectsCertainty::NoCommandSent);
+        let out = o(
+            Delivery::DeniedByPolicy,
+            Reply::None,
+            EffectsCertainty::NoCommandSent,
+        );
         assert_eq!(out.exit_code(), ExitCode::PolicyDenied);
     }
 
     #[test]
     fn queued_is_not_applied() {
-        let out = o(Delivery::Sent, Reply::Queued, EffectsCertainty::EffectsPossible);
+        let out = o(
+            Delivery::Sent,
+            Reply::Queued,
+            EffectsCertainty::EffectsPossible,
+        );
         // STATE-03: QUEUED must never render as "applied".
         assert!(out.is_uncertain());
         assert_ne!(out.exit_code(), ExitCode::Success);
@@ -297,15 +328,27 @@ mod tests {
 
     #[test]
     fn reply_suppressed_mode_is_9() {
-        let out = o(Delivery::Sent, Reply::SuppressedByReplyMode, EffectsCertainty::UnacknowledgedByMode);
+        let out = o(
+            Delivery::Sent,
+            Reply::SuppressedByReplyMode,
+            EffectsCertainty::UnacknowledgedByMode,
+        );
         assert_eq!(out.exit_code(), ExitCode::SentUnacknowledged);
     }
 
     #[test]
     fn partial_batch_rolls_up_children() {
         let ok = ExecutionOutcome::confirmed(ResponseHandle(1));
-        let err = o(Delivery::Sent, Reply::Error(ServerError::parse(b"ERR x")), EffectsCertainty::ReplyObserved);
-        let unknown = o(Delivery::UnknownAfterSend, Reply::None, EffectsCertainty::EffectsPossible);
+        let err = o(
+            Delivery::Sent,
+            Reply::Error(ServerError::parse(b"ERR x")),
+            EffectsCertainty::ReplyObserved,
+        );
+        let unknown = o(
+            Delivery::UnknownAfterSend,
+            Reply::None,
+            EffectsCertainty::EffectsPossible,
+        );
 
         let all_ok = ExecutionOutcome {
             delivery: Delivery::Sent,
@@ -329,13 +372,21 @@ mod tests {
             effects: EffectsCertainty::KnownPartial,
             render: RenderStatus::Rendered,
         };
-        assert_eq!(some_unknown.exit_code(), ExitCode::ResultUnknown, "one unknown child poisons the batch");
+        assert_eq!(
+            some_unknown.exit_code(),
+            ExitCode::ResultUnknown,
+            "one unknown child poisons the batch"
+        );
     }
 
     #[test]
     fn conditional_write_not_applied_is_success_not_failure() {
         // `SET k v NX` returning nil is not an error (v2.1 §13.7 / CMD-05 family).
-        let out = o(Delivery::Sent, Reply::Ok(ResponseHandle(7)), EffectsCertainty::ConditionNotApplied);
+        let out = o(
+            Delivery::Sent,
+            Reply::Ok(ResponseHandle(7)),
+            EffectsCertainty::ConditionNotApplied,
+        );
         assert_eq!(out.exit_code(), ExitCode::Success);
         assert!(!out.is_uncertain());
     }
@@ -344,7 +395,10 @@ mod tests {
     fn server_error_parse_splits_code_and_escapes_message() {
         let e = ServerError::parse(b"WRONGTYPE Operation \x1b]0;x\x07against");
         assert_eq!(e.code, "WRONGTYPE");
-        assert!(!e.message.as_display().contains('\x1b'), "error text must be escaped");
+        assert!(
+            !e.message.as_display().contains('\x1b'),
+            "error text must be escaped"
+        );
         let bare = ServerError::parse(b"ERR");
         assert_eq!(bare.code, "ERR");
         assert!(bare.message.is_empty());

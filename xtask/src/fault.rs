@@ -91,7 +91,12 @@ impl FaultProxy {
     /// Propagates the bind error.
     pub async fn bind(upstream: SocketAddr, fault: Fault) -> std::io::Result<Self> {
         let listener = TcpListener::bind(("127.0.0.1", 0)).await?;
-        Ok(Self { listener, upstream, fault, stats: ProxyStats::default() })
+        Ok(Self {
+            listener,
+            upstream,
+            fault,
+            stats: ProxyStats::default(),
+        })
     }
 
     /// Address the client under test should connect to.
@@ -120,7 +125,7 @@ impl FaultProxy {
         self.stats.connections.fetch_add(1, Ordering::SeqCst);
         if self.fault == Fault::Blackhole {
             // Hold the socket open, forward nothing.
-            tokio::time::sleep(Duration::from_secs(3600)).await;
+            tokio::time::sleep(Duration::from_hours(1)).await;
             return Ok(());
         }
         let server = TcpStream::connect(self.upstream).await?;
@@ -143,8 +148,10 @@ impl FaultProxy {
                     Ok(n) => n,
                 };
                 let total = c2s.fetch_add(n as u64, Ordering::SeqCst) + n as u64;
-                if let Fault::CutAfterClientBytes { after_bytes } = fault {
-                    if total > after_bytes {
+                if let Fault::CutAfterClientBytes { after_bytes } = fault
+                    && total > after_bytes
+                {
+                    {
                         // Forward only the allowed prefix, then stop: the server may well have
                         // applied it, which is exactly the uncertainty STATE-01 describes.
                         let allowed = after_bytes.saturating_sub(total - n as u64);
@@ -170,8 +177,11 @@ impl FaultProxy {
                     Ok(n) => n,
                 };
                 let mut out = buf[..n].to_vec();
-                if let Fault::CorruptServerByte { at } = fault {
-                    if at >= seen && at < seen + n as u64 {
+                if let Fault::CorruptServerByte { at } = fault
+                    && at >= seen
+                    && at < seen + n as u64
+                {
+                    {
                         let idx = usize::try_from(at - seen).unwrap_or(0);
                         out[idx] ^= 0xff;
                     }
@@ -180,9 +190,13 @@ impl FaultProxy {
                 seen += n as u64;
                 s2c.fetch_add(n as u64, Ordering::SeqCst);
 
-                if let Fault::CutAfterServerBytes { after_bytes } = fault {
-                    if seen > after_bytes {
-                        let allowed = usize::try_from(after_bytes.saturating_sub(before)).unwrap_or(0).min(out.len());
+                if let Fault::CutAfterServerBytes { after_bytes } = fault
+                    && seen > after_bytes
+                {
+                    {
+                        let allowed = usize::try_from(after_bytes.saturating_sub(before))
+                            .unwrap_or(0)
+                            .min(out.len());
                         let _ = cw.write_all(&out[..allowed]).await;
                         let _ = cw.flush().await;
                         break;
@@ -249,7 +263,11 @@ pub mod fs {
     /// # Errors
     /// Propagates write errors.
     pub fn fill_to(p: &Path, limit: u64) -> io::Result<()> {
-        let f = std::fs::OpenOptions::new().create(true).write(true).truncate(true).open(p)?;
+        let f = std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .truncate(true)
+            .open(p)?;
         f.set_len(limit)?;
         Ok(())
     }
@@ -291,7 +309,7 @@ mod tests {
         let mut b = vec![0u8; 4096];
         while out.len() < want {
             match tokio::time::timeout(Duration::from_millis(500), c.read(&mut b)).await {
-                Ok(Ok(0)) | Err(_) | Ok(Err(_)) => break,
+                Ok(Ok(0) | Err(_)) | Err(_) => break,
                 Ok(Ok(n)) => out.extend_from_slice(&b[..n]),
             }
         }
@@ -315,17 +333,24 @@ mod tests {
     async fn cut_after_client_bytes_truncates_the_request() {
         // STATE-01: the server receives a prefix; the client cannot know whether it applied.
         let (up, _u) = echo_upstream().await;
-        let p = FaultProxy::bind(up, Fault::CutAfterClientBytes { after_bytes: 4 }).await.unwrap();
+        let p = FaultProxy::bind(up, Fault::CutAfterClientBytes { after_bytes: 4 })
+            .await
+            .unwrap();
         let addr = p.addr().unwrap();
         tokio::spawn(async move { p.run_once().await });
         let got = talk(addr, b"0123456789", 10).await;
-        assert!(got.len() <= 4, "at most the allowed prefix comes back, got {got:?}");
+        assert!(
+            got.len() <= 4,
+            "at most the allowed prefix comes back, got {got:?}"
+        );
     }
 
     #[tokio::test]
     async fn cut_after_server_bytes_truncates_the_reply() {
         let (up, _u) = echo_upstream().await;
-        let p = FaultProxy::bind(up, Fault::CutAfterServerBytes { after_bytes: 3 }).await.unwrap();
+        let p = FaultProxy::bind(up, Fault::CutAfterServerBytes { after_bytes: 3 })
+            .await
+            .unwrap();
         let addr = p.addr().unwrap();
         tokio::spawn(async move { p.run_once().await });
         let got = talk(addr, b"0123456789", 10).await;
@@ -336,17 +361,24 @@ mod tests {
     async fn fragment_server_preserves_all_bytes() {
         // Incremental decoding must survive arbitrary chunking (V-B02).
         let (up, _u) = echo_upstream().await;
-        let p = FaultProxy::bind(up, Fault::FragmentServer { chunk: 1 }).await.unwrap();
+        let p = FaultProxy::bind(up, Fault::FragmentServer { chunk: 1 })
+            .await
+            .unwrap();
         let addr = p.addr().unwrap();
         tokio::spawn(async move { p.run_once().await });
         let got = talk(addr, b"abcdefgh", 8).await;
-        assert_eq!(got, b"abcdefgh", "fragmentation must not lose or reorder bytes");
+        assert_eq!(
+            got, b"abcdefgh",
+            "fragmentation must not lose or reorder bytes"
+        );
     }
 
     #[tokio::test]
     async fn corrupt_server_byte_flips_exactly_one() {
         let (up, _u) = echo_upstream().await;
-        let p = FaultProxy::bind(up, Fault::CorruptServerByte { at: 2 }).await.unwrap();
+        let p = FaultProxy::bind(up, Fault::CorruptServerByte { at: 2 })
+            .await
+            .unwrap();
         let addr = p.addr().unwrap();
         tokio::spawn(async move { p.run_once().await });
         let got = talk(addr, b"abcd", 4).await;
@@ -373,7 +405,10 @@ mod tests {
         let f = dir.join("x.toml");
         std::fs::write(&f, b"a").unwrap();
         fs::make_read_only(&f).unwrap();
-        assert!(std::fs::write(&f, b"b").is_err(), "read-only must reject writes");
+        assert!(
+            std::fs::write(&f, b"b").is_err(),
+            "read-only must reject writes"
+        );
         fs::make_writable(&f).unwrap();
         std::fs::write(&f, b"b").unwrap();
         assert_eq!(std::fs::read(&f).unwrap(), b"b");

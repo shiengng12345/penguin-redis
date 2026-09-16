@@ -34,8 +34,18 @@ pub enum Expectation {
     Incomplete,
 }
 
-fn s(category: &'static str, name: impl Into<String>, bytes: Vec<u8>, expectation: Expectation) -> Sample {
-    Sample { category, name: name.into(), bytes, expectation }
+fn s(
+    category: &'static str,
+    name: impl Into<String>,
+    bytes: Vec<u8>,
+    expectation: Expectation,
+) -> Sample {
+    Sample {
+        category,
+        name: name.into(),
+        bytes,
+        expectation,
+    }
 }
 
 fn r3(f: &Frame) -> Vec<u8> {
@@ -54,12 +64,35 @@ fn malformed_length() -> Vec<Sample> {
             let mut bytes = vec![*p];
             bytes.extend_from_slice(b);
             bytes.extend_from_slice(b"\r\n");
-            v.push(s(c, format!("{}-{}-{}", p.escape_ascii(), i, j), bytes, Expectation::ProtocolError));
+            // Hex, not the raw byte: `*` and `?` are illegal in Windows paths (WIN-01).
+            v.push(s(
+                c,
+                format!("t{p:02x}-{i}-{j}"),
+                bytes,
+                Expectation::ProtocolError,
+            ));
         }
     }
-    for (i, big) in ["99999999999999999999", "18446744073709551616", "9223372036854775808"].iter().enumerate() {
-        v.push(s(c, format!("overflow-{i}"), format!("${big}\r\n").into_bytes(), Expectation::ProtocolError));
-        v.push(s(c, format!("overflow-int-{i}"), format!(":{big}\r\n").into_bytes(), Expectation::ProtocolError));
+    for (i, big) in [
+        "99999999999999999999",
+        "18446744073709551616",
+        "9223372036854775808",
+    ]
+    .iter()
+    .enumerate()
+    {
+        v.push(s(
+            c,
+            format!("overflow-{i}"),
+            format!("${big}\r\n").into_bytes(),
+            Expectation::ProtocolError,
+        ));
+        v.push(s(
+            c,
+            format!("overflow-int-{i}"),
+            format!(":{big}\r\n").into_bytes(),
+            Expectation::ProtocolError,
+        ));
     }
     v
 }
@@ -68,14 +101,45 @@ fn malformed_length() -> Vec<Sample> {
 fn oversized_declared() -> Vec<Sample> {
     let c = "oversized-declared";
     let mut v = Vec::new();
-    for (i, len) in [1u64 << 20, 1 << 24, 1 << 28, 1 << 30, 1 << 32, 1 << 40, 1 << 62].iter().enumerate() {
-        v.push(s(c, format!("bulk-{i}"), format!("${len}\r\n").into_bytes(), Expectation::BudgetExceeded));
-        v.push(s(c, format!("array-{i}"), format!("*{len}\r\n").into_bytes(), Expectation::BudgetExceeded));
-        v.push(s(c, format!("map-{i}"), format!("%{len}\r\n").into_bytes(), Expectation::BudgetExceeded));
+    for (i, len) in [
+        1u64 << 20,
+        1 << 24,
+        1 << 28,
+        1 << 30,
+        1 << 32,
+        1 << 40,
+        1 << 62,
+    ]
+    .iter()
+    .enumerate()
+    {
+        v.push(s(
+            c,
+            format!("bulk-{i}"),
+            format!("${len}\r\n").into_bytes(),
+            Expectation::BudgetExceeded,
+        ));
+        v.push(s(
+            c,
+            format!("array-{i}"),
+            format!("*{len}\r\n").into_bytes(),
+            Expectation::BudgetExceeded,
+        ));
+        v.push(s(
+            c,
+            format!("map-{i}"),
+            format!("%{len}\r\n").into_bytes(),
+            Expectation::BudgetExceeded,
+        ));
         // declared big, then a small body and close → truncated
         let mut b = format!("${len}\r\n").into_bytes();
         b.extend_from_slice(b"short");
-        v.push(s(c, format!("bulk-truncated-{i}"), b, Expectation::Incomplete));
+        v.push(s(
+            c,
+            format!("bulk-truncated-{i}"),
+            b,
+            Expectation::Incomplete,
+        ));
     }
     v
 }
@@ -90,7 +154,11 @@ fn deep_nesting() -> Vec<Sample> {
             b.extend_from_slice(b"*1\r\n");
         }
         b.extend_from_slice(b":1\r\n");
-        let exp = if depth <= 64 { Expectation::Valid } else { Expectation::BudgetExceeded };
+        let exp = if depth <= 64 {
+            Expectation::Valid
+        } else {
+            Expectation::BudgetExceeded
+        };
         v.push(s(c, format!("array-{depth}"), b, exp));
         let mut m = Vec::with_capacity(depth * 8);
         for _ in 0..depth {
@@ -109,7 +177,12 @@ fn invalid_type() -> Vec<Sample> {
     for &b in b"@&aZ0\0\x1b \n/\\'\"[{<?`\x7f\xff\xc3\xe2" {
         let mut bytes = vec![b];
         bytes.extend_from_slice(b"OK\r\n");
-        v.push(s(c, format!("byte-{b:02x}"), bytes, Expectation::ProtocolError));
+        v.push(s(
+            c,
+            format!("byte-{b:02x}"),
+            bytes,
+            Expectation::ProtocolError,
+        ));
     }
     v
 }
@@ -127,7 +200,11 @@ fn truncated_crlf() -> Vec<Sample> {
         ("bulk-body-lf", b"$3\r\nfoo\n", Expectation::ProtocolError),
         ("bulk-body-none", b"$3\r\nfoo", Expectation::Incomplete),
         ("bulk-body-cr", b"$3\r\nfoo\r", Expectation::Incomplete),
-        ("bulk-body-wrong-len", b"$3\r\nfoobar\r\n", Expectation::ProtocolError),
+        (
+            "bulk-body-wrong-len",
+            b"$3\r\nfoobar\r\n",
+            Expectation::ProtocolError,
+        ),
         ("array-partial", b"*2\r\n:1\r\n", Expectation::Incomplete),
         ("map-odd", b"%1\r\n+k\r\n", Expectation::Incomplete),
         ("null-lf", b"_\n", Expectation::ProtocolError),
@@ -138,7 +215,12 @@ fn truncated_crlf() -> Vec<Sample> {
     // CRLF inside a bulk body is legal (binary-safe) — must be Valid
     for i in 1..=8usize {
         let body = "\r\n".repeat(i);
-        v.push(s(c, format!("crlf-in-body-{i}"), r3(&Frame::bulk(body.as_bytes())), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("crlf-in-body-{i}"),
+            r3(&Frame::bulk(body.as_bytes())),
+            Expectation::Valid,
+        ));
     }
     v
 }
@@ -159,15 +241,34 @@ fn utf8_boundary() -> Vec<Sample> {
         "a\u{0}b".as_bytes(),
     ];
     for (i, b) in valid.iter().enumerate() {
-        v.push(s(c, format!("valid-{i}"), r3(&Frame::bulk(b)), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("valid-{i}"),
+            r3(&Frame::bulk(b)),
+            Expectation::Valid,
+        ));
     }
     let invalid: [&[u8]; 12] = [
-        b"\xff", b"\xc3", b"\xc3\x28", b"\xe2\x82", b"\xf0\x9f\x90", b"\xed\xa0\x80", // lone surrogate
-        b"\xc0\xaf", // overlong
-        b"\xf8\x88\x80\x80\x80", b"\x80", b"abc\xffdef", b"\xef\xbf\xbe", b"\xf4\x90\x80\x80",
+        b"\xff",
+        b"\xc3",
+        b"\xc3\x28",
+        b"\xe2\x82",
+        b"\xf0\x9f\x90",
+        b"\xed\xa0\x80", // lone surrogate
+        b"\xc0\xaf",     // overlong
+        b"\xf8\x88\x80\x80\x80",
+        b"\x80",
+        b"abc\xffdef",
+        b"\xef\xbf\xbe",
+        b"\xf4\x90\x80\x80",
     ];
     for (i, b) in invalid.iter().enumerate() {
-        v.push(s(c, format!("invalid-{i}"), r3(&Frame::bulk(b)), Expectation::Valid)); // binary-safe → Valid frame
+        v.push(s(
+            c,
+            format!("invalid-{i}"),
+            r3(&Frame::bulk(b)),
+            Expectation::Valid,
+        )); // binary-safe → Valid frame
     }
     v
 }
@@ -178,32 +279,47 @@ fn terminal_escape() -> Vec<Sample> {
     let mut v = Vec::new();
     let payloads: [&[u8]; 20] = [
         b"\x1b]0;evil title\x07",
-        b"\x1b]52;c;ZXZpbA==\x07",           // OSC52 clipboard
+        b"\x1b]52;c;ZXZpbA==\x07", // OSC52 clipboard
         b"\x1b]8;;http://evil\x07link\x1b]8;;\x07",
         b"\x1b[2J",
         b"\x1b[H",
         b"\x1b[?1049h",
         b"\x1b[31mred\x1b[0m",
         b"\x1bc",
-        b"\x1bP+q\x1b\\",                     // DCS
+        b"\x1bP+q\x1b\\", // DCS
         b"\x1b_APC\x1b\\",
-        b"\x9b2J",                            // C1 CSI
-        b"\x9d0;t\x9c",                       // C1 OSC/ST
+        b"\x9b2J",      // C1 CSI
+        b"\x9d0;t\x9c", // C1 OSC/ST
         b"\r\x1b[Kfake prompt> ",
         b"\x07\x07\x07",
         b"\x08\x08\x08",
         b"\x0c",
-        b"\x1b[6n",                           // cursor report request
+        b"\x1b[6n", // cursor report request
         b"\x1b[>c",
         b"\x1b[?2004h",
-        b"\x1b[200~pasted\x1b[201~",          // fake bracketed paste
+        b"\x1b[200~pasted\x1b[201~", // fake bracketed paste
     ];
     for (i, p) in payloads.iter().enumerate() {
-        v.push(s(c, format!("bulk-{i:02}"), r3(&Frame::bulk(p)), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("bulk-{i:02}"),
+            r3(&Frame::bulk(p)),
+            Expectation::Valid,
+        ));
     }
     // also as simple string / error / verbatim
-    v.push(s(c, "simple", r3(&Frame::simple("\x1b]0;x\x07")), Expectation::Valid));
-    v.push(s(c, "error", r3(&Frame::error("ERR \x1b[2J")), Expectation::Valid));
+    v.push(s(
+        c,
+        "simple",
+        r3(&Frame::simple("\x1b]0;x\x07")),
+        Expectation::Valid,
+    ));
+    v.push(s(
+        c,
+        "error",
+        r3(&Frame::error("ERR \x1b[2J")),
+        Expectation::Valid,
+    ));
     v
 }
 
@@ -212,14 +328,40 @@ fn attributes() -> Vec<Sample> {
     let c = "attribute";
     let mut v = Vec::new();
     for n in 0..=20usize {
-        let attrs: Vec<(Frame, Frame)> = (0..n).map(|_| (Frame::simple("k"), Frame::Integer(1))).collect();
-        v.push(s(c, format!("dup-{n:02}"), r3(&Frame::Attribute { attrs, value: Box::new(Frame::simple("OK")) }), Expectation::Valid));
+        let attrs: Vec<(Frame, Frame)> = (0..n)
+            .map(|_| (Frame::simple("k"), Frame::Integer(1)))
+            .collect();
+        v.push(s(
+            c,
+            format!("dup-{n:02}"),
+            r3(&Frame::Attribute {
+                attrs,
+                value: Box::new(Frame::simple("OK")),
+            }),
+            Expectation::Valid,
+        ));
     }
     // attribute wrapping attribute
-    let inner = Frame::Attribute { attrs: vec![(Frame::simple("a"), Frame::Integer(1))], value: Box::new(Frame::Integer(7)) };
-    v.push(s(c, "nested", r3(&Frame::Attribute { attrs: vec![], value: Box::new(inner) }), Expectation::Valid));
+    let inner = Frame::Attribute {
+        attrs: vec![(Frame::simple("a"), Frame::Integer(1))],
+        value: Box::new(Frame::Integer(7)),
+    };
+    v.push(s(
+        c,
+        "nested",
+        r3(&Frame::Attribute {
+            attrs: vec![],
+            value: Box::new(inner),
+        }),
+        Expectation::Valid,
+    ));
     // attribute with no value following (truncated)
-    v.push(s(c, "no-value", b"|1\r\n+k\r\n:1\r\n".to_vec(), Expectation::Incomplete));
+    v.push(s(
+        c,
+        "no-value",
+        b"|1\r\n+k\r\n:1\r\n".to_vec(),
+        Expectation::Incomplete,
+    ));
     v
 }
 
@@ -229,21 +371,73 @@ fn overlong_number() -> Vec<Sample> {
     let mut v = Vec::new();
     let ints = ["9223372036854775807", "-9223372036854775808"];
     for (i, n) in ints.iter().enumerate() {
-        v.push(s(c, format!("int-edge-{i}"), format!(":{n}\r\n").into_bytes(), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("int-edge-{i}"),
+            format!(":{n}\r\n").into_bytes(),
+            Expectation::Valid,
+        ));
     }
-    let bad_ints = ["9223372036854775808", "-9223372036854775809", "1e3", "0x1", "١٢٣", "1_000", "+1", "--1", "1-", ""];
+    let bad_ints = [
+        "9223372036854775808",
+        "-9223372036854775809",
+        "1e3",
+        "0x1",
+        "١٢٣",
+        "1_000",
+        "+1",
+        "--1",
+        "1-",
+        "",
+    ];
     for (i, n) in bad_ints.iter().enumerate() {
-        v.push(s(c, format!("int-bad-{i}"), format!(":{n}\r\n").into_bytes(), Expectation::ProtocolError));
+        v.push(s(
+            c,
+            format!("int-bad-{i}"),
+            format!(":{n}\r\n").into_bytes(),
+            Expectation::ProtocolError,
+        ));
     }
-    let doubles = ["1.2300", "-0", "0", "1e3", "1E-3", "inf", "-inf", "nan", "3.14159265358979323846264338327950288", "9007199254740993"];
+    let doubles = [
+        "1.2300",
+        "-0",
+        "0",
+        "1e3",
+        "1E-3",
+        "inf",
+        "-inf",
+        "nan",
+        "3.14159265358979323846264338327950288",
+        "9007199254740993",
+    ];
     for (i, d) in doubles.iter().enumerate() {
-        v.push(s(c, format!("double-{i}"), format!(",{d}\r\n").into_bytes(), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("double-{i}"),
+            format!(",{d}\r\n").into_bytes(),
+            Expectation::Valid,
+        ));
     }
     for (i, d) in ["", "abc", "1..2", "--1", "1e", "0x10"].iter().enumerate() {
-        v.push(s(c, format!("double-bad-{i}"), format!(",{d}\r\n").into_bytes(), Expectation::ProtocolError));
+        v.push(s(
+            c,
+            format!("double-bad-{i}"),
+            format!(",{d}\r\n").into_bytes(),
+            Expectation::ProtocolError,
+        ));
     }
-    v.push(s(c, "bignum-huge", format!("({}\r\n", "9".repeat(4096)).into_bytes(), Expectation::Valid));
-    v.push(s(c, "bignum-bad", b"(12a\r\n".to_vec(), Expectation::ProtocolError));
+    v.push(s(
+        c,
+        "bignum-huge",
+        format!("({}\r\n", "9".repeat(4096)).into_bytes(),
+        Expectation::Valid,
+    ));
+    v.push(s(
+        c,
+        "bignum-bad",
+        b"(12a\r\n".to_vec(),
+        Expectation::ProtocolError,
+    ));
     v
 }
 
@@ -257,10 +451,20 @@ fn binary_nul() -> Vec<Sample> {
             *b = u8::try_from((i * 13 + j * 7) % 256).unwrap_or(0);
         }
         body.push(0);
-        v.push(s(c, format!("mixed-{i:02}"), r3(&Frame::bulk(&body)), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("mixed-{i:02}"),
+            r3(&Frame::bulk(&body)),
+            Expectation::Valid,
+        ));
     }
     let all: Vec<u8> = (0..=255u8).collect();
-    v.push(s(c, "all-bytes", r3(&Frame::bulk(&all)), Expectation::Valid));
+    v.push(s(
+        c,
+        "all-bytes",
+        r3(&Frame::bulk(&all)),
+        Expectation::Valid,
+    ));
     v.push(s(c, "empty", r3(&Frame::bulk(b"")), Expectation::Valid));
     v
 }
@@ -270,19 +474,65 @@ fn streamed() -> Vec<Sample> {
     let c = "streamed";
     let mut v = Vec::new();
     for n in 0..=12usize {
-        let chunks: Vec<Bytes> = (0..n).map(|i| Bytes::from(vec![b'a' + u8::try_from(i % 26).unwrap_or(0); i + 1])).collect();
-        v.push(s(c, format!("bulk-{n:02}chunks"), r3(&Frame::StreamedBulk(chunks)), Expectation::Valid));
+        let chunks: Vec<Bytes> = (0..n)
+            .map(|i| Bytes::from(vec![b'a' + u8::try_from(i % 26).unwrap_or(0); i + 1]))
+            .collect();
+        v.push(s(
+            c,
+            format!("bulk-{n:02}chunks"),
+            r3(&Frame::StreamedBulk(chunks)),
+            Expectation::Valid,
+        ));
     }
     for n in [0i64, 1, 2, 5, 50] {
-        v.push(s(c, format!("array-{n}"), r3(&Frame::StreamedArray((0..n).map(Frame::Integer).collect())), Expectation::Valid));
-        v.push(s(c, format!("map-{n}"), r3(&Frame::StreamedMap((0..n).map(|i| (Frame::simple("k"), Frame::Integer(i))).collect())), Expectation::Valid));
-        v.push(s(c, format!("set-{n}"), r3(&Frame::StreamedSet((0..n).map(Frame::Integer).collect())), Expectation::Valid));
+        v.push(s(
+            c,
+            format!("array-{n}"),
+            r3(&Frame::StreamedArray((0..n).map(Frame::Integer).collect())),
+            Expectation::Valid,
+        ));
+        v.push(s(
+            c,
+            format!("map-{n}"),
+            r3(&Frame::StreamedMap(
+                (0..n)
+                    .map(|i| (Frame::simple("k"), Frame::Integer(i)))
+                    .collect(),
+            )),
+            Expectation::Valid,
+        ));
+        v.push(s(
+            c,
+            format!("set-{n}"),
+            r3(&Frame::StreamedSet((0..n).map(Frame::Integer).collect())),
+            Expectation::Valid,
+        ));
     }
     // malformed streamed
-    v.push(s(c, "bulk-no-terminator", b"$?\r\n;3\r\nabc\r\n".to_vec(), Expectation::Incomplete));
-    v.push(s(c, "bulk-bad-chunk-len", b"$?\r\n;x\r\n".to_vec(), Expectation::ProtocolError));
-    v.push(s(c, "array-no-terminator", b"*?\r\n:1\r\n".to_vec(), Expectation::Incomplete));
-    v.push(s(c, "bad-terminator", b"*?\r\n:1\r\n,\r\n".to_vec(), Expectation::ProtocolError));
+    v.push(s(
+        c,
+        "bulk-no-terminator",
+        b"$?\r\n;3\r\nabc\r\n".to_vec(),
+        Expectation::Incomplete,
+    ));
+    v.push(s(
+        c,
+        "bulk-bad-chunk-len",
+        b"$?\r\n;x\r\n".to_vec(),
+        Expectation::ProtocolError,
+    ));
+    v.push(s(
+        c,
+        "array-no-terminator",
+        b"*?\r\n:1\r\n".to_vec(),
+        Expectation::Incomplete,
+    ));
+    v.push(s(
+        c,
+        "bad-terminator",
+        b"*?\r\n:1\r\n,\r\n".to_vec(),
+        Expectation::ProtocolError,
+    ));
     v
 }
 
@@ -294,15 +544,27 @@ fn push() -> Vec<Sample> {
     for n in 0..=20usize {
         let mut b = Vec::new();
         for i in 0..n {
-            b.extend_from_slice(&r3(&Frame::Push(vec![Frame::simple("message"), Frame::bulk(b"ch"), Frame::bulk(format!("m{i}").as_bytes())])));
+            b.extend_from_slice(&r3(&Frame::Push(vec![
+                Frame::simple("message"),
+                Frame::bulk(b"ch"),
+                Frame::bulk(format!("m{i}").as_bytes()),
+            ])));
         }
         b.extend_from_slice(&reply);
         v.push(s(c, format!("before-reply-{n:02}"), b, Expectation::Valid));
     }
     let mut after = reply.clone();
-    after.extend_from_slice(&r3(&Frame::Push(vec![Frame::simple("invalidate"), Frame::Array(vec![Frame::bulk(b"k")])])));
+    after.extend_from_slice(&r3(&Frame::Push(vec![
+        Frame::simple("invalidate"),
+        Frame::Array(vec![Frame::bulk(b"k")]),
+    ])));
     v.push(s(c, "after-reply", after, Expectation::Valid));
-    v.push(s(c, "push-nested-in-array", b"*1\r\n>1\r\n+x\r\n".to_vec(), Expectation::ProtocolError));
+    v.push(s(
+        c,
+        "push-nested-in-array",
+        b"*1\r\n>1\r\n+x\r\n".to_vec(),
+        Expectation::ProtocolError,
+    ));
     v
 }
 
@@ -356,7 +618,12 @@ mod tests {
     fn names_are_unique_within_category() {
         let mut seen = std::collections::HashSet::new();
         for smp in corpus() {
-            assert!(seen.insert((smp.category, smp.name.clone())), "dup {}/{}", smp.category, smp.name);
+            assert!(
+                seen.insert((smp.category, smp.name.clone())),
+                "dup {}/{}",
+                smp.category,
+                smp.name
+            );
         }
     }
 

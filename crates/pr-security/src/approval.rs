@@ -153,7 +153,11 @@ impl ApprovalToken {
     ///
     /// # Errors
     /// Returns the specific [`ApprovalRefusal`]; the caller maps it to exit code 5.
-    pub fn authorise(&self, req: &CommandRequest, ctx: &ExecutionContext) -> Result<(), ApprovalRefusal> {
+    pub fn authorise(
+        &self,
+        req: &CommandRequest,
+        ctx: &ExecutionContext,
+    ) -> Result<(), ApprovalRefusal> {
         if self.profile_uuid != ctx.profile_uuid {
             return Err(ApprovalRefusal::ProfileMismatch);
         }
@@ -196,15 +200,27 @@ mod tests {
 
     fn ident() -> TrustIdentity {
         TrustIdentity {
-            endpoint: Endpoint::Tcp { host: "h".into(), port: 6379 },
+            endpoint: Endpoint::Tcp {
+                host: "h".into(),
+                port: 6379,
+            },
             tls_identity: TlsIdentity::None,
-            server_identity: ServerIdentity::Standalone { run_id_prefix: None },
-            auth_identity: AuthIdentity { username: None, secret_ref: "credential:1".into() },
+            server_identity: ServerIdentity::Standalone {
+                run_id_prefix: None,
+            },
+            auth_identity: AuthIdentity {
+                username: None,
+                secret_ref: "credential:1".into(),
+            },
         }
     }
 
     fn req(args: &[&[u8]], effects: Effects) -> CommandRequest {
-        CommandRequest::new(args.iter().map(|a| Bytes::copy_from_slice(a)).collect(), RequestOrigin::User, effects)
+        CommandRequest::new(
+            args.iter().map(|a| Bytes::copy_from_slice(a)).collect(),
+            RequestOrigin::User,
+            effects,
+        )
     }
 
     fn ctx(id: &TrustIdentity) -> ExecutionContext<'_> {
@@ -235,10 +251,16 @@ mod tests {
         let id = ident();
         let approved = req(&[b"SET", b"a b"], Effects::write());
         let substituted = req(&[b"SET", b"a", b"b"], Effects::write());
-        assert_eq!(approved.display().as_display(), substituted.display().as_display());
+        assert_eq!(
+            approved.display().as_display(),
+            substituted.display().as_display()
+        );
         let t = token(&id, &approved);
         assert_eq!(t.authorise(&approved, &ctx(&id)), Ok(()));
-        assert_eq!(t.authorise(&substituted, &ctx(&id)), Err(ApprovalRefusal::RequestMismatch));
+        assert_eq!(
+            t.authorise(&substituted, &ctx(&id)),
+            Err(ApprovalRefusal::RequestMismatch)
+        );
     }
 
     #[test]
@@ -246,7 +268,10 @@ mod tests {
         let id = ident();
         let a = req(&[b"DEL", b"player:10001"], Effects::write());
         let b = req(&[b"DEL", b"player:10002"], Effects::write());
-        assert_eq!(token(&id, &a).authorise(&b, &ctx(&id)), Err(ApprovalRefusal::RequestMismatch));
+        assert_eq!(
+            token(&id, &a).authorise(&b, &ctx(&id)),
+            Err(ApprovalRefusal::RequestMismatch)
+        );
     }
 
     #[test]
@@ -255,7 +280,10 @@ mod tests {
         let id = ident();
         let composed = req(&[b"GET", "caf\u{e9}".as_bytes()], Effects::read());
         let decomposed = req(&[b"GET", "cafe\u{301}".as_bytes()], Effects::read());
-        assert_eq!(token(&id, &composed).authorise(&decomposed, &ctx(&id)), Err(ApprovalRefusal::RequestMismatch));
+        assert_eq!(
+            token(&id, &composed).authorise(&decomposed, &ctx(&id)),
+            Err(ApprovalRefusal::RequestMismatch)
+        );
     }
 
     #[test]
@@ -281,7 +309,10 @@ mod tests {
         assert_eq!(t.authorise(&r, &c), Err(ApprovalRefusal::Expired));
         let mut c2 = ctx(&id);
         c2.actions_used = 1;
-        assert_eq!(t.authorise(&r, &c2), Err(ApprovalRefusal::ActionBudgetExhausted));
+        assert_eq!(
+            t.authorise(&r, &c2),
+            Err(ApprovalRefusal::ActionBudgetExhausted)
+        );
     }
 
     #[test]
@@ -301,7 +332,10 @@ mod tests {
         let mut other = ident();
         other.auth_identity.secret_ref = "credential:2".into();
         let c3 = ctx(&other);
-        assert_eq!(t.authorise(&r, &c3), Err(ApprovalRefusal::TrustIdentityMismatch));
+        assert_eq!(
+            t.authorise(&r, &c3),
+            Err(ApprovalRefusal::TrustIdentityMismatch)
+        );
     }
 
     #[test]
@@ -309,33 +343,80 @@ mod tests {
         // R12: pre-approved policy covers read-only work only.
         let id = ident();
         let w = req(&[b"SET", b"k", b"v"], Effects::write());
-        let t = ApprovalToken::for_request("p1", &id, 0, Epochs::default(), &w, 10_000, Issuer::Policy { id: "ro".into() });
-        assert_eq!(t.authorise(&w, &ctx(&id)), Err(ApprovalRefusal::PolicyCannotAuthorise));
+        let t = ApprovalToken::for_request(
+            "p1",
+            &id,
+            0,
+            Epochs::default(),
+            &w,
+            10_000,
+            Issuer::Policy { id: "ro".into() },
+        );
+        assert_eq!(
+            t.authorise(&w, &ctx(&id)),
+            Err(ApprovalRefusal::PolicyCannotAuthorise)
+        );
 
         let r = req(&[b"GET", b"k"], Effects::read());
-        let t2 = ApprovalToken::for_request("p1", &id, 0, Epochs::default(), &r, 10_000, Issuer::Policy { id: "ro".into() });
+        let t2 = ApprovalToken::for_request(
+            "p1",
+            &id,
+            0,
+            Epochs::default(),
+            &r,
+            10_000,
+            Issuer::Policy { id: "ro".into() },
+        );
         assert_eq!(t2.authorise(&r, &ctx(&id)), Ok(()));
 
         let mut agent_read = r.clone();
         agent_read.origin = RequestOrigin::Agent;
-        let t3 = ApprovalToken::for_request("p1", &id, 0, Epochs::default(), &agent_read, 10_000, Issuer::Policy { id: "ro".into() });
-        assert_eq!(t3.authorise(&agent_read, &ctx(&id)), Err(ApprovalRefusal::PolicyCannotAuthorise));
+        let t3 = ApprovalToken::for_request(
+            "p1",
+            &id,
+            0,
+            Epochs::default(),
+            &agent_read,
+            10_000,
+            Issuer::Policy { id: "ro".into() },
+        );
+        assert_eq!(
+            t3.authorise(&agent_read, &ctx(&id)),
+            Err(ApprovalRefusal::PolicyCannotAuthorise)
+        );
     }
 
     #[test]
     fn unknown_effects_count_as_mutating_for_policy_tokens() {
         let id = ident();
         let u = req(&[b"NEWCMD", b"x"], Effects::unknown());
-        let t = ApprovalToken::for_request("p1", &id, 0, Epochs::default(), &u, 10_000, Issuer::Policy { id: "ro".into() });
-        assert_eq!(t.authorise(&u, &ctx(&id)), Err(ApprovalRefusal::PolicyCannotAuthorise));
+        let t = ApprovalToken::for_request(
+            "p1",
+            &id,
+            0,
+            Epochs::default(),
+            &u,
+            10_000,
+            Issuer::Policy { id: "ro".into() },
+        );
+        assert_eq!(
+            t.authorise(&u, &ctx(&id)),
+            Err(ApprovalRefusal::PolicyCannotAuthorise)
+        );
     }
 
     #[test]
     fn plan_hash_is_order_sensitive_and_boundary_sensitive() {
         let a = req(&[b"SET", b"k", b"1"], Effects::write());
         let b = req(&[b"SET", b"k", b"2"], Effects::write());
-        assert_ne!(plan_hash(&[a.clone(), b.clone()]), plan_hash(&[b.clone(), a.clone()]));
-        assert_ne!(plan_hash(std::slice::from_ref(&a)), plan_hash(&[a.clone(), a.clone()]));
+        assert_ne!(
+            plan_hash(&[a.clone(), b.clone()]),
+            plan_hash(&[b.clone(), a.clone()])
+        );
+        assert_ne!(
+            plan_hash(std::slice::from_ref(&a)),
+            plan_hash(&[a.clone(), a.clone()])
+        );
         assert_eq!(plan_hash(&[a.clone(), b.clone()]), plan_hash(&[a, b]));
     }
 }

@@ -86,7 +86,11 @@ impl SafeText {
                 }
             }
         }
-        Self { escaped, raw, escaped_any }
+        Self {
+            escaped,
+            raw,
+            escaped_any,
+        }
     }
 
     /// Build from a `&str` (still escaped — a Rust string can hold `\u{1b}`).
@@ -101,7 +105,11 @@ impl SafeText {
     pub fn trusted(s: impl Into<String>) -> Self {
         let s = s.into();
         let raw = Bytes::copy_from_slice(s.as_bytes());
-        Self { escaped: s, raw, escaped_any: false }
+        Self {
+            escaped: s,
+            raw,
+            escaped_any: false,
+        }
     }
 
     fn push_str_escaped(out: &mut String, s: &str) -> bool {
@@ -172,7 +180,9 @@ mod tests {
     use super::*;
 
     fn d(b: &[u8]) -> String {
-        SafeText::from_bytes(Bytes::copy_from_slice(b)).as_display().to_owned()
+        SafeText::from_bytes(Bytes::copy_from_slice(b))
+            .as_display()
+            .to_owned()
     }
 
     #[test]
@@ -237,7 +247,10 @@ mod tests {
             let t = SafeText::from_bytes(Bytes::copy_from_slice(&[0x1b, b]));
             let s = t.as_display();
             assert!(!s.contains('\x1b'), "byte {b:#04x} leaked ESC");
-            assert!(!s.chars().any(is_dangerous_char), "byte {b:#04x} leaked a dangerous char");
+            assert!(
+                !s.chars().any(is_dangerous_char),
+                "byte {b:#04x} leaked a dangerous char"
+            );
         }
     }
 

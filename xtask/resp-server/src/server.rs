@@ -69,7 +69,11 @@ impl SyntheticServer {
     }
 }
 
-async fn read_one_command(stream: &mut TcpStream, buf: &mut Vec<u8>, step_idx: usize) -> Result<Vec<Vec<u8>>, ServeError> {
+async fn read_one_command(
+    stream: &mut TcpStream,
+    buf: &mut Vec<u8>,
+    step_idx: usize,
+) -> Result<Vec<Vec<u8>>, ServeError> {
     loop {
         match parse_command(buf) {
             Ok((cmd, used)) => {
@@ -89,7 +93,13 @@ async fn read_one_command(stream: &mut TcpStream, buf: &mut Vec<u8>, step_idx: u
     }
 }
 
-async fn play(mut stream: TcpStream, proto: Proto, script: &Script) -> Result<Vec<Vec<Vec<u8>>>, ServeError> {
+// One arm per Step; splitting it would only move the match elsewhere.
+#[allow(clippy::too_many_lines)]
+async fn play(
+    mut stream: TcpStream,
+    proto: Proto,
+    script: &Script,
+) -> Result<Vec<Vec<Vec<u8>>>, ServeError> {
     stream.set_nodelay(true)?;
     let mut inbuf: Vec<u8> = Vec::new();
     let mut received = Vec::new();
@@ -98,7 +108,10 @@ async fn play(mut stream: TcpStream, proto: Proto, script: &Script) -> Result<Ve
             Step::Expect(expected) => {
                 let got = read_one_command(&mut stream, &mut inbuf, i).await?;
                 if !expected.is_empty() && &got != expected {
-                    return Err(ServeError::Mismatch { expected: expected.clone(), got });
+                    return Err(ServeError::Mismatch {
+                        expected: expected.clone(),
+                        got,
+                    });
                 }
                 received.push(got);
             }
@@ -111,7 +124,11 @@ async fn play(mut stream: TcpStream, proto: Proto, script: &Script) -> Result<Ve
                 stream.write_all(&bytes).await?;
             }
             Step::SendRaw(b) => stream.write_all(b).await?,
-            Step::SendChunked { bytes, chunk, delay_ms } => {
+            Step::SendChunked {
+                bytes,
+                chunk,
+                delay_ms,
+            } => {
                 let chunk = (*chunk).max(1);
                 for piece in bytes.chunks(chunk) {
                     stream.write_all(piece).await?;
@@ -121,7 +138,11 @@ async fn play(mut stream: TcpStream, proto: Proto, script: &Script) -> Result<Ve
                     }
                 }
             }
-            Step::SplitAt { bytes, at, delay_ms } => {
+            Step::SplitAt {
+                bytes,
+                at,
+                delay_ms,
+            } => {
                 let mut prev = 0usize;
                 for &cut in at {
                     let cut = cut.min(bytes.len());
@@ -152,7 +173,9 @@ async fn play(mut stream: TcpStream, proto: Proto, script: &Script) -> Result<Ve
                 stream.write_all(b"\r\n").await?;
             }
             Step::TruncatedBulk { declared, actual } => {
-                stream.write_all(format!("${declared}\r\n").as_bytes()).await?;
+                stream
+                    .write_all(format!("${declared}\r\n").as_bytes())
+                    .await?;
                 let block = vec![b'x'; *actual];
                 stream.write_all(&block).await?;
                 stream.shutdown().await?;
@@ -221,7 +244,10 @@ mod tests {
         let script = Script::new().then(Step::Expect(vec![b"PING".to_vec()]));
         let server = tokio::spawn(async move { srv.run_once(&script).await });
         let _ = client_roundtrip(addr, b"*1\r\n$4\r\nQUIT\r\n", 0).await;
-        assert!(matches!(server.await.unwrap(), Err(ServeError::Mismatch { .. })));
+        assert!(matches!(
+            server.await.unwrap(),
+            Err(ServeError::Mismatch { .. })
+        ));
     }
 
     #[tokio::test]
@@ -229,9 +255,11 @@ mod tests {
         let srv = SyntheticServer::bind(Proto::Resp3).await.unwrap();
         let addr = srv.addr().unwrap();
         let payload = b"$5\r\nh\xc3\xa9llo\r\n".to_vec(); // split inside the UTF-8 sequence
-        let script = Script::new()
-            .then(Step::ReadCommand)
-            .then(Step::SplitAt { bytes: payload.clone(), at: vec![5, 6], delay_ms: 1 });
+        let script = Script::new().then(Step::ReadCommand).then(Step::SplitAt {
+            bytes: payload.clone(),
+            at: vec![5, 6],
+            delay_ms: 1,
+        });
         let server = tokio::spawn(async move { srv.run_once(&script).await });
         let got = client_roundtrip(addr, b"PING\r\n", payload.len()).await;
         assert_eq!(got, payload);
@@ -245,7 +273,11 @@ mod tests {
         let len = 100_003u64;
         let script = Script::new()
             .then(Step::ReadCommand)
-            .then(Step::BlobStream { len, chunk: 4096, fill: b'z' });
+            .then(Step::BlobStream {
+                len,
+                chunk: 4096,
+                fill: b'z',
+            });
         let server = tokio::spawn(async move { srv.run_once(&script).await });
         let header = format!("${len}\r\n");
         let len_usize = usize::try_from(len).unwrap();
@@ -254,7 +286,11 @@ mod tests {
         assert_eq!(got.len(), total);
         assert!(got.starts_with(header.as_bytes()));
         assert!(got.ends_with(b"\r\n"));
-        assert!(got[header.len()..header.len() + len_usize].iter().all(|b| *b == b'z'));
+        assert!(
+            got[header.len()..header.len() + len_usize]
+                .iter()
+                .all(|b| *b == b'z')
+        );
         server.await.unwrap().unwrap();
     }
 
@@ -264,7 +300,10 @@ mod tests {
         let addr = srv.addr().unwrap();
         let script = Script::new()
             .then(Step::ReadCommand)
-            .then(Step::TruncatedBulk { declared: 1_000_000, actual: 10 });
+            .then(Step::TruncatedBulk {
+                declared: 1_000_000,
+                actual: 10,
+            });
         let server = tokio::spawn(async move { srv.run_once(&script).await });
         let got = client_roundtrip(addr, b"PING\r\n", usize::MAX).await;
         assert_eq!(got, b"$1000000\r\nxxxxxxxxxx".to_vec());

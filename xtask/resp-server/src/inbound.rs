@@ -21,7 +21,10 @@ pub enum InboundError {
 }
 
 fn find_crlf(buf: &[u8], from: usize) -> Option<usize> {
-    buf[from..].windows(2).position(|w| w == b"\r\n").map(|p| from + p)
+    buf[from..]
+        .windows(2)
+        .position(|w| w == b"\r\n")
+        .map(|p| from + p)
 }
 
 fn parse_len(buf: &[u8], from: usize) -> Result<(i64, usize), InboundError> {
@@ -86,18 +89,33 @@ mod tests {
     #[test]
     fn parses_multibulk_and_inline() {
         let (c, n) = parse_command(b"*2\r\n$3\r\nGET\r\n$1\r\nk\r\nleft").unwrap();
-        assert_eq!(c.0, vec![Bytes::from_static(b"GET"), Bytes::from_static(b"k")]);
+        assert_eq!(
+            c.0,
+            vec![Bytes::from_static(b"GET"), Bytes::from_static(b"k")]
+        );
         assert_eq!(n, 20); // *2\r\n(4) + $3\r\nGET\r\n(9) + $1\r\nk\r\n(7)
         let (c, _) = parse_command(b"PING  x\r\n").unwrap();
-        assert_eq!(c.0, vec![Bytes::from_static(b"PING"), Bytes::from_static(b"x")]);
+        assert_eq!(
+            c.0,
+            vec![Bytes::from_static(b"PING"), Bytes::from_static(b"x")]
+        );
     }
 
     #[test]
     fn incomplete_and_malformed() {
-        assert_eq!(parse_command(b"*2\r\n$3\r\nGE").unwrap_err(), InboundError::Incomplete);
-        assert_eq!(parse_command(b"*1\r\n:1\r\n").unwrap_err(), InboundError::Malformed(4));
+        assert_eq!(
+            parse_command(b"*2\r\n$3\r\nGE").unwrap_err(),
+            InboundError::Incomplete
+        );
+        assert_eq!(
+            parse_command(b"*1\r\n:1\r\n").unwrap_err(),
+            InboundError::Malformed(4)
+        );
         // declared len 1 but body is "ab": terminator check fails at data_end = 9
-        assert_eq!(parse_command(b"*1\r\n$1\r\nab\r\n").unwrap_err(), InboundError::Malformed(9));
+        assert_eq!(
+            parse_command(b"*1\r\n$1\r\nab\r\n").unwrap_err(),
+            InboundError::Malformed(9)
+        );
     }
 
     #[test]

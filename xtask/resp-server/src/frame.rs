@@ -130,11 +130,17 @@ impl Frame {
     #[must_use]
     pub fn depth(&self) -> usize {
         match self {
-            Self::Array(v) | Self::Set(v) | Self::Push(v) | Self::StreamedArray(v) | Self::StreamedSet(v) => {
-                1 + v.iter().map(Self::depth).max().unwrap_or(0)
-            }
+            Self::Array(v)
+            | Self::Set(v)
+            | Self::Push(v)
+            | Self::StreamedArray(v)
+            | Self::StreamedSet(v) => 1 + v.iter().map(Self::depth).max().unwrap_or(0),
             Self::Map(kv) | Self::StreamedMap(kv) => {
-                1 + kv.iter().map(|(k, v)| k.depth().max(v.depth())).max().unwrap_or(0)
+                1 + kv
+                    .iter()
+                    .map(|(k, v)| k.depth().max(v.depth()))
+                    .max()
+                    .unwrap_or(0)
             }
             Self::Attribute { attrs, value } => {
                 1 + attrs

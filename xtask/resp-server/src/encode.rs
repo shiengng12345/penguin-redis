@@ -129,7 +129,11 @@ fn encode_streamed(f: &Frame, proto: Proto, out: &mut Vec<u8>) -> Result<(), Enc
             out.extend_from_slice(b";0\r\n");
         }
         Frame::StreamedArray(v) | Frame::StreamedSet(v) => {
-            out.extend_from_slice(if matches!(f, Frame::StreamedArray(_)) { b"*?\r\n" } else { b"~?\r\n" });
+            out.extend_from_slice(if matches!(f, Frame::StreamedArray(_)) {
+                b"*?\r\n"
+            } else {
+                b"~?\r\n"
+            });
             for x in v {
                 encode(x, proto, out)?;
             }
@@ -185,7 +189,11 @@ pub fn encode(f: &Frame, proto: Proto, out: &mut Vec<u8>) -> Result<(), EncodeEr
             }
         },
         Frame::Set(v) => {
-            put_len(out, if proto == Proto::Resp3 { b'~' } else { b'*' }, v.len());
+            put_len(
+                out,
+                if proto == Proto::Resp3 { b'~' } else { b'*' },
+                v.len(),
+            );
             for x in v {
                 encode(x, proto, out)?;
             }
@@ -219,14 +227,20 @@ pub fn encode(f: &Frame, proto: Proto, out: &mut Vec<u8>) -> Result<(), EncodeEr
         // RESP2 pub/sub fixtures could not be produced at all.
         Frame::Push(v) => match proto {
             Proto::Resp3 | Proto::Resp2 => {
-                put_len(out, if proto == Proto::Resp3 { b'>' } else { b'*' }, v.len());
+                put_len(
+                    out,
+                    if proto == Proto::Resp3 { b'>' } else { b'*' },
+                    v.len(),
+                );
                 for x in v {
                     encode(x, proto, out)?;
                 }
             }
-            Proto::Resp2 => return Err(EncodeError::NoResp2Form("push")),
         },
-        Frame::StreamedBulk(_) | Frame::StreamedArray(_) | Frame::StreamedSet(_) | Frame::StreamedMap(_) => {
+        Frame::StreamedBulk(_)
+        | Frame::StreamedArray(_)
+        | Frame::StreamedSet(_)
+        | Frame::StreamedMap(_) => {
             encode_streamed(f, proto, out)?;
         }
     }
@@ -269,17 +283,29 @@ mod tests {
         assert_eq!(r3(&Frame::double("1.2300")), b",1.2300\r\n");
         assert_eq!(r3(&Frame::double("-0")), b",-0\r\n");
         assert_eq!(r3(&Frame::double("inf")), b",inf\r\n");
-        assert_eq!(r3(&Frame::BigNumber(Bytes::from_static(b"9007199254740993"))), b"(9007199254740993\r\n");
-        assert_eq!(r3(&Frame::BulkError(Bytes::from_static(b"SYNTAX bad"))), b"!10\r\nSYNTAX bad\r\n");
         assert_eq!(
-            r3(&Frame::Verbatim { format: *b"txt", data: Bytes::from_static(b"hi") }),
+            r3(&Frame::BigNumber(Bytes::from_static(b"9007199254740993"))),
+            b"(9007199254740993\r\n"
+        );
+        assert_eq!(
+            r3(&Frame::BulkError(Bytes::from_static(b"SYNTAX bad"))),
+            b"!10\r\nSYNTAX bad\r\n"
+        );
+        assert_eq!(
+            r3(&Frame::Verbatim {
+                format: *b"txt",
+                data: Bytes::from_static(b"hi")
+            }),
             b"=6\r\ntxt:hi\r\n"
         );
     }
 
     #[test]
     fn aggregates_and_down_conversion() {
-        let m = Frame::map([(Frame::bulk(b"a"), Frame::Integer(1)), (Frame::bulk(b"a"), Frame::Integer(2))]);
+        let m = Frame::map([
+            (Frame::bulk(b"a"), Frame::Integer(1)),
+            (Frame::bulk(b"a"), Frame::Integer(2)),
+        ]);
         assert_eq!(r3(&m), b"%2\r\n$1\r\na\r\n:1\r\n$1\r\na\r\n:2\r\n");
         // duplicates preserved, flattened for RESP2
         assert_eq!(r2(&m), b"*4\r\n$1\r\na\r\n:1\r\n$1\r\na\r\n:2\r\n");
@@ -290,7 +316,10 @@ mod tests {
             value: Box::new(Frame::simple("OK")),
         };
         assert_eq!(r3(&attr), b"|1\r\n+ttl\r\n:3\r\n+OK\r\n");
-        assert_eq!(to_vec(&attr, Proto::Resp2), Err(EncodeError::NoResp2Form("attribute")));
+        assert_eq!(
+            to_vec(&attr, Proto::Resp2),
+            Err(EncodeError::NoResp2Form("attribute"))
+        );
         let push = Frame::Push(vec![Frame::simple("message")]);
         assert_eq!(r3(&push), b">1\r\n+message\r\n");
         // RESP2 subscribers receive pub/sub messages as arrays, so this down-converts.
@@ -305,7 +334,10 @@ mod tests {
         assert_eq!(r3(&a), b"*?\r\n:1\r\n:2\r\n.\r\n");
         let m = Frame::StreamedMap(vec![(Frame::simple("k"), Frame::Integer(1))]);
         assert_eq!(r3(&m), b"%?\r\n+k\r\n:1\r\n.\r\n");
-        assert_eq!(to_vec(&s, Proto::Resp2), Err(EncodeError::NoResp2Form("streamed-bulk")));
+        assert_eq!(
+            to_vec(&s, Proto::Resp2),
+            Err(EncodeError::NoResp2Form("streamed-bulk"))
+        );
     }
 
     #[test]
@@ -313,7 +345,10 @@ mod tests {
         // `;0` is the terminator; an empty chunk has no wire form. Silently skipping it would
         // be undetectable data loss, which is the one thing this server must never do.
         let s = Frame::StreamedBulk(vec![Bytes::from_static(b"a"), Bytes::new()]);
-        assert_eq!(to_vec(&s, Proto::Resp3), Err(EncodeError::UnrepresentableFrame("empty streamed chunk")));
+        assert_eq!(
+            to_vec(&s, Proto::Resp3),
+            Err(EncodeError::UnrepresentableFrame("empty streamed chunk"))
+        );
     }
 
     #[test]
@@ -326,7 +361,9 @@ mod tests {
 
     #[test]
     fn depth_counts_nesting() {
-        let f = Frame::Array(vec![Frame::Array(vec![Frame::Array(vec![Frame::Integer(1)])])]);
+        let f = Frame::Array(vec![Frame::Array(vec![Frame::Array(vec![
+            Frame::Integer(1),
+        ])])]);
         assert_eq!(f.depth(), 4);
         assert_eq!(Frame::Integer(1).depth(), 1);
     }

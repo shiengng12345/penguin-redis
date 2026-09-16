@@ -74,7 +74,9 @@ pub fn parse(p: &str) -> Result<Vec<Step>, JsonError> {
                     if start == i || i >= b.len() || b[i] != b']' {
                         return Err(JsonError::BadPath("expected [n]"));
                     }
-                    let n = p[start..i].parse::<usize>().map_err(|_| JsonError::BadPath("bad index"))?;
+                    let n = p[start..i]
+                        .parse::<usize>()
+                        .map_err(|_| JsonError::BadPath("bad index"))?;
                     i += 1;
                     steps.push(Step::Index(n));
                 }
@@ -95,7 +97,9 @@ fn parse_occurrence(p: &str, b: &[u8], i: &mut usize) -> Result<Option<u32>, Jso
         if start == *i {
             return Err(JsonError::BadPath("expected digits after '#'"));
         }
-        let n = p[start..*i].parse::<u32>().map_err(|_| JsonError::BadPath("bad occurrence"))?;
+        let n = p[start..*i]
+            .parse::<u32>()
+            .map_err(|_| JsonError::BadPath("bad occurrence"))?;
         if n == 0 {
             return Err(JsonError::BadPath("occurrence is 1-based"));
         }
@@ -146,18 +150,54 @@ mod tests {
 
     #[test]
     fn parses_the_documented_forms() {
-        assert_eq!(parse("$.a").unwrap(), vec![Step::Member { name: "a".into(), occurrence: None }]);
-        assert_eq!(parse(".a").unwrap(), vec![Step::Member { name: "a".into(), occurrence: None }]);
-        assert_eq!(parse("$.a#2").unwrap(), vec![Step::Member { name: "a".into(), occurrence: Some(2) }]);
-        assert_eq!(parse("$[\"a b\"]").unwrap(), vec![Step::Member { name: "a b".into(), occurrence: None }]);
-        assert_eq!(parse("$[\"a\"]#3").unwrap(), vec![Step::Member { name: "a".into(), occurrence: Some(3) }]);
+        assert_eq!(
+            parse("$.a").unwrap(),
+            vec![Step::Member {
+                name: "a".into(),
+                occurrence: None
+            }]
+        );
+        assert_eq!(
+            parse(".a").unwrap(),
+            vec![Step::Member {
+                name: "a".into(),
+                occurrence: None
+            }]
+        );
+        assert_eq!(
+            parse("$.a#2").unwrap(),
+            vec![Step::Member {
+                name: "a".into(),
+                occurrence: Some(2)
+            }]
+        );
+        assert_eq!(
+            parse("$[\"a b\"]").unwrap(),
+            vec![Step::Member {
+                name: "a b".into(),
+                occurrence: None
+            }]
+        );
+        assert_eq!(
+            parse("$[\"a\"]#3").unwrap(),
+            vec![Step::Member {
+                name: "a".into(),
+                occurrence: Some(3)
+            }]
+        );
         assert_eq!(parse("$[2]").unwrap(), vec![Step::Index(2)]);
         assert_eq!(
             parse("$.a[1].b#2").unwrap(),
             vec![
-                Step::Member { name: "a".into(), occurrence: None },
+                Step::Member {
+                    name: "a".into(),
+                    occurrence: None
+                },
                 Step::Index(1),
-                Step::Member { name: "b".into(), occurrence: Some(2) },
+                Step::Member {
+                    name: "b".into(),
+                    occurrence: Some(2)
+                },
             ]
         );
         assert_eq!(parse("$").unwrap(), vec![]);

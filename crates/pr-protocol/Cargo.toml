@@ -6,9 +6,14 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-protocol"
+description = "Penguin Redis — pr-protocol: incremental bounded lossless RESP2/RESP3 decoder"
 
 [lints]
 workspace = true
 
 [dependencies]
+bytes = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

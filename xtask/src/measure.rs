@@ -29,7 +29,11 @@ impl CountingAllocator {
     /// Create the counter.
     #[must_use]
     pub const fn new() -> Self {
-        Self { live: AtomicUsize::new(0), peak: AtomicUsize::new(0), allocs: AtomicU64::new(0) }
+        Self {
+            live: AtomicUsize::new(0),
+            peak: AtomicUsize::new(0),
+            allocs: AtomicU64::new(0),
+        }
     }
     /// Bytes currently allocated.
     pub fn live_bytes(&self) -> usize {
@@ -45,7 +49,8 @@ impl CountingAllocator {
     }
     /// Reset the peak and call counter to the current live value.
     pub fn reset_peak(&self) {
-        self.peak.store(self.live.load(Ordering::Relaxed), Ordering::Relaxed);
+        self.peak
+            .store(self.live.load(Ordering::Relaxed), Ordering::Relaxed);
         self.allocs.store(0, Ordering::Relaxed);
     }
 
@@ -168,7 +173,9 @@ impl Sample {
             heap_peak: to_i(self.heap_peak) - to_i(before.heap_peak),
             allocs: self.allocs.saturating_sub(before.allocs),
             rss: match (self.rss, before.rss) {
-                (Some(a), Some(b)) => Some(i64::try_from(a).unwrap_or(i64::MAX) - i64::try_from(b).unwrap_or(0)),
+                (Some(a), Some(b)) => {
+                    Some(i64::try_from(a).unwrap_or(i64::MAX) - i64::try_from(b).unwrap_or(0))
+                }
                 _ => None,
             },
         }
@@ -218,9 +225,15 @@ impl Budget {
     pub fn check(&self, d: Delta) -> BudgetCheck {
         let used = d.heap_peak.max(d.heap_live);
         if used <= self.max_heap_bytes {
-            BudgetCheck::Within { used, allowed: self.max_heap_bytes }
+            BudgetCheck::Within {
+                used,
+                allowed: self.max_heap_bytes,
+            }
         } else {
-            BudgetCheck::Exceeded { used, allowed: self.max_heap_bytes }
+            BudgetCheck::Exceeded {
+                used,
+                allowed: self.max_heap_bytes,
+            }
         }
     }
 }
@@ -230,16 +243,30 @@ pub mod budgets {
     use super::Budget;
 
     /// §12.5 / R08: assistance heap increment, 12 MiB cap (10 MiB of sub-items + 2 MiB margin).
-    pub const ASSISTANCE_HEAP: Budget =
-        Budget { name: "assistance heap increment", max_heap_bytes: 12 * 1024 * 1024 };
+    pub const ASSISTANCE_HEAP: Budget = Budget {
+        name: "assistance heap increment",
+        max_heap_bytes: 12 * 1024 * 1024,
+    };
     /// §24.3: whole result store.
-    pub const RESULT_STORE: Budget = Budget { name: "result store", max_heap_bytes: 64 * 1024 * 1024 };
+    pub const RESULT_STORE: Budget = Budget {
+        name: "result store",
+        max_heap_bytes: 64 * 1024 * 1024,
+    };
     /// §24.3: one retained result.
-    pub const SINGLE_RESULT: Budget = Budget { name: "single retained result", max_heap_bytes: 16 * 1024 * 1024 };
+    pub const SINGLE_RESULT: Budget = Budget {
+        name: "single retained result",
+        max_heap_bytes: 16 * 1024 * 1024,
+    };
     /// §24.6: idle REPL RSS target.
-    pub const IDLE_REPL_RSS: Budget = Budget { name: "idle REPL RSS", max_heap_bytes: 30 * 1024 * 1024 };
+    pub const IDLE_REPL_RSS: Budget = Budget {
+        name: "idle REPL RSS",
+        max_heap_bytes: 30 * 1024 * 1024,
+    };
     /// §24.6: idle TUI RSS target.
-    pub const IDLE_TUI_RSS: Budget = Budget { name: "idle TUI RSS", max_heap_bytes: 60 * 1024 * 1024 };
+    pub const IDLE_TUI_RSS: Budget = Budget {
+        name: "idle TUI RSS",
+        max_heap_bytes: 60 * 1024 * 1024,
+    };
 }
 
 #[cfg(test)]
@@ -257,7 +284,11 @@ mod tests {
         assert_eq!(a.alloc_count(), 2);
         a.record_free(1000);
         assert_eq!(a.live_bytes(), base + 500);
-        assert_eq!(a.peak_bytes(), base + 1500, "peak is a high-water mark, not the live value");
+        assert_eq!(
+            a.peak_bytes(),
+            base + 1500,
+            "peak is a high-water mark, not the live value"
+        );
     }
 
     #[test]
@@ -278,26 +309,57 @@ mod tests {
         a.record_alloc(2_048);
         let after = Sample::take(&a);
         let d = after.since(before);
-        assert_eq!(d.heap_live, 2_048, "must measure the increment, not the total");
+        assert_eq!(
+            d.heap_live, 2_048,
+            "must measure the increment, not the total"
+        );
         assert_eq!(d.allocs, 1);
     }
 
     #[test]
     fn budget_check_reports_both_numbers() {
-        let d = Delta { heap_live: 5_000, heap_peak: 9_000, allocs: 3, rss: None };
-        let b = Budget { name: "t", max_heap_bytes: 10_000 };
-        assert_eq!(b.check(d), BudgetCheck::Within { used: 9_000, allowed: 10_000 });
+        let d = Delta {
+            heap_live: 5_000,
+            heap_peak: 9_000,
+            allocs: 3,
+            rss: None,
+        };
+        let b = Budget {
+            name: "t",
+            max_heap_bytes: 10_000,
+        };
+        assert_eq!(
+            b.check(d),
+            BudgetCheck::Within {
+                used: 9_000,
+                allowed: 10_000
+            }
+        );
         assert!(b.check(d).ok());
 
-        let small = Budget { name: "t", max_heap_bytes: 8_000 };
-        assert_eq!(small.check(d), BudgetCheck::Exceeded { used: 9_000, allowed: 8_000 });
+        let small = Budget {
+            name: "t",
+            max_heap_bytes: 8_000,
+        };
+        assert_eq!(
+            small.check(d),
+            BudgetCheck::Exceeded {
+                used: 9_000,
+                allowed: 8_000
+            }
+        );
         assert!(!small.check(d).ok());
     }
 
     #[test]
     fn budget_uses_peak_not_live() {
         // A module that allocates 50 MiB and frees it still cost 50 MiB of peak.
-        let d = Delta { heap_live: 0, heap_peak: 50 * 1024 * 1024, allocs: 1, rss: None };
+        let d = Delta {
+            heap_live: 0,
+            heap_peak: 50 * 1024 * 1024,
+            allocs: 1,
+            rss: None,
+        };
         assert!(!budgets::ASSISTANCE_HEAP.check(d).ok());
     }
 
@@ -316,10 +378,10 @@ mod tests {
         match rss_bytes() {
             Some(v) => assert!(v > 0, "RSS must be positive if reported"),
             None => {
-                assert!(
-                    !cfg!(any(target_os = "linux", target_os = "macos")),
-                    "linux/macos must be able to report RSS"
-                );
+                // On linux/macos this arm means the platform source failed, which is a real
+                // failure of the instrument rather than an acceptable outcome.
+                #[cfg(any(target_os = "linux", target_os = "macos"))]
+                panic!("linux/macos must be able to report RSS");
             }
         }
     }

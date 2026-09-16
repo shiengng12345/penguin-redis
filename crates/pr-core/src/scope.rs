@@ -75,7 +75,9 @@ impl TaskScope {
     /// Observation handle for counters.
     #[must_use]
     pub fn handle(&self) -> TaskScopeHandle {
-        TaskScopeHandle { live: Arc::clone(&self.live) }
+        TaskScopeHandle {
+            live: Arc::clone(&self.live),
+        }
     }
 
     /// A child token, so a task can observe cancellation cooperatively.
@@ -205,7 +207,10 @@ mod tests {
                 tokio::time::sleep(Duration::from_millis(10)).await;
             }
         });
-        assert!(scope.shutdown(1000).await, "sleeping tasks cancel at their await points");
+        assert!(
+            scope.shutdown(1000).await,
+            "sleeping tasks cancel at their await points"
+        );
         assert_eq!(h.live(), 0);
     }
 
@@ -223,7 +228,11 @@ mod tests {
         let drained = scope.shutdown(50).await;
         assert!(!drained, "must not claim a clean drain it did not achieve");
         tokio::time::sleep(Duration::from_millis(600)).await;
-        assert_eq!(h.live(), 0, "guard must clear the count once the task returns");
+        assert_eq!(
+            h.live(),
+            0,
+            "guard must clear the count once the task returns"
+        );
     }
 
     #[tokio::test]

@@ -11,5 +11,6 @@ pub use approval::{
     ApprovalRefusal, ApprovalToken, Epochs, ExecutionContext, Issuer, plan_hash, request_hash,
 };
 pub use trust::{
-    AuthIdentity, DiscoveryBounds, Endpoint, RebindVerdict, ServerIdentity, TlsIdentity, TrustIdentity,
+    AuthIdentity, DiscoveryBounds, Endpoint, RebindVerdict, ServerIdentity, TlsIdentity,
+    TrustIdentity,
 };

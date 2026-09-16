@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 7 |
+| PASS | 8 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 56 |
+| IN-PROGRESS | 55 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -41,7 +41,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-B01 | IN-PROGRESS | — | |
-| V-B02 | IN-PROGRESS | — | |
+| V-B02 | PASS | `crates/pr-protocol/` · 23 tests（含 316 样本 corpus 逐字节喂入） | 增量 RESP2/3 解码含 streamed；预算与协议错误分离；词法保真；bare-LF 即时报错 |
 | V-B03 | IN-PROGRESS | — | |
 | V-B04 | IN-PROGRESS | — | `pr-core::outcome` 四维度+退出码映射已实现并测试；待 V-A03 组合矩阵全量 |
 | V-B05 | IN-PROGRESS | — | |
@@ -154,3 +154,4 @@
 | 2026-09-16 | V-A03 / V-I01 / V-J01 → PASS；pr-core + pr-security 契约冻结；CI workflow 与 4 个 gate 脚本落地 |
 | 2026-09-16 | V-E01 → PASS（pr-json occurrence DOM，SPIKE-004）；workspace 85 tests 全绿 |
 | 2026-09-16 | V-A01 / V-A04 / V-A06 → PASS（PTY harness、故障注入、资源测量）；111 tests 全绿 |
+| 2026-09-16 | V-B02 → PASS（增量 RESP decoder）；首次 CI 实跑暴露 4 个真实问题并修复；134 tests 全绿 |

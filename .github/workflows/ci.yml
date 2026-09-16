@@ -162,12 +162,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: no floating tags
         run: |
-          if grep -nE '(^|[^a-z])latest' compatibility/manifest.toml; then
+          # Strip comments first: the file explains that `latest` is banned, and that
+          # explanation must not be mistaken for a use of it.
+          if sed 's/#.*//' compatibility/manifest.toml | grep -nE '(^|[^a-z])latest'; then
             echo "::error::compatibility/manifest.toml must not reference 'latest' (v2.1 §20.4)"
             exit 1
           fi
           missing=$(grep -c '^digest = "sha256:' compatibility/manifest.toml || true)
           servers=$(grep -c '^\[\[server\]\]' compatibility/manifest.toml || true)
+          set -e
           echo "servers=$servers digests=$missing"
           if [ "$missing" -lt "$servers" ]; then
             echo "::error::every [[server]] needs a sha256 digest"

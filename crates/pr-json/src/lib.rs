@@ -30,7 +30,9 @@ mod tests {
     #[test]
     fn duplicate_members_are_all_retained_and_addressable() {
         let d = doc(r#"{"a":1,"a":2}"#);
-        let NodeKind::Object(ms) = &d.root().kind else { panic!("expected object") };
+        let NodeKind::Object(ms) = &d.root().kind else {
+            panic!("expected object")
+        };
         assert_eq!(ms.len(), 2, "serde_json would have dropped one");
         assert_eq!((ms[0].occurrence, ms[0].occurrence_total), (1, 2));
         assert_eq!((ms[1].occurrence, ms[1].occurrence_total), (2, 2));
@@ -43,7 +45,10 @@ mod tests {
     fn ambiguous_path_is_refused_not_silently_resolved() {
         // JSON-05: the failure mode ADR-028 exists to prevent.
         let d = doc(r#"{"a":1,"a":2}"#);
-        assert_eq!(d.get("$.a").unwrap_err(), JsonError::AmbiguousMember("a".into(), 2));
+        assert_eq!(
+            d.get("$.a").unwrap_err(),
+            JsonError::AmbiguousMember("a".into(), 2)
+        );
         assert!(d.get("$.a#3").is_err());
     }
 
@@ -58,13 +63,19 @@ mod tests {
     #[test]
     fn number_lexemes_survive_verbatim() {
         let d = doc(r#"{"big":9007199254740993,"amt":1.2300,"e":1e3,"neg":-0,"z":0}"#);
-        assert_eq!(d.number_lexeme(d.get("$.big").unwrap()), Some("9007199254740993"));
+        assert_eq!(
+            d.number_lexeme(d.get("$.big").unwrap()),
+            Some("9007199254740993")
+        );
         assert_eq!(d.number_lexeme(d.get("$.amt").unwrap()), Some("1.2300"));
         assert_eq!(d.number_lexeme(d.get("$.e").unwrap()), Some("1e3"));
         assert_eq!(d.number_lexeme(d.get("$.neg").unwrap()), Some("-0"));
         assert_eq!(d.number_lexeme(d.get("$.z").unwrap()), Some("0"));
         // f64 would collapse the first three; prove we never went through one.
-        assert_ne!(d.number_lexeme(d.get("$.big").unwrap()), Some("9007199254740992"));
+        assert_ne!(
+            d.number_lexeme(d.get("$.big").unwrap()),
+            Some("9007199254740992")
+        );
     }
 
     // ---------------------------------------------------------------- DATA-02 strings
@@ -72,8 +83,14 @@ mod tests {
     fn numeric_looking_strings_stay_strings() {
         let d = doc(r#"{"id":"000123","flag":"false","n":"1e5"}"#);
         assert!(matches!(d.get("$.id").unwrap().kind, NodeKind::String));
-        assert_eq!(d.string_value(d.get("$.id").unwrap()).as_deref(), Some("000123"));
-        assert_eq!(d.string_value(d.get("$.flag").unwrap()).as_deref(), Some("false"));
+        assert_eq!(
+            d.string_value(d.get("$.id").unwrap()).as_deref(),
+            Some("000123")
+        );
+        assert_eq!(
+            d.string_value(d.get("$.flag").unwrap()).as_deref(),
+            Some("false")
+        );
         assert_eq!(d.number_lexeme(d.get("$.id").unwrap()), None);
     }
 
@@ -100,14 +117,29 @@ mod tests {
             b = b,
             peng = char::from_u32(0x1_F427).unwrap()
         );
-        assert_eq!(d.string_value(d.get("$.s").unwrap()).as_deref(), Some(want.as_str()));
+        assert_eq!(
+            d.string_value(d.get("$.s").unwrap()).as_deref(),
+            Some(want.as_str())
+        );
 
         // Raw bytes are byte-identical to what arrived: still escaped, never normalised.
         let raw = std::str::from_utf8(d.raw(d.get("$.s").unwrap())).unwrap();
-        assert!(raw.contains(&format!("{b}u00e9")), "raw kept the escape: {raw}");
-        assert!(raw.contains(&format!("{b}ud83d{b}udc27")), "raw kept the pair: {raw}");
-        assert!(!raw.contains(char::from_u32(0xE9).unwrap()), "raw must not be decoded");
-        assert!(!raw.contains(char::from_u32(0x1_F427).unwrap()), "raw must not be decoded");
+        assert!(
+            raw.contains(&format!("{b}u00e9")),
+            "raw kept the escape: {raw}"
+        );
+        assert!(
+            raw.contains(&format!("{b}ud83d{b}udc27")),
+            "raw kept the pair: {raw}"
+        );
+        assert!(
+            !raw.contains(char::from_u32(0xE9).unwrap()),
+            "raw must not be decoded"
+        );
+        assert!(
+            !raw.contains(char::from_u32(0x1_F427).unwrap()),
+            "raw must not be decoded"
+        );
     }
 
     #[test]
@@ -116,13 +148,24 @@ mod tests {
         // syntactically well-formed JSON that denotes no Unicode scalar, so we keep the
         // document (the user can still copy the original bytes) and simply decline to decode
         // that string, rather than rejecting data Redis happily stores.
-        for src in [br#"{"s":"\ud800"}"#.as_slice(), br#"{"s":"\udc00"}"#.as_slice()] {
+        for src in [
+            br#"{"s":"\ud800"}"#.as_slice(),
+            br#"{"s":"\udc00"}"#.as_slice(),
+        ] {
             let d = Document::parse(Bytes::copy_from_slice(src), Limits::default())
                 .expect("syntactically valid JSON must parse");
             let n = d.get("$.s").unwrap();
             assert!(matches!(n.kind, NodeKind::String));
-            assert_eq!(d.raw(n), &src[5..src.len() - 1], "raw token preserved verbatim");
-            assert_eq!(d.string_value(n), None, "must decline to decode a lone surrogate");
+            assert_eq!(
+                d.raw(n),
+                &src[5..src.len() - 1],
+                "raw token preserved verbatim"
+            );
+            assert_eq!(
+                d.string_value(n),
+                None,
+                "must decline to decode a lone surrogate"
+            );
         }
     }
 
@@ -132,7 +175,10 @@ mod tests {
         let src = r#"{"a":1,"a":2,"b":  "keep me"}"#;
         let d = doc(src);
         let out = d.replace("$.a#2", b"99").unwrap();
-        assert_eq!(std::str::from_utf8(&out).unwrap(), r#"{"a":1,"a":99,"b":  "keep me"}"#);
+        assert_eq!(
+            std::str::from_utf8(&out).unwrap(),
+            r#"{"a":1,"a":99,"b":  "keep me"}"#
+        );
         // whitespace, key order and the untouched duplicate all survive
         assert!(out.windows(2).any(|w| w == b"  "));
     }
@@ -146,9 +192,17 @@ mod tests {
     #[test]
     fn nested_and_array_paths_resolve() {
         let d = doc(r#"{"cfg":{"ch":["FCM","HUAWEI"],"on":true},"cfg":{"ch":[]}}"#);
-        assert_eq!(d.string_value(d.get(r#"$.cfg#1.ch[1]"#).unwrap()).as_deref(), Some("HUAWEI"));
-        assert!(matches!(d.get("$.cfg#1.on").unwrap().kind, NodeKind::Bool(true)));
-        let NodeKind::Array(items) = &d.get("$.cfg#2.ch").unwrap().kind else { panic!() };
+        assert_eq!(
+            d.string_value(d.get("$.cfg#1.ch[1]").unwrap()).as_deref(),
+            Some("HUAWEI")
+        );
+        assert!(matches!(
+            d.get("$.cfg#1.on").unwrap().kind,
+            NodeKind::Bool(true)
+        ));
+        let NodeKind::Array(items) = &d.get("$.cfg#2.ch").unwrap().kind else {
+            panic!()
+        };
         assert!(items.is_empty());
     }
 
@@ -156,8 +210,26 @@ mod tests {
     #[test]
     fn rejects_invalid_documents() {
         for bad in [
-            "{", "}", "[1,]", "{\"a\":}", "{a:1}", "{'a':1}", "01", "1.", ".1", "+1", "1e", "nul",
-            "tru", "{\"a\":1}x", "\"\u{1}\"", "[1 2]", "{\"a\" 1}", "--1", "1e+", "{\"a\":1,}",
+            "{",
+            "}",
+            "[1,]",
+            "{\"a\":}",
+            "{a:1}",
+            "{'a':1}",
+            "01",
+            "1.",
+            ".1",
+            "+1",
+            "1e",
+            "nul",
+            "tru",
+            "{\"a\":1}x",
+            "\"\u{1}\"",
+            "[1 2]",
+            "{\"a\" 1}",
+            "--1",
+            "1e+",
+            "{\"a\":1,}",
         ] {
             assert!(
                 Document::parse(Bytes::copy_from_slice(bad.as_bytes()), Limits::default()).is_err(),
@@ -168,7 +240,18 @@ mod tests {
 
     #[test]
     fn accepts_valid_edge_documents() {
-        for good in ["{}", "[]", "0", "-0", "1e-3", "\"\"", "null", "true", "[[[]]]", " {\n\t\"a\" : 1 }\r\n"] {
+        for good in [
+            "{}",
+            "[]",
+            "0",
+            "-0",
+            "1e-3",
+            "\"\"",
+            "null",
+            "true",
+            "[[[]]]",
+            " {\n\t\"a\" : 1 }\r\n",
+        ] {
             assert!(
                 Document::parse(Bytes::copy_from_slice(good.as_bytes()), Limits::default()).is_ok(),
                 "should accept {good:?}"
@@ -180,10 +263,20 @@ mod tests {
     fn depth_budget_is_enforced() {
         // v2.1 §24.3: deep nesting must hit a budget, not blow the stack.
         let deep = format!("{}{}", "[".repeat(200), "]".repeat(200));
-        let e = Document::parse(Bytes::copy_from_slice(deep.as_bytes()), Limits { max_depth: 64 }).unwrap_err();
+        let e = Document::parse(
+            Bytes::copy_from_slice(deep.as_bytes()),
+            Limits { max_depth: 64 },
+        )
+        .unwrap_err();
         assert_eq!(e, JsonError::DepthExceeded(64));
         let ok = format!("{}{}", "[".repeat(50), "]".repeat(50));
-        assert!(Document::parse(Bytes::copy_from_slice(ok.as_bytes()), Limits { max_depth: 64 }).is_ok());
+        assert!(
+            Document::parse(
+                Bytes::copy_from_slice(ok.as_bytes()),
+                Limits { max_depth: 64 }
+            )
+            .is_ok()
+        );
     }
 
     #[test]
@@ -195,7 +288,10 @@ mod tests {
         assert!(!Document::looks_like_json(b"true"));
         assert!(!Document::looks_like_json(b"null"));
         assert!(!Document::looks_like_json(b"\"str\""));
-        assert!(!Document::looks_like_json(br#"{"a":1"#), "incomplete must not count");
+        assert!(
+            !Document::looks_like_json(br#"{"a":1"#),
+            "incomplete must not count"
+        );
         assert!(!Document::looks_like_json(b"ACTIVE"));
     }
 

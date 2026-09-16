@@ -1,4 +1,4 @@
-//! V-A01 — one PTY driver for macOS/Linux PTY and Windows ConPTY.
+//! V-A01 — one PTY driver for macOS/Linux PTY and Windows `ConPTY`.
 //!
 //! Every terminal claim in v2.1 (§14 input contract, §7.3 colour, §6.2 width, §35.1 Windows)
 //! has to be checked against a *real* terminal, not a component snapshot. `portable-pty`
@@ -98,9 +98,18 @@ impl Recording {
             .events
             .iter()
             .map(|e| match e {
-                Event::Input { bytes, .. } => G { kind: "in", data: bytes.clone() },
-                Event::Output { bytes, .. } => G { kind: "out", data: bytes.clone() },
-                Event::Resize { cols, rows, .. } => G { kind: "resize", data: format!("{cols}x{rows}") },
+                Event::Input { bytes, .. } => G {
+                    kind: "in",
+                    data: bytes.clone(),
+                },
+                Event::Output { bytes, .. } => G {
+                    kind: "out",
+                    data: bytes.clone(),
+                },
+                Event::Resize { cols, rows, .. } => G {
+                    kind: "resize",
+                    data: format!("{cols}x{rows}"),
+                },
             })
             .collect();
         Ok(serde_json::to_string_pretty(&g)?)
@@ -119,7 +128,10 @@ pub fn escape(b: &[u8]) -> String {
             b'\t' => s.push_str("\\t"),
             b'\\' => s.push_str("\\\\"),
             0x20..=0x7e => s.push(c as char),
-            _ => s.push_str(&format!("\\x{c:02x}")),
+            _ => {
+                use std::fmt::Write as _;
+                let _ = write!(s, "\\x{c:02x}");
+            }
         }
     }
     s
@@ -187,11 +199,25 @@ impl PtySession {
     pub fn spawn(cmd: CommandBuilder, cols: u16, rows: u16) -> Result<Self, PtyError> {
         let sys = NativePtySystem::default();
         let pair = sys
-            .openpty(PtySize { rows, cols, pixel_width: 0, pixel_height: 0 })
+            .openpty(PtySize {
+                rows,
+                cols,
+                pixel_width: 0,
+                pixel_height: 0,
+            })
             .map_err(|e| PtyError::Pty(e.to_string()))?;
-        let _child = pair.slave.spawn_command(cmd).map_err(|e| PtyError::Pty(e.to_string()))?;
-        let writer = pair.master.take_writer().map_err(|e| PtyError::Pty(e.to_string()))?;
-        let mut reader = pair.master.try_clone_reader().map_err(|e| PtyError::Pty(e.to_string()))?;
+        let _child = pair
+            .slave
+            .spawn_command(cmd)
+            .map_err(|e| PtyError::Pty(e.to_string()))?;
+        let writer = pair
+            .master
+            .take_writer()
+            .map_err(|e| PtyError::Pty(e.to_string()))?;
+        let mut reader = pair
+            .master
+            .try_clone_reader()
+            .map_err(|e| PtyError::Pty(e.to_string()))?;
 
         let buf = Arc::new(Mutex::new(Vec::new()));
         let events = Arc::new(Mutex::new(Vec::new()));
@@ -210,14 +236,25 @@ impl PtySession {
                             g.extend_from_slice(&chunk[..n]);
                         }
                         if let Ok(mut g) = e2.lock() {
-                            g.push(Event::Output { at_ms, bytes: escape(&chunk[..n]) });
+                            g.push(Event::Output {
+                                at_ms,
+                                bytes: escape(&chunk[..n]),
+                            });
                         }
                     }
                 }
             }
         });
 
-        Ok(Self { pair, writer, buf, events, start, cols, rows })
+        Ok(Self {
+            pair,
+            writer,
+            buf,
+            events,
+            start,
+            cols,
+            rows,
+        })
     }
 
     fn now_ms(&self) -> u64 {
@@ -233,7 +270,10 @@ impl PtySession {
         self.writer.flush()?;
         let at_ms = self.now_ms();
         if let Ok(mut g) = self.events.lock() {
-            g.push(Event::Input { at_ms, bytes: escape(bytes) });
+            g.push(Event::Input {
+                at_ms,
+                bytes: escape(bytes),
+            });
         }
         Ok(())
     }
@@ -257,7 +297,12 @@ impl PtySession {
     pub fn resize(&mut self, cols: u16, rows: u16) -> Result<(), PtyError> {
         self.pair
             .master
-            .resize(PtySize { rows, cols, pixel_width: 0, pixel_height: 0 })
+            .resize(PtySize {
+                rows,
+                cols,
+                pixel_width: 0,
+                pixel_height: 0,
+            })
             .map_err(|e| PtyError::Pty(e.to_string()))?;
         self.cols = cols;
         self.rows = rows;
@@ -284,14 +329,16 @@ impl PtySession {
             if self
                 .buf
                 .lock()
-                .map(|g| g.windows(needle.len()).any(|w| w == needle))
-                .unwrap_or(false)
+                .is_ok_and(|g| g.windows(needle.len()).any(|w| w == needle))
             {
                 return Ok(());
             }
             std::thread::sleep(Duration::from_millis(5));
         }
-        Err(PtyError::Timeout(timeout, String::from_utf8_lossy(needle).into_owned()))
+        Err(PtyError::Timeout(
+            timeout,
+            String::from_utf8_lossy(needle).into_owned(),
+        ))
     }
 
     /// Current size.
@@ -353,7 +400,7 @@ mod tests {
     #[test]
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn reports_terminal_size_to_the_child() {
-        let mut s = PtySession::spawn(sh("printf 'cols=%s' \"$(tput cols)\""), 100, 30).unwrap();
+        let s = PtySession::spawn(sh("printf 'cols=%s' \"$(tput cols)\""), 100, 30).unwrap();
         s.wait_for(b"cols=100", Duration::from_secs(5)).unwrap();
         assert_eq!(s.size(), (100, 30));
     }
@@ -362,11 +409,17 @@ mod tests {
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn resize_is_visible_to_the_child() {
         // UX-07 / ASSIST-067: resize must actually reach the process under test.
-        let mut s = PtySession::spawn(sh("sleep 0.3; printf 'cols=%s' \"$(tput cols)\""), 80, 24).unwrap();
+        let mut s =
+            PtySession::spawn(sh("sleep 0.3; printf 'cols=%s' \"$(tput cols)\""), 80, 24).unwrap();
         s.resize(40, 12).unwrap();
         s.wait_for(b"cols=40", Duration::from_secs(5)).unwrap();
         assert_eq!(s.size(), (40, 12));
-        assert!(s.recording().events.iter().any(|e| matches!(e, Event::Resize { cols: 40, .. })));
+        assert!(
+            s.recording()
+                .events
+                .iter()
+                .any(|e| matches!(e, Event::Resize { cols: 40, .. }))
+        );
     }
 
     #[test]
@@ -385,15 +438,23 @@ mod tests {
                 _ => None,
             })
             .collect();
-        assert!(input.contains("\\x1b[200~"), "paste start marker recorded: {input}");
-        assert!(input.contains("\\x1b[201~"), "paste end marker recorded: {input}");
+        assert!(
+            input.contains("\\x1b[200~"),
+            "paste start marker recorded: {input}"
+        );
+        assert!(
+            input.contains("\\x1b[201~"),
+            "paste end marker recorded: {input}"
+        );
     }
 
     #[test]
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn wait_for_times_out_with_the_needle_named() {
         let s = PtySession::spawn(sh("printf 'x'"), 80, 24).unwrap();
-        let e = s.wait_for(b"never-appears", Duration::from_millis(300)).unwrap_err();
+        let e = s
+            .wait_for(b"never-appears", Duration::from_millis(300))
+            .unwrap_err();
         match e {
             PtyError::Timeout(_, n) => assert_eq!(n, "never-appears"),
             other => panic!("expected timeout, got {other:?}"),
@@ -411,7 +472,10 @@ mod tests {
         let g1 = rec.to_golden().unwrap();
         let g2 = rec.to_golden().unwrap();
         assert_eq!(g1, g2, "golden form must be deterministic");
-        assert!(!g1.contains('\x1b'), "golden file must never carry a live escape");
+        assert!(
+            !g1.contains('\x1b'),
+            "golden file must never carry a live escape"
+        );
         assert!(rec.platform.contains(std::env::consts::OS));
     }
 }

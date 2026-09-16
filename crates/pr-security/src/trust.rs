@@ -149,7 +149,10 @@ fn hash_endpoint(h: &mut Hasher, e: &Endpoint) {
 fn hash_tls(h: &mut Hasher, t: &TlsIdentity) {
     match t {
         TlsIdentity::None => h.update(b"tls-none\0"),
-        TlsIdentity::Ca { ca_set_hash, server_name } => {
+        TlsIdentity::Ca {
+            ca_set_hash,
+            server_name,
+        } => {
             h.update(b"tls-ca\0");
             h.update(ca_set_hash.as_bytes());
             h.update(b"\0");
@@ -172,7 +175,9 @@ fn hash_server(h: &mut Hasher, s: &ServerIdentity) {
             h.update(b"sentinel\0");
             h.update(master_name.as_bytes())
         }
-        ServerIdentity::Cluster { node_id_set_hash, .. } => {
+        ServerIdentity::Cluster {
+            node_id_set_hash, ..
+        } => {
             h.update(b"cluster\0");
             h.update(node_id_set_hash.as_bytes())
         }
@@ -188,7 +193,13 @@ impl TrustIdentity {
         hash_endpoint(&mut h, &self.endpoint);
         hash_tls(&mut h, &self.tls_identity);
         hash_server(&mut h, &self.server_identity);
-        h.update(self.auth_identity.username.as_deref().unwrap_or("").as_bytes());
+        h.update(
+            self.auth_identity
+                .username
+                .as_deref()
+                .unwrap_or("")
+                .as_bytes(),
+        );
         h.update(b"\0");
         h.update(self.auth_identity.secret_ref.as_bytes());
         h.finalize().to_hex().to_string()
@@ -214,7 +225,9 @@ impl TrustIdentity {
         if self.tls_identity != previous.tls_identity {
             return RebindVerdict::TlsIdentityChanged;
         }
-        if core::mem::discriminant(&self.server_identity) != core::mem::discriminant(&previous.server_identity) {
+        if core::mem::discriminant(&self.server_identity)
+            != core::mem::discriminant(&previous.server_identity)
+        {
             return RebindVerdict::ServerIdentityChanged;
         }
         // Same kind: compare only the fields that define the *logical service*. run_id and
@@ -225,8 +238,14 @@ impl TrustIdentity {
                 ServerIdentity::Sentinel { master_name: b, .. },
             )
             | (
-                ServerIdentity::Cluster { node_id_set_hash: a, .. },
-                ServerIdentity::Cluster { node_id_set_hash: b, .. },
+                ServerIdentity::Cluster {
+                    node_id_set_hash: a,
+                    ..
+                },
+                ServerIdentity::Cluster {
+                    node_id_set_hash: b,
+                    ..
+                },
             ) => a != b,
             _ => false,
         };
@@ -253,10 +272,14 @@ impl DiscoveryBounds {
     /// Whether a redirect target may be connected to without explicit confirmation.
     #[must_use]
     pub fn permits(&self, host: &str, port: u16) -> bool {
-        if self.allowed_hosts.contains(&format!("{host}:{port}")) || self.allowed_hosts.contains(host) {
+        if self.allowed_hosts.contains(&format!("{host}:{port}"))
+            || self.allowed_hosts.contains(host)
+        {
             return true;
         }
-        self.allowed_suffixes.iter().any(|s| host.ends_with(s.as_str()))
+        self.allowed_suffixes
+            .iter()
+            .any(|s| host.ends_with(s.as_str()))
     }
 }
 
@@ -267,13 +290,21 @@ mod tests {
 
     fn base() -> TrustIdentity {
         TrustIdentity {
-            endpoint: Endpoint::Tcp { host: "redis-dev.internal".into(), port: 6379 },
+            endpoint: Endpoint::Tcp {
+                host: "redis-dev.internal".into(),
+                port: 6379,
+            },
             tls_identity: TlsIdentity::Ca {
                 ca_set_hash: "ca-abc".into(),
                 server_name: "redis-dev.internal".into(),
             },
-            server_identity: ServerIdentity::Standalone { run_id_prefix: Some("aaaa".into()) },
-            auth_identity: AuthIdentity { username: Some("dev".into()), secret_ref: "credential:uuid-1".into() },
+            server_identity: ServerIdentity::Standalone {
+                run_id_prefix: Some("aaaa".into()),
+            },
+            auth_identity: AuthIdentity {
+                username: Some("dev".into()),
+                secret_ref: "credential:uuid-1".into(),
+            },
         }
     }
 
@@ -282,7 +313,10 @@ mod tests {
         // NET-06 / failover: the service moved, the identity did not.
         let a = base();
         let mut b = base();
-        b.endpoint = Endpoint::Tcp { host: "10.0.0.7".into(), port: 6380 };
+        b.endpoint = Endpoint::Tcp {
+            host: "10.0.0.7".into(),
+            port: 6380,
+        };
         assert_eq!(b.compare(&a), RebindVerdict::AddressOnly);
         assert!(!b.compare(&a).requires_rebind());
         assert_eq!(a.credential_binding_hash(), b.credential_binding_hash());
@@ -292,7 +326,9 @@ mod tests {
     fn restart_changing_run_id_does_not_rebind() {
         let a = base();
         let mut b = base();
-        b.server_identity = ServerIdentity::Standalone { run_id_prefix: Some("zzzz".into()) };
+        b.server_identity = ServerIdentity::Standalone {
+            run_id_prefix: Some("zzzz".into()),
+        };
         assert_eq!(b.compare(&a), RebindVerdict::NoChange);
         assert_eq!(a.credential_binding_hash(), b.credential_binding_hash());
     }
@@ -302,7 +338,10 @@ mod tests {
         // NET-02: credentials must not follow a replaced service.
         let a = base();
         let mut b = base();
-        b.tls_identity = TlsIdentity::Ca { ca_set_hash: "ca-OTHER".into(), server_name: "redis-dev.internal".into() };
+        b.tls_identity = TlsIdentity::Ca {
+            ca_set_hash: "ca-OTHER".into(),
+            server_name: "redis-dev.internal".into(),
+        };
         assert_eq!(b.compare(&a), RebindVerdict::TlsIdentityChanged);
         assert!(b.compare(&a).requires_rebind());
         assert_ne!(a.credential_binding_hash(), b.credential_binding_hash());
@@ -319,28 +358,48 @@ mod tests {
     #[test]
     fn sentinel_master_rename_is_a_different_service_but_new_sentinels_are_not() {
         let a = TrustIdentity {
-            server_identity: ServerIdentity::Sentinel { master_name: "mymaster".into(), sentinel_set_hash: "s1".into() },
+            server_identity: ServerIdentity::Sentinel {
+                master_name: "mymaster".into(),
+                sentinel_set_hash: "s1".into(),
+            },
             ..base()
         };
         let mut same_master = a.clone();
-        same_master.server_identity =
-            ServerIdentity::Sentinel { master_name: "mymaster".into(), sentinel_set_hash: "s2-added".into() };
-        assert_eq!(same_master.compare(&a), RebindVerdict::NoChange, "adding a sentinel warns, not rebinds");
+        same_master.server_identity = ServerIdentity::Sentinel {
+            master_name: "mymaster".into(),
+            sentinel_set_hash: "s2-added".into(),
+        };
+        assert_eq!(
+            same_master.compare(&a),
+            RebindVerdict::NoChange,
+            "adding a sentinel warns, not rebinds"
+        );
 
         let mut other_master = a.clone();
-        other_master.server_identity =
-            ServerIdentity::Sentinel { master_name: "othermaster".into(), sentinel_set_hash: "s1".into() };
-        assert_eq!(other_master.compare(&a), RebindVerdict::ServerIdentityChanged);
+        other_master.server_identity = ServerIdentity::Sentinel {
+            master_name: "othermaster".into(),
+            sentinel_set_hash: "s1".into(),
+        };
+        assert_eq!(
+            other_master.compare(&a),
+            RebindVerdict::ServerIdentityChanged
+        );
     }
 
     #[test]
     fn cluster_node_set_change_forces_rebind() {
         let a = TrustIdentity {
-            server_identity: ServerIdentity::Cluster { node_id_set_hash: "n1".into(), seed_hosts: vec![] },
+            server_identity: ServerIdentity::Cluster {
+                node_id_set_hash: "n1".into(),
+                seed_hosts: vec![],
+            },
             ..base()
         };
         let mut b = a.clone();
-        b.server_identity = ServerIdentity::Cluster { node_id_set_hash: "n2".into(), seed_hosts: vec![] };
+        b.server_identity = ServerIdentity::Cluster {
+            node_id_set_hash: "n2".into(),
+            seed_hosts: vec![],
+        };
         assert_eq!(b.compare(&a), RebindVerdict::ServerIdentityChanged);
     }
 
@@ -348,7 +407,10 @@ mod tests {
     fn changing_topology_kind_forces_rebind() {
         let a = base();
         let mut b = base();
-        b.server_identity = ServerIdentity::Cluster { node_id_set_hash: "n1".into(), seed_hosts: vec![] };
+        b.server_identity = ServerIdentity::Cluster {
+            node_id_set_hash: "n1".into(),
+            seed_hosts: vec![],
+        };
         assert_eq!(b.compare(&a), RebindVerdict::ServerIdentityChanged);
     }
 
@@ -366,8 +428,14 @@ mod tests {
         let a = base();
         assert_eq!(a.hash(), a.hash());
         let mut b = base();
-        b.endpoint = Endpoint::Unix { path: "/tmp/r.sock".into() };
-        assert_ne!(a.hash(), b.hash(), "endpoint is part of the full identity hash");
+        b.endpoint = Endpoint::Unix {
+            path: "/tmp/r.sock".into(),
+        };
+        assert_ne!(
+            a.hash(),
+            b.hash(),
+            "endpoint is part of the full identity hash"
+        );
     }
 
     #[test]

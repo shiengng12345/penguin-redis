@@ -104,7 +104,7 @@ struct Parser<'a> {
     limits: Limits,
 }
 
-impl<'a> Parser<'a> {
+impl Parser<'_> {
     fn ws(&mut self) {
         while self.i < self.b.len() && matches!(self.b[self.i], b' ' | b'\t' | b'\n' | b'\r') {
             self.i += 1;
@@ -203,6 +203,9 @@ impl<'a> Parser<'a> {
         Ok(start..self.i)
     }
 
+    // A single-pass value parser is naturally long; splitting it per-token would scatter the
+    // span bookkeeping that makes this DOM lossless.
+    #[allow(clippy::too_many_lines)]
     fn value(&mut self) -> Result<JsonNode, JsonError> {
         self.depth += 1;
         if self.depth > self.limits.max_depth {
@@ -213,23 +216,38 @@ impl<'a> Parser<'a> {
         let node = match self.peek()? {
             b'n' => {
                 self.lit(b"null", "expected null")?;
-                JsonNode { span: start..self.i, kind: NodeKind::Null }
+                JsonNode {
+                    span: start..self.i,
+                    kind: NodeKind::Null,
+                }
             }
             b't' => {
                 self.lit(b"true", "expected true")?;
-                JsonNode { span: start..self.i, kind: NodeKind::Bool(true) }
+                JsonNode {
+                    span: start..self.i,
+                    kind: NodeKind::Bool(true),
+                }
             }
             b'f' => {
                 self.lit(b"false", "expected false")?;
-                JsonNode { span: start..self.i, kind: NodeKind::Bool(false) }
+                JsonNode {
+                    span: start..self.i,
+                    kind: NodeKind::Bool(false),
+                }
             }
             b'"' => {
                 let s = self.string_span()?;
-                JsonNode { span: s, kind: NodeKind::String }
+                JsonNode {
+                    span: s,
+                    kind: NodeKind::String,
+                }
             }
             b'-' | b'0'..=b'9' => {
                 let s = self.number_span()?;
-                JsonNode { span: s, kind: NodeKind::Number }
+                JsonNode {
+                    span: s,
+                    kind: NodeKind::Number,
+                }
             }
             b'[' => {
                 self.i += 1;
@@ -251,7 +269,10 @@ impl<'a> Parser<'a> {
                         }
                     }
                 }
-                JsonNode { span: start..self.i, kind: NodeKind::Array(items) }
+                JsonNode {
+                    span: start..self.i,
+                    kind: NodeKind::Array(items),
+                }
             }
             b'{' => {
                 self.i += 1;
@@ -264,7 +285,7 @@ impl<'a> Parser<'a> {
                         self.ws();
                         let ks = self.string_span()?;
                         let key = decode_string(&self.b[ks.clone()])
-                            .map_err(|()| JsonError::Syntax(ks.start, "bad key escape"))?;
+                            .ok_or(JsonError::Syntax(ks.start, "bad key escape"))?;
                         self.ws();
                         self.eat(b':', "expected ':'")?;
                         let v = self.value()?;
@@ -281,21 +302,32 @@ impl<'a> Parser<'a> {
                     }
                 }
                 // Assign occurrence indices. Duplicates are kept, in source order (§8.3).
-                let mut totals: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+                let mut totals: std::collections::HashMap<String, u32> =
+                    std::collections::HashMap::new();
                 for (_, k, _) in &raw {
                     *totals.entry(k.clone()).or_insert(0) += 1;
                 }
-                let mut seen: std::collections::HashMap<String, u32> = std::collections::HashMap::new();
+                let mut seen: std::collections::HashMap<String, u32> =
+                    std::collections::HashMap::new();
                 let members = raw
                     .into_iter()
                     .map(|(ks, key, value)| {
                         let n = seen.entry(key.clone()).or_insert(0);
                         *n += 1;
                         let total = totals.get(&key).copied().unwrap_or(1);
-                        Member { key_span: ks, occurrence: *n, occurrence_total: total, key, value }
+                        Member {
+                            key_span: ks,
+                            occurrence: *n,
+                            occurrence_total: total,
+                            key,
+                            value,
+                        }
                     })
                     .collect();
-                JsonNode { span: start..self.i, kind: NodeKind::Object(members) }
+                JsonNode {
+                    span: start..self.i,
+                    kind: NodeKind::Object(members),
+                }
             }
             _ => return Err(JsonError::Syntax(self.i, "unexpected token")),
         };
@@ -306,23 +338,25 @@ impl<'a> Parser<'a> {
 
 /// Decode a JSON string token (including surrounding quotes) into a `String`.
 ///
-/// # Errors
-/// Returns `Err(())` on a malformed escape or an unpaired surrogate.
-pub fn decode_string(tok: &[u8]) -> Result<String, ()> {
-    let inner = tok.get(1..tok.len().saturating_sub(1)).ok_or(())?;
+/// Returns `None` on a malformed escape or an unpaired surrogate. A lone surrogate is
+/// well-formed JSON that denotes no Unicode scalar, so the document is still kept and only
+/// this one string declines to decode (ADR-005).
+#[must_use]
+pub fn decode_string(tok: &[u8]) -> Option<String> {
+    let inner = tok.get(1..tok.len().saturating_sub(1))?;
     let mut out = String::with_capacity(inner.len());
     let mut i = 0;
     while i < inner.len() {
         let c = inner[i];
         if c != b'\\' {
-            let s = std::str::from_utf8(&inner[i..]).map_err(|_| ())?;
-            let ch = s.chars().next().ok_or(())?;
+            let s = std::str::from_utf8(&inner[i..]).ok()?;
+            let ch = s.chars().next()?;
             out.push(ch);
             i += ch.len_utf8();
             continue;
         }
         i += 1;
-        let e = *inner.get(i).ok_or(())?;
+        let e = *inner.get(i)?;
         i += 1;
         match e {
             b'"' => out.push('"'),
@@ -334,32 +368,33 @@ pub fn decode_string(tok: &[u8]) -> Result<String, ()> {
             b'r' => out.push('\r'),
             b't' => out.push('\t'),
             b'u' => {
-                let hex = inner.get(i..i + 4).ok_or(())?;
+                let hex = inner.get(i..i + 4)?;
                 i += 4;
-                let hi = u16::from_str_radix(std::str::from_utf8(hex).map_err(|_| ())?, 16).map_err(|_| ())?;
+                let hi = u16::from_str_radix(std::str::from_utf8(hex).ok()?, 16).ok()?;
                 if (0xD800..0xDC00).contains(&hi) {
                     // high surrogate: require the low half
                     if inner.get(i) != Some(&b'\\') || inner.get(i + 1) != Some(&b'u') {
-                        return Err(());
+                        return None;
                     }
-                    let hex2 = inner.get(i + 2..i + 6).ok_or(())?;
+                    let hex2 = inner.get(i + 2..i + 6)?;
                     i += 6;
-                    let lo = u16::from_str_radix(std::str::from_utf8(hex2).map_err(|_| ())?, 16).map_err(|_| ())?;
+                    let lo = u16::from_str_radix(std::str::from_utf8(hex2).ok()?, 16).ok()?;
                     if !(0xDC00..0xE000).contains(&lo) {
-                        return Err(());
+                        return None;
                     }
-                    let c = 0x1_0000u32 + ((u32::from(hi) - 0xD800) << 10) + (u32::from(lo) - 0xDC00);
-                    out.push(char::from_u32(c).ok_or(())?);
+                    let c =
+                        0x1_0000u32 + ((u32::from(hi) - 0xD800) << 10) + (u32::from(lo) - 0xDC00);
+                    out.push(char::from_u32(c)?);
                 } else if (0xDC00..0xE000).contains(&hi) {
-                    return Err(()); // lone low surrogate
+                    return None; // lone low surrogate
                 } else {
-                    out.push(char::from_u32(u32::from(hi)).ok_or(())?);
+                    out.push(char::from_u32(u32::from(hi))?);
                 }
             }
-            _ => return Err(()),
+            _ => return None,
         }
     }
-    Ok(out)
+    Some(out)
 }
 
 impl Document {
@@ -369,7 +404,12 @@ impl Document {
     /// [`JsonError`] describing the first syntax problem, depth overrun, or trailing bytes.
     pub fn parse(source: impl Into<Bytes>, limits: Limits) -> Result<Self, JsonError> {
         let source: Bytes = source.into();
-        let mut p = Parser { b: &source, i: 0, depth: 0, limits };
+        let mut p = Parser {
+            b: &source,
+            i: 0,
+            depth: 0,
+            limits,
+        };
         let root = p.value()?;
         p.ws();
         if p.i != source.len() {
@@ -382,7 +422,8 @@ impl Document {
     #[must_use]
     pub fn looks_like_json(b: &[u8]) -> bool {
         let t = b.trim_ascii();
-        matches!(t.first(), Some(b'{' | b'[')) && Self::parse(Bytes::copy_from_slice(t), Limits::default()).is_ok()
+        matches!(t.first(), Some(b'{' | b'['))
+            && Self::parse(Bytes::copy_from_slice(t), Limits::default()).is_ok()
     }
 
     /// The root node.
@@ -414,7 +455,9 @@ impl Document {
     /// Decoded value of a string node.
     #[must_use]
     pub fn string_value(&self, n: &JsonNode) -> Option<String> {
-        matches!(n.kind, NodeKind::String).then(|| decode_string(self.raw(n)).ok()).flatten()
+        matches!(n.kind, NodeKind::String)
+            .then(|| decode_string(self.raw(n)))
+            .flatten()
     }
 
     /// Resolve a path (see [`crate::path`]) to a node.

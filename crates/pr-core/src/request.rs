@@ -61,17 +61,26 @@ impl Effects {
     /// An unclassified command.
     #[must_use]
     pub fn unknown() -> Self {
-        Self { unknown: true, ..Self::default() }
+        Self {
+            unknown: true,
+            ..Self::default()
+        }
     }
     /// A pure read.
     #[must_use]
     pub fn read() -> Self {
-        Self { reads_data: true, ..Self::default() }
+        Self {
+            reads_data: true,
+            ..Self::default()
+        }
     }
     /// A write.
     #[must_use]
     pub fn write() -> Self {
-        Self { writes_data: true, ..Self::default() }
+        Self {
+            writes_data: true,
+            ..Self::default()
+        }
     }
     /// True if this may change server state in any way.
     #[must_use]
@@ -94,7 +103,11 @@ pub struct RequestBudget {
 impl Default for RequestBudget {
     fn default() -> Self {
         // v2.1 §24.3: 16 MiB single-result retention; §12.5 depth guard.
-        Self { max_retained_bytes: 16 * 1024 * 1024, timeout_ms: 30_000, max_depth: 64 }
+        Self {
+            max_retained_bytes: 16 * 1024 * 1024,
+            timeout_ms: 30_000,
+            max_depth: 64,
+        }
     }
 }
 
@@ -115,7 +128,12 @@ impl CommandRequest {
     /// Build a request from argv.
     #[must_use]
     pub fn new(args: Vec<Bytes>, origin: RequestOrigin, effects: Effects) -> Self {
-        Self { args, origin, effects, budget: RequestBudget::default() }
+        Self {
+            args,
+            origin,
+            effects,
+            budget: RequestBudget::default(),
+        }
     }
 
     /// Uppercased command name (first argument) as a `String`, for catalog lookup.
@@ -182,7 +200,11 @@ mod tests {
         let c = req(&[b"SET", b"a b"]);
         let d = req(&[b"SET", b"a", b"b"]);
         assert_ne!(c.canonical_bytes(), d.canonical_bytes());
-        assert_eq!(c.display().as_display(), d.display().as_display(), "display collides; bytes must not");
+        assert_eq!(
+            c.display().as_display(),
+            d.display().as_display(),
+            "display collides; bytes must not"
+        );
     }
 
     #[test]
@@ -214,9 +236,15 @@ mod tests {
 
     #[test]
     fn command_name_is_uppercased_and_tolerates_binary() {
-        assert_eq!(req(&[b"hgetall", b"k"]).command_name().as_deref(), Some("HGETALL"));
+        assert_eq!(
+            req(&[b"hgetall", b"k"]).command_name().as_deref(),
+            Some("HGETALL")
+        );
         assert_eq!(req(&[b"\xff"]).command_name(), None);
-        assert_eq!(CommandRequest::new(vec![], RequestOrigin::User, Effects::unknown()).command_name(), None);
+        assert_eq!(
+            CommandRequest::new(vec![], RequestOrigin::User, Effects::unknown()).command_name(),
+            None
+        );
     }
 
     #[test]
