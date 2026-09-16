@@ -204,17 +204,43 @@ fn the_destination_is_never_written_in_place() {
     // A reader that opens the file at any moment sees a whole version, old or new. That holds
     // because the destination is only ever replaced by rename -- if it were opened for writing
     // and truncated, there would be a window where it is empty.
+    //
+    // This is asserted **directly**, by holding a reader open across the update, rather than by
+    // comparing an identity number before and after. Two earlier attempts at the indirect
+    // version were both wrong on Windows and both looked right:
+    //
+    //   - creation time: NTFS file system tunnelling deliberately restores the original
+    //     creation timestamp when a name is recreated within ~15 seconds of being removed,
+    //     which is exactly what an atomic replace does. The test then reported "modified in
+    //     place" about the operation it exists to prove.
+    //   - `Metadata::file_index`: still unstable (`windows_by_handle`), so it does not compile.
+    //
+    // Holding the reader open is also the property the protocol actually promises, instead of
+    // a proxy for it. A handle opened before the replace keeps reading the version it opened;
+    // an in-place rewrite would show the new bytes, or an empty window, through that handle.
     let dir = scratch("atomic");
     let path = dir.join("profiles.toml");
     let file = SharedFile::new(&path);
     file.update(|_| "one\n".to_owned()).unwrap();
-    let first_inode = inode_of(&path);
+
+    let mut reader = std::fs::File::open(&path).unwrap();
 
     file.update(|_| "two\n".to_owned()).unwrap();
-    let second_inode = inode_of(&path);
-    assert_ne!(
-        first_inode, second_inode,
-        "the file was modified in place rather than replaced"
+
+    let mut seen = String::new();
+    std::io::Read::read_to_string(&mut reader, &mut seen).unwrap();
+    // Content checks rather than an exact match: the file carries a `# penguin-version:`
+    // header, and pinning the whole text here would make this test fail for the unrelated
+    // reason that the header changed.
+    assert!(
+        seen.contains("one\n") && !seen.contains("two"),
+        "a reader that opened the file before the update saw the update through its own \
+         handle, so the destination was rewritten in place rather than replaced; it read {seen:?}"
+    );
+    let now = std::fs::read_to_string(&path).unwrap();
+    assert!(
+        now.contains("two\n") && !now.contains("one\n"),
+        "and a reader opening it now must see the new version; it read {now:?}"
     );
 
     // And no temp file is left behind.
@@ -233,28 +259,6 @@ fn the_destination_is_never_written_in_place() {
         "temp files left behind: {leftovers:?}"
     );
     let _ = std::fs::remove_dir_all(&dir);
-}
-
-#[cfg(unix)]
-fn inode_of(p: &Path) -> u64 {
-    use std::os::unix::fs::MetadataExt as _;
-    std::fs::metadata(p).unwrap().ino()
-}
-
-#[cfg(windows)]
-fn inode_of(p: &Path) -> u64 {
-    use std::os::windows::fs::MetadataExt as _;
-    // NTFS's file index is the identity here. The creation time is **not**: NTFS has file
-    // system tunnelling, which deliberately restores the original creation timestamp when a
-    // name is recreated within about fifteen seconds of being removed. That is exactly what an
-    // atomic replace does, so a creation-time comparison reports "modified in place" about the
-    // very operation it is supposed to prove happened -- and it did, on every Windows CI run.
-    //
-    // `file_index` is `None` on a volume that has no such notion; there the test cannot make
-    // its claim and says so rather than passing.
-    let m = std::fs::metadata(p).unwrap();
-    m.file_index()
-        .expect("this filesystem reports no file index, so identity cannot be checked here")
 }
 
 // ---------------------------------------------------------------------------------------------
