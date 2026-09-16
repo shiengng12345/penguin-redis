@@ -198,6 +198,21 @@ jobs:
       - name: every category has at least 20 samples (V-A03 criterion)
         run: cargo nextest run -p resp-server -E 'test(/every_category/)'
 
+  # ---------------------------------------------------------------- Catalog gate
+  catalog:
+    name: catalog snapshots reproduce from their pinned images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: fingerprints match, and each snapshot re-captures byte-identically
+        run: ./ci/check-catalog-snapshots.sh
+      - name: the compiled catalog classifies every command
+        run: cargo test -p pr-catalog --test grammar_table
+
   # ---------------------------------------------------------------- Phase 0 gate
   phase-0-gate:
     name: Phase 0 report has no unresolved items

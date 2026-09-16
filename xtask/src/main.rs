@@ -3,8 +3,11 @@
 //! ```text
 //! xtask measure-baseline   # V-A06/V-H01: startup, idle heap, RSS baseline
 //! xtask budgets            # print the budget table from v2.1
+//! xtask catalog-stamp <f>  # V-F01: fingerprint a pinned catalog snapshot
+//! xtask catalog-verify <f> # V-F01: check a snapshot against its fingerprint
 //! ```
 
+pub mod catalog;
 pub mod fault;
 pub mod measure;
 
@@ -54,6 +57,30 @@ fn main() {
         Some("budgets") => {
             print_budgets();
             0
+        }
+        Some(verb @ ("catalog-stamp" | "catalog-verify")) => {
+            let files = &args[2..];
+            if files.is_empty() {
+                eprintln!("{verb}: expected at least one snapshot path");
+                std::process::exit(2);
+            }
+            let mut bad = 0;
+            for f in files {
+                let path = std::path::Path::new(f);
+                let r = if verb == "catalog-stamp" {
+                    catalog::stamp(path)
+                } else {
+                    catalog::verify(path)
+                };
+                match r {
+                    Ok(msg) => println!("{f}: {msg}"),
+                    Err(e) => {
+                        eprintln!("{e}");
+                        bad += 1;
+                    }
+                }
+            }
+            i32::from(bad > 0)
         }
         Some("rss") => {
             match rss_bytes() {

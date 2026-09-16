@@ -12,6 +12,7 @@ description = "Penguin Redis — xtask: V-A06 measurement and V-A04 fault inject
 workspace = true
 
 [dependencies]
+pr-catalog = { path = "../crates/pr-catalog" }
 tokio = { workspace = true }
 
 [dev-dependencies]

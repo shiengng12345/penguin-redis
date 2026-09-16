@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 30 |
+| PASS | 32 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 32 |
+| IN-PROGRESS | 30 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -88,10 +88,10 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-F01 | IN-PROGRESS | — | |
+| V-F01 | PASS | `crates/pr-catalog/snapshots/` (redis 8.0.6 / valkey 8.1.10, digest-pinned) · `src/snapshot.rs` + `src/compile.rs` · `ci/catalog-snapshot.sh` · `ci/check-catalog-snapshots.sh` · 38 unit + 19 integration tests | 固定镜像抓取 → blake3 指纹 → 编译成 `CommandSpec`；577 / 379 条命令全部分类，仅 EVAL/EVALSHA/EXEC/FCALL 刻意留 `unknown`（其效果等于被要求执行的内容）；override 表只能加限制，`unknown` 仅在标注 `classified` 时清除；双分支 merge 报告 Redis-only(HEXPIRE/VADD/模块) 与 Valkey-only(COMMANDLOG/CLIENT CAPA/SCRIPT SHOW)，效果冲突为 0；CI 门禁要求快照能从 pinned image 逐字节重现 |
 | V-F02 | PASS | `crates/pr-intelligence/src/analyser.rs` · 11 tests（含 3 个 proptest） | 宽容分析器与权威 tokenizer 的 argv 等价性 property；span 恒在范围内且 analyse 不 panic；按 span 替换后参数个数不变、替换落在正确位置（ASSIST-081） |
 | V-F03 | PASS | `crates/pr-repl/` · 26 tests | 权威 tokenizer 对齐 `sdssplitargs`；全 256 字节 quote 往返；`:` 本地命令独立 grammar（重复选项报错、零 shell 展开） |
-| V-F04 | IN-PROGRESS | — | |
+| V-F04 | PASS | `crates/pr-catalog/tests/grammar_table.rs` · 19 tests（§11.7 十一行逐行）· `src/spec.rs` grammar walker | 真实语法树 walker 而非位置表：子命令非 key、HSET field/value 交替且 value 位不枚举、ZADD score/member 不互换（带选项时仍正确）、SET/ZADD 互斥组按版本过滤且冲突可解释不暗改、XADD 嵌套 choice、EVAL numkeys（解析失败时取 0 个 key）、XREAD STREAMS 成对切分、key 名为 NX/GET 由位置决定、ZRANGE BYSCORE/BYLEX 模式、二进制参数无损、模块命令分类 |
 | V-F05 | PASS | `crates/pr-intelligence/src/broker.rs` · 11 tests | 到达时校验 revision+scope+序号；过期结果丢弃且**不显示**；焦点跟 `CandidateId` 不跟索引（ASSIST-028）；候选消失时焦点不静默落到别处 |
 | V-F06 | PASS | `crates/pr-intelligence/src/scope.rs` · 14 tests | 六元组 scope（profile UUID + 服务身份 + DB + auth/policy/**topology** epoch）；逐项验证任一变化都不泄漏；field 绑定 parent key；schema hint 不主张存在性 |
 | V-F07 | IN-PROGRESS | — | |
@@ -171,3 +171,4 @@
 | 2026-09-16 | V-F02 → PASS（双解析器等价性 property）；395 tests 全绿 |
 | 2026-09-16 | V-F05 / V-F06 → PASS（异步 broker、observation scope 隔离）；420 tests 全绿 |
 | 2026-09-16 | V-F10 / V-D05 → PASS（零发送不变量、SafeText 显示边界）；441 tests 全绿 |
+| 2026-09-16 | V-F01 / V-F04 → PASS（catalog 编译流水线 + §11.7 语法全表）；walker 抓到两个真 bug（Choice 选不到无关键字分支、numkeys 解析失败仍吞 key）；`deny_unknown_fields` 抓到快照残留字段；新增 `catalog` CI 门禁；488 tests 全绿 |
