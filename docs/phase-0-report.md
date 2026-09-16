@@ -8,7 +8,7 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 43 |
+| PASS | 42 |
 | FALLBACK-ADOPTED | 1 |
 | IN-PROGRESS | 19 |
 | BLOCKED | 0 |
