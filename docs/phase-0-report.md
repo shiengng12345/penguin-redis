@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 16 |
+| PASS | 17 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 46 |
+| IN-PROGRESS | 45 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -57,7 +57,7 @@
 | V-C03 | IN-PROGRESS | — | |
 | V-C04 | IN-PROGRESS | — | |
 | V-C05 | IN-PROGRESS | — | |
-| V-C06 | IN-PROGRESS | — | |
+| V-C06 | PASS | `crates/pr-render/src/theme.rs` · 14 tests | Dark/Light/High-contrast 三套 token 全定义；WCAG 对比度自动校验；24bit→256→16→mono 量化后 JSON token 仍可分辨；**mono 保留 bold、plain 零转义** |
 | V-C07 | IN-PROGRESS | — | |
 
 ## Track D · 安全与凭证
@@ -162,3 +162,4 @@
 | 2026-09-16 | **CI 17/17 全绿** → V-A05 PASS；SPIKE-001 结论：Reedline 不达标，V-C01 走 ADR-026 回退并实现自有 LineBuffer；216 tests 全绿 |
 | 2026-09-16 | V-B05 / V-D01 → PASS（会话状态机、三平台凭证存储）；244 tests 全绿 |
 | 2026-09-16 | V-D02 → PASS（凭证 journal 与崩溃 reconciliation）；256 tests 全绿 |
+| 2026-09-16 | V-C06 → PASS（三主题 token + 量化降级）；测试暴露 mono/plain 语义混淆并分离；270 tests 全绿 |
