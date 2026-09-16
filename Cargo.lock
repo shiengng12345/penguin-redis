@@ -759,6 +759,7 @@ dependencies = [
  "pr-protocol",
  "pr-security",
  "thiserror 2.0.20",
+ "toml",
 ]
 
 [[package]]

@@ -1,0 +1,269 @@
+# redis-cli special-mode inventory (V-I04, v2.1 §28.4, R36)
+#
+# Generated from the help output of a digest-pinned redis-cli, not from memory and not
+# from the blueprint. §28.4 is explicit about why: "名称与详细 flags 由该 baseline 的
+# help/source 生成登记，不能因为本段列了名字就标记实现完成."
+#
+# `contract` is the row of §28.4's table this flag falls under. `uncontracted` means the
+# baseline has it and §28.4 does not name it — recorded rather than quietly dropped,
+# because an unlisted mode is a compatibility gap nobody has decided about yet.
+
+[baseline]
+tool = "redis-cli"
+version = "8.0.6"
+image = "redis@sha256:ae471bdc20de180beed36e347d170ec0bdf8faa327959ea1f24692f22b05b955"
+captured = "2026-09-16"
+source = "redis-cli --help, redis-cli --cluster help"
+
+# ---------------------------------------------------------------- key-space analysis
+# §28.4 row 1: dedicated read-only session, ordinary commands, results stay local.
+# Allowed in production under §23.3's read budget; an agent needs policy permission.
+# Cancellation yields partial results plus the range already scanned.
+
+[[mode]]
+flag = "--scan"
+contract = "scan-analysis"
+session = "dedicated-readonly"
+protocol = "ordinary-commands"
+data_flow = "read-only, local"
+prod = "allow-under-read-budget"
+agent = "policy-required"
+cancel = "partial results plus scanned range"
+options = ["--pattern", "--quoted-pattern", "--count"]
+
+[[mode]]
+flag = "--bigkeys"
+contract = "scan-analysis"
+session = "dedicated-readonly"
+protocol = "ordinary-commands"
+data_flow = "read-only, local"
+prod = "allow-under-read-budget"
+agent = "policy-required"
+cancel = "partial results plus scanned range"
+options = ["--pattern", "--count"]
+
+[[mode]]
+flag = "--memkeys"
+contract = "scan-analysis"
+session = "dedicated-readonly"
+protocol = "ordinary-commands"
+data_flow = "read-only, local"
+prod = "allow-under-read-budget"
+agent = "policy-required"
+cancel = "partial results plus scanned range"
+options = ["--memkeys-samples", "--pattern", "--count"]
+
+[[mode]]
+flag = "--keystats"
+contract = "scan-analysis"
+session = "dedicated-readonly"
+protocol = "ordinary-commands"
+data_flow = "read-only, local"
+prod = "allow-under-read-budget"
+agent = "policy-required"
+cancel = "partial results plus scanned range"
+options = ["--keystats-samples", "--cursor", "--top", "--pattern", "--count"]
+note = "combines --bigkeys and --memkeys; --cursor resumes a scan a Ctrl-C interrupted, which is the partial-result contract made explicit by the baseline itself"
+
+[[mode]]
+flag = "--hotkeys"
+contract = "uncontracted"
+session = "dedicated-readonly"
+protocol = "ordinary-commands"
+data_flow = "read-only, local"
+prod = "allow-under-read-budget"
+agent = "policy-required"
+cancel = "partial results plus scanned range"
+options = ["--pattern", "--count"]
+note = "§28.4's table names --scan/--bigkeys/--memkeys/--keystats but not --hotkeys. It belongs to the same row by every property, and it has one extra precondition the others do not: it only works when maxmemory-policy is an LFU policy, so the mode must say so rather than return an empty result that looks like 'no hot keys'."
+
+# ---------------------------------------------------------------- monitoring
+# §28.4 row 2: dedicated session, INFO/PING loop, read-only, duration budget.
+
+[[mode]]
+flag = "--stat"
+contract = "stat-latency"
+session = "dedicated"
+protocol = "info-ping-loop"
+data_flow = "read-only"
+prod = "allow-with-duration-budget"
+agent = "policy-required"
+cancel = "stopping ends it"
+options = ["-i"]
+
+[[mode]]
+flag = "--latency"
+contract = "stat-latency"
+session = "dedicated"
+protocol = "info-ping-loop"
+data_flow = "read-only"
+prod = "allow-with-duration-budget"
+agent = "policy-required"
+cancel = "stopping ends it"
+
+[[mode]]
+flag = "--latency-history"
+contract = "stat-latency"
+session = "dedicated"
+protocol = "info-ping-loop"
+data_flow = "read-only"
+prod = "allow-with-duration-budget"
+agent = "policy-required"
+cancel = "stopping ends it"
+options = ["-i"]
+
+[[mode]]
+flag = "--latency-dist"
+contract = "stat-latency"
+session = "dedicated"
+protocol = "info-ping-loop"
+data_flow = "read-only"
+prod = "allow-with-duration-budget"
+agent = "policy-required"
+cancel = "stopping ends it"
+
+[[mode]]
+flag = "--intrinsic-latency"
+contract = "uncontracted"
+session = "none"
+protocol = "none"
+data_flow = "local only"
+prod = "allow"
+agent = "allow"
+cancel = "stopping ends it"
+note = "Measures the *local machine's* scheduling latency and never contacts a server. §28.4's latency row assumes an INFO/PING loop, which this is not. Worth recording precisely because it is the one 'mode' that cannot fail for a reason the server is responsible for, and a user comparing its number with --latency needs to be told they are different measurements."
+
+# ---------------------------------------------------------------- writing
+# §28.4 row 3: dedicated session, frame-by-frame parsing (§18.5), writes to the server.
+# Production follows the write policy; **agent is denied**.
+
+[[mode]]
+flag = "--pipe"
+contract = "pipe"
+session = "dedicated"
+protocol = "frame-by-frame"
+data_flow = "writes to server"
+prod = "write-policy"
+agent = "deny"
+cancel = "unacknowledged frames marked unknown"
+options = ["--pipe-timeout"]
+
+# ---------------------------------------------------------------- bulk export
+# §28.4 row 4: dedicated replication session, full data leaves the server.
+# **Denied in production and for agents.** Dev requires confirmation and a path preview.
+
+[[mode]]
+flag = "--rdb"
+contract = "rdb-export"
+session = "dedicated-replication"
+protocol = "sync-replconf"
+data_flow = "full dataset exported to this machine"
+prod = "deny"
+agent = "deny"
+dev = "confirm-with-path-preview"
+cancel = "a partial file is marked incomplete and can be deleted"
+note = "A filename of \"-\" writes to stdout, which turns a whole-database export into something a shell redirect decides the destination of. The confirmation must name the resolved destination, not the argument."
+
+[[mode]]
+flag = "--functions-rdb"
+contract = "rdb-export"
+session = "dedicated-replication"
+protocol = "sync-replconf"
+data_flow = "functions exported to this machine"
+prod = "deny"
+agent = "deny"
+dev = "confirm-with-path-preview"
+cancel = "a partial file is marked incomplete and can be deleted"
+
+[[mode]]
+flag = "--replica"
+contract = "replica-stream"
+session = "dedicated-replication"
+protocol = "replication-stream"
+data_flow = "continuous export"
+prod = "deny"
+agent = "deny"
+cancel = "stopping disconnects; the range received is shown"
+
+# ---------------------------------------------------------------- scripting
+# §28.4 row 6: dedicated session, may write. Production follows the unknown_commands policy
+# (deny by default); **sync mode needs an extra confirmation because it blocks the server**.
+
+[[mode]]
+flag = "--eval"
+contract = "scripting"
+session = "dedicated"
+protocol = "script"
+data_flow = "may write"
+prod = "unknown-commands-policy"
+agent = "deny"
+cancel = "the debug session is released when it ends"
+
+[[mode]]
+flag = "--ldb"
+contract = "scripting"
+session = "dedicated"
+protocol = "script"
+data_flow = "may write"
+prod = "unknown-commands-policy"
+agent = "deny"
+cancel = "the debug session is released when it ends"
+
+[[mode]]
+flag = "--ldb-sync-mode"
+contract = "scripting"
+session = "dedicated"
+protocol = "script"
+data_flow = "may write"
+prod = "unknown-commands-policy-plus-extra-confirmation"
+agent = "deny"
+cancel = "the debug session is released when it ends"
+note = "Blocks the server for the duration of the debugging session. §28.4 requires a separate confirmation for exactly this reason: the cost is paid by every other client, not by the person debugging."
+
+# ---------------------------------------------------------------- repetition
+# §28.4 row 7: same session and policy as the command itself, times a repeat budget.
+
+[[mode]]
+flag = "-r"
+contract = "repeat"
+session = "same-as-command"
+protocol = "ordinary-commands"
+data_flow = "same as the command"
+prod = "command-policy-times-repeat-budget"
+agent = "command-policy-times-repeat-budget"
+cancel = "each repetition has its own outcome"
+options = ["-i"]
+note = "The policy multiplies: a write approved once is not a write approved a thousand times, which is why §28.4 gives the repeat count its own budget."
+
+# ---------------------------------------------------------------- load generation
+# §28.4 row 8: dedicated session, **creates load**. Denied in production and for agents.
+
+[[mode]]
+flag = "--lru-test"
+contract = "lru-test"
+session = "dedicated"
+protocol = "bulk-writes"
+data_flow = "generates load"
+prod = "deny"
+agent = "deny"
+dev = "confirm"
+cancel = "stopping ends it"
+
+# ---------------------------------------------------------------- cluster management
+# §28.4 row 9 and §28.5: multi-node session, changes topology, full action plan required.
+# **Agent denied.** Interrupting shows the steps already completed.
+
+[[mode]]
+flag = "--cluster"
+contract = "cluster-management"
+session = "multi-node"
+protocol = "cluster-management-commands"
+data_flow = "topology change"
+prod = "action-plan-required"
+agent = "deny"
+cancel = "step-by-step outcome; an interruption shows the completed steps"
+subcommands = [
+  "create", "check", "info", "fix", "reshard", "rebalance",
+  "add-node", "del-node", "call", "set-timeout", "import", "backup", "help",
+]
+note = "`backup` exports data and `call` runs an arbitrary command on every node — both are more than a topology change, and §28.5's action plan has to say which nodes each step touches."

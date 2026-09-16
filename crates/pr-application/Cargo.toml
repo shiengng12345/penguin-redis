@@ -18,3 +18,6 @@ pr-protocol = { path = "../pr-protocol" }
 pr-security = { path = "../pr-security" }
 bytes = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+toml = { workspace = true }

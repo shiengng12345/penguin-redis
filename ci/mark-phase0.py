@@ -7,9 +7,12 @@ CI gate only caught it because it counts rows. This does the edit structurally i
 find the row by ID, replace the whole line, and recount the summary from the rows that are
 actually there rather than from a number somebody remembered to bump.
 
+Evidence and notes are read from files, not from the command line. Backticks in a shell
+argument are command substitution, and a note full of `code spans` silently loses every one of
+them — which is how a ledger row ended up describing flags it never named.
+
 Usage:
-    ci/mark-phase0.py V-D03 PASS "evidence links" "what was verified and why it matters"
-    ci/mark-phase0.py V-D03 PASS ... ... --log "one line for the changelog"
+    ci/mark-phase0.py V-D03 PASS --evidence-file e.md --note-file n.md [--log-file l.md]
 """
 
 import re
@@ -63,15 +66,40 @@ def main() -> int:
         # drifted: `PASS` was being incremented for an item recorded as FALLBACK-ADOPTED too,
         # so the three categories summed to one more than there are items.
         return recount()
-    log_line = None
-    if "--log" in args:
-        i = args.index("--log")
-        log_line = args[i + 1]
+    def take(flag: str) -> str | None:
+        nonlocal args
+        if flag not in args:
+            return None
+        i = args.index(flag)
+        value = args[i + 1]
         args = args[:i] + args[i + 2 :]
-    if len(args) != 4:
-        print(__doc__, file=sys.stderr)
-        return 2
-    item, status, evidence, note = args
+        return value
+
+    evidence_file = take("--evidence-file")
+    note_file = take("--note-file")
+    log_file = take("--log-file")
+    log_line = take("--log")
+
+    if evidence_file:
+        evidence = Path(evidence_file).read_text(encoding="utf-8").strip()
+        note = Path(note_file).read_text(encoding="utf-8").strip() if note_file else ""
+        if log_file:
+            log_line = Path(log_file).read_text(encoding="utf-8").strip()
+        if len(args) != 2:
+            print(__doc__, file=sys.stderr)
+            return 2
+        item, status = args
+    else:
+        if len(args) != 4:
+            print(__doc__, file=sys.stderr)
+            return 2
+        item, status, evidence, note = args
+
+    # A row is one line. A newline in the evidence or the note would split the table.
+    evidence = " ".join(evidence.split())
+    note = " ".join(note.split())
+    if log_line:
+        log_line = " ".join(log_line.split())
 
     text = REPORT.read_text(encoding="utf-8")
     lines = text.split("\n")
