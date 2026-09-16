@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 38 |
+| PASS | 39 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 24 |
+| IN-PROGRESS | 23 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -56,7 +56,7 @@
 | V-C02 | PASS | `crates/pr-terminal/`（ownership/event/paint/coordinator + `pr-terminal-demo`）· `tests/owner.rs` 19 tests · `tests/pty_owner.rs` 7 PTY tests | 「无第二个 stdin 读者/并发 stdout 写者」做成资源而非约定：`Ownership` 进程级 token，第二个 `Coordinator::new` 返回 `AlreadyOwned`，`Painter` 必须同时持 token 与 `&mut Sink`；worker 只能 `Mailbox::post`，由 coordinator 决定何时 print-and-redraw。ASSIST-062：25/20 条 push 涌入与打字交错，buffer、光标、菜单焦点均不变，通知逐条进 scrollback 且从不落在 prompt 行内；UX-12/场景 H：F1 帮助不动命令框，Esc 先关帮助再退 TUI，草稿与来源 `@r2 / DB 0 / result #17` 原样带回且**不执行**；alternate screen 进/出各恰好一次，TUI 期间通知排队、回到 REPL 后按序补印 |
 | V-C03 | PASS | `crates/pr-terminal/src/paste.rs` 18 tests · `tests/paste_matrix.rs` 10 tests · `tests/owner.rs` 6 tests · `tests/pty_owner.rs` 3 PTY tests · `docs/manual-verification/MV-V-C03-paste.md` | paste-staging：多行进审阅视图逐行显示、可上下移动/编辑/删除，三种选择（逐条 / 单条多行 / 取消），**Enter 在该视图中刻意无作用**——用户凭反射会按的那个键正是此刻必须什么都不做的键。单行直接进编辑缓冲区不提交。真实 PTY 上验证：粘贴 3 行含 `FLUSHALL`，删掉那行再选「逐条」，只有另两条被提交。无 bracketed paste 的 10 ms 时序启发式在 14 条定时 trace corpus 上 **0 漏检 / 误判 0 of 7（0%）**；覆盖瞬时、1ms、CRLF、纯 `\r`、10 行脚本、超长单行，以及正常打字、快速打字（15ms）、犹豫打字、按键重复、刚好 11ms 的边界。时序**无法**覆盖的情形（慢速中继的粘贴）用一个断言「它确实漏检」的测试写明，而不是从 corpus 里删掉 |
 | V-C04 | PASS | `crates/pr-terminal/tests/width_matrix.rs` 12 tests · `crates/pr-terminal/src/probe.rs` 12 tests · `crates/pr-render/src/table.rs` `DrawMode::CursorReset` · `xtask/pty-harness/src/screen.rs` `CellWidth` · `docs/manual-verification/MV-V-C04-width.md` | 降级绘制不能靠「渲染完再读回自己的输出」证明——那只说明渲染器同意自己。测试改为**用一种宽度模型渲染、用另一种模型显示**：屏幕模型的 `CellWidth::UnicodeWide` 扮演 CJK 终端，narrow 策略渲染的 padded 表格右边框逐行漂移（先断言这个漂移真的发生，否则降级测试是空的），`CursorReset` 每个单元格边界发绝对光标移动，框线仍对齐。`CSI 6 n` 探测：仅 TTY、仅用户触发（`prc --probe-width`），非 TTY 直接拒绝且**一个字节都不写**，无应答 500 ms 放弃而非挂起，一处分歧即切换。过程中修正屏幕模型两个真实错误：组合字符被强制成 1 列（终端会合成到前一格，格子改存 grapheme cluster），以及 box-drawing 按 Ambiguous 判宽（真实终端特例化为窄，否则任何 TUI 都是坏的）。真实终端差异 → `MV-V-C04-*` 人工记录，编号已分配 |
-| V-C05 | IN-PROGRESS | — | |
+| V-C05 | PASS | `crates/pr-repl/src/entries.rs` 9 tests · `crates/pr-terminal/tests/key_matrix.rs` 4 tests · `docs/manual-verification/MV-V-C05-keys.md` | 验收标准是「每个功能至少一条文字入口在所有组合可用」，不是「每个快捷键都能用」——后者不可能成立。§14.2 八行做成数据，测试断言：除「取消输入」（Ctrl+C 是唯一每个终端都送达的键）外每个功能都有文字入口、每条入口都能 parse、全是可直接键入的 ASCII、`Ctrl+Space` 不作任何默认键、重映射**不能**连带移除文字入口。裸 PTY 实测（macOS）：F1(SS3/CSI)、F2(SS3/CSI)、F3、F4、F5、F6、Ctrl+R/P/N **全部送达**；`Ctrl+Space`（NUL）**未送达**，与 §14.2 预判一致。终端 × 输入法（含 macOS F 键默认被系统占用的两种设置）→ `MV-V-C05-*` 人工记录，编号已分配 |
 | V-C06 | PASS | `crates/pr-render/src/theme.rs` · 14 tests | Dark/Light/High-contrast 三套 token 全定义；WCAG 对比度自动校验；24bit→256→16→mono 量化后 JSON token 仍可分辨；**mono 保留 bold、plain 零转义** |
 | V-C07 | IN-PROGRESS | — | |
 
@@ -179,3 +179,4 @@
 | 2026-09-16 | V-H04 → PASS（任务监督 leak detection / PERF-03）；修正 `TaskScope` 的取消语义（`select!` 竞速使协作清理永远跑不到、`shutdown` 返回值失真）；617 tests |
 | 2026-09-16 | V-C04 → PASS（Unicode 宽度矩阵）；新增 `DrawMode::CursorReset` 降级绘制、`CSI 6 n` 探测与 `prc --probe-width`；屏幕模型改为 grapheme cluster 格子；651 tests |
 | 2026-09-16 | V-C03 → PASS（bracketed paste 与时序启发式）；paste-staging 接入 coordinator，`Action::SubmitMany` 让「一次粘贴多条命令」必须被显式处理；687 tests |
+| 2026-09-16 | V-C05 → PASS（按键可达性）；§14.2 表格入代码 + `PR_KEYPROBE` 键位探针；700 tests |

@@ -27,7 +27,40 @@ use std::time::Duration;
 
 use pr_terminal::{Action, Coordinator, Input, Key, Mailbox, NoticeOrigin, Stdout, translate};
 
+/// Echo every decoded key and nothing else (V-C05).
+///
+/// A separate mode rather than a flag on the normal loop: the question here is what the
+/// terminal *delivers*, and answering it must not depend on any of the coordinator's own
+/// key handling.
+fn key_probe() -> Result<(), Box<dyn std::error::Error>> {
+    println!("keyprobe ready");
+    std::io::stdout().flush()?;
+    crossterm::terminal::enable_raw_mode()?;
+    loop {
+        if !crossterm::event::poll(Duration::from_millis(50))? {
+            continue;
+        }
+        let Some(input) = translate(&crossterm::event::read()?) else {
+            continue;
+        };
+        if let Input::Key(k) = &input {
+            if *k == Key::Ctrl('d') {
+                break;
+            }
+            // `\r\n` because raw mode does not translate a bare newline.
+            print!("key={k:?}\r\n");
+            std::io::stdout().flush()?;
+        }
+    }
+    crossterm::terminal::disable_raw_mode()?;
+    println!("keyprobe done");
+    Ok(())
+}
+
 fn run() -> Result<(), Box<dyn std::error::Error>> {
+    if std::env::var("PR_KEYPROBE").is_ok() {
+        return key_probe();
+    }
     // Printed before anything else touches the terminal, so a PTY test that times out can
     // tell "the process never started" apart from "the coordinator never painted". Windows
     // CI needed exactly this distinction.

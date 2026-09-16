@@ -5,11 +5,13 @@
 //! `redis-cli` byte for byte, the other is Penguin's own (ADR-002, R18).
 
 pub mod buffer;
+pub mod entries;
 pub mod history;
 pub mod local;
 pub mod quoting;
 
 pub use buffer::{EditError, LineBuffer, TextEdit};
+pub use entries::{ENTRIES, KeyEntry, KeyMap, entry_for, text_entries};
 pub use history::{
     Entry, History, HistoryError, RedactionLevel, SCHEMA_VERSION, Scope, has_placeholder, redact,
 };
