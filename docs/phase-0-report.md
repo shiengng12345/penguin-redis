@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 32 |
+| PASS | 33 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 30 |
+| IN-PROGRESS | 29 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -53,7 +53,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-C01 | FALLBACK-ADOPTED(ADR-026) | `docs/spikes/SPIKE-001.md` · `crates/pr-repl/src/buffer.rs` · 20 tests | Reedline 不满足 (b)：undo 在私有 `Editor` 上；且 mid-codepoint 光标会在库内 panic。采用预命名回退：自有 grapheme LineBuffer + EditTransaction |
-| V-C02 | IN-PROGRESS | — | |
+| V-C02 | PASS | `crates/pr-terminal/`（ownership/event/paint/coordinator + `pr-terminal-demo`）· `tests/owner.rs` 19 tests · `tests/pty_owner.rs` 7 PTY tests | 「无第二个 stdin 读者/并发 stdout 写者」做成资源而非约定：`Ownership` 进程级 token，第二个 `Coordinator::new` 返回 `AlreadyOwned`，`Painter` 必须同时持 token 与 `&mut Sink`；worker 只能 `Mailbox::post`，由 coordinator 决定何时 print-and-redraw。ASSIST-062：25/20 条 push 涌入与打字交错，buffer、光标、菜单焦点均不变，通知逐条进 scrollback 且从不落在 prompt 行内；UX-12/场景 H：F1 帮助不动命令框，Esc 先关帮助再退 TUI，草稿与来源 `@r2 / DB 0 / result #17` 原样带回且**不执行**；alternate screen 进/出各恰好一次，TUI 期间通知排队、回到 REPL 后按序补印 |
 | V-C03 | IN-PROGRESS | — | |
 | V-C04 | IN-PROGRESS | — | |
 | V-C05 | IN-PROGRESS | — | |
@@ -172,3 +172,4 @@
 | 2026-09-16 | V-F05 / V-F06 → PASS（异步 broker、observation scope 隔离）；420 tests 全绿 |
 | 2026-09-16 | V-F10 / V-D05 → PASS（零发送不变量、SafeText 显示边界）；441 tests 全绿 |
 | 2026-09-16 | V-F01 / V-F04 → PASS（catalog 编译流水线 + §11.7 语法全表）；walker 抓到两个真 bug（Choice 选不到无关键字分支、numkeys 解析失败仍吞 key）；`deny_unknown_fields` 抓到快照残留字段；新增 `catalog` CI 门禁；488 tests 全绿 |
+| 2026-09-16 | V-C02 → PASS（单一 terminal owner）；引入 crossterm（ADR-022 指定）作 raw mode 与事件源；真实 PTY 上跑 ASSIST-062 / UX-12 / 场景 H；524 tests 全绿 |

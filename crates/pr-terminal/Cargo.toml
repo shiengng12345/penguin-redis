@@ -11,4 +11,16 @@ description = "Penguin Redis — pr-terminal"
 [lints]
 workspace = true
 
+[[bin]]
+name = "pr-terminal-demo"
+path = "src/bin/demo.rs"
+
 [dependencies]
+crossterm = { workspace = true }
+pr-render = { path = "../pr-render" }
+pr-repl = { path = "../pr-repl" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+portable-pty = "0.9"
+pty-harness = { path = "../../xtask/pty-harness" }

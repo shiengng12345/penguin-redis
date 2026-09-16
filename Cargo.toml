@@ -22,6 +22,7 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"   # Penguin-owned schemas ONLY (v2.1 §8.3); never for server business JSON
 toml = "0.9"
 blake3 = "1"
+crossterm = "0.29"   # ADR-022: the single event source and raw-mode owner
 tracing = "0.1"
 
 [workspace.lints.rust]
