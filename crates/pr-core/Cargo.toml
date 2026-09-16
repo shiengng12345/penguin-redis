@@ -17,6 +17,11 @@ thiserror = { workspace = true }
 tokio = { workspace = true }
 tokio-util = { workspace = true }
 
+# V-C07 / §35.1: the OS delivery layer for Ctrl+C and Ctrl+Break. The meaning layer above it
+# is platform-free; only `SetConsoleCtrlHandler` is not.
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Console"] }
+
 [dev-dependencies]
 proptest = { workspace = true }
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }

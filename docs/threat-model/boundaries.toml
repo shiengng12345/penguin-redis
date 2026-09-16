@@ -45,7 +45,20 @@ name = "who answered"
 crosses = "a TLS identity and a service identity into a decision to send a credential"
 why = "The address is chosen by DNS, by a failover, or by a `MOVED` the server sent. Binding a credential to an address means the server can move where the password goes."
 cases = ["SEC-05"]
-covered_by = ["crates/pr-security/src/trust.rs", "crates/pr-security/tests/trust_binding.rs"]
+covered_by = [
+  "crates/pr-security/src/trust.rs",
+  "crates/pr-security/tests/trust_binding.rs",
+  # V-G04: the TLS identity is no longer only a type. A real handshake against a real server,
+  # with wrong-name, expired and unknown-CA all refused and each refusal naming its own reason.
+  "crates/pr-transport/src/tls.rs",
+  "crates/pr-transport/tests/tls_matrix.rs",
+  # V-G03: a tunnel adds a second identity to trust — the jump host's. `base_options` refuses
+  # to weaken host-key checking, refuses a shared ControlMaster, and refuses to fall back to a
+  # direct connection when the SOCKS5 proxy says no.
+  "crates/pr-transport/src/ssh.rs",
+  "crates/pr-transport/tests/ssh_tunnels.rs",
+  "crates/pr-transport/tests/ssh_live.rs",
+]
 
 [[boundary]]
 id = "errors"
@@ -120,7 +133,14 @@ name = "renderers and adapters"
 crosses = "third-party code into the render path"
 why = "A renderer that panics must not take the session with it, and must not cause the command to run twice on the way back."
 cases = ["SEC-07"]
-covered_by = ["crates/pr-render/src/generic.rs"]
+covered_by = [
+  "crates/pr-render/src/generic.rs",
+  # V-D09: the L2 boundary is a process, not a catch_unwind. A plugin that panics, aborts,
+  # hangs, floods or exhausts memory is contained, and its failure is reported as a failure
+  # rather than as an empty render.
+  "crates/pr-render/src/plugin.rs",
+  "crates/pr-render/tests/plugin_isolation.rs",
+]
 
 [[boundary]]
 id = "mcp"
@@ -128,7 +148,17 @@ name = "an agent over MCP"
 crosses = "a request from a program into the same kernel a person uses"
 why = "§23.1: an agent cannot create its own approval. Every write, consuming read, admin or unclassified command needs a human-issued token, and a policy cannot issue one."
 cases = ["SEC-03", "SEC-06", "SEC-09"]
-covered_by = ["crates/pr-security/src/approval.rs", "crates/pr-application/src/pipe.rs"]
+covered_by = [
+  "crates/pr-security/src/approval.rs",
+  "crates/pr-application/src/pipe.rs",
+  # V-D08: the channel itself, not only the policy above it. A closed tool list, every byte on
+  # stdout belonging to a JSON-RPC frame, and `execute_approved_plan` refused before anything
+  # else happens when no human token is offered.
+  "crates/pr-mcp/src/stdio.rs",
+  "crates/pr-mcp/src/tools.rs",
+  "crates/pr-mcp/tests/bootstrap.rs",
+  "crates/pr-mcp/tests/approval_boundary.rs",
+]
 
 [[boundary]]
 id = "pipe"

@@ -26,6 +26,13 @@ fn main() {
     // the first line of work would leave that line uncovered.
     let _ = pr_security::secrets::scrub_panics();
 
+    // §35.1 / V-C07: on Windows, Ctrl+C and Ctrl+Break arrive from the console rather than as
+    // keystrokes, so the handler has to be registered before there is anything to interrupt.
+    // Off Windows this does nothing and returns Ok, so there is one code path here.
+    if let Err(e) = pr_core::signal::delivery::install() {
+        eprintln!("prc: could not register the console interrupt handler: {e}");
+    }
+
     let argv: Vec<String> = std::env::args().skip(1).collect();
 
     // V-D06's audit harness drives the crash-report path through a real process: register the

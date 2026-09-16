@@ -305,3 +305,162 @@ mod tests {
         assert_eq!(i.consecutive(), 0);
     }
 }
+
+/// Getting an interrupt from the operating system into [`Interrupts`] (§35.1, V-C07).
+///
+/// Everything above this point is platform-free on purpose: Ctrl+C means the same thing
+/// whatever delivered it. This is the part that does not.
+///
+/// On Unix, Ctrl+C arrives as a keystroke in raw mode and the terminal layer already sees it;
+/// there is nothing to install. On Windows, `CTRL_C_EVENT` and `CTRL_BREAK_EVENT` are delivered
+/// by the console to a registered handler on a thread the OS creates, which is why this needs a
+/// counter rather than a callback: a handler must set a flag and return, because whatever it
+/// calls runs concurrently with every other thread in the process.
+///
+/// §35.1 defines Ctrl+Break as two Ctrl+C. That is applied **here**, at delivery, so the
+/// meaning layer keeps one rule rather than two: `pending()` returns a count of Ctrl+C
+/// equivalents, and a Break contributes two of them.
+pub mod delivery {
+    use std::sync::atomic::{AtomicU32, Ordering};
+
+    /// Ctrl+C equivalents that have arrived and not yet been taken.
+    static PENDING: AtomicU32 = AtomicU32::new(0);
+
+    /// What one console event is worth, in Ctrl+C equivalents.
+    ///
+    /// A free function so the mapping is testable on every platform, not only where the console
+    /// exists. `0` is `CTRL_C_EVENT` and `1` is `CTRL_BREAK_EVENT`; the rest (close, logoff,
+    /// shutdown) are not interrupts and are left for the default handler.
+    #[must_use]
+    pub fn weight_of_event(ctrl_type: u32) -> Option<u32> {
+        match ctrl_type {
+            0 => Some(1),
+            // §35.1: 「Ctrl+Break 等价于两次 Ctrl+C」. Two, at the door, so nothing downstream
+            // has to special-case it — the same reasoning as running the rule twice rather
+            // than giving Break its own branch in `Interrupts::on`.
+            1 => Some(2),
+            _ => None,
+        }
+    }
+
+    /// Record a console event. Returns whether it was one this owns.
+    pub fn deliver(ctrl_type: u32) -> bool {
+        match weight_of_event(ctrl_type) {
+            Some(n) => {
+                PENDING.fetch_add(n, Ordering::SeqCst);
+                true
+            }
+            None => false,
+        }
+    }
+
+    /// Take everything that has arrived, leaving the counter at zero.
+    pub fn take_pending() -> u32 {
+        PENDING.swap(0, Ordering::SeqCst)
+    }
+
+    /// How many are waiting, without taking them.
+    #[must_use]
+    pub fn pending() -> u32 {
+        PENDING.load(Ordering::SeqCst)
+    }
+
+    #[cfg(windows)]
+    #[allow(unsafe_code)]
+    mod windows_console {
+        //! The one `unsafe` in this crate, and the reason it is here rather than behind a
+        //! wrapper crate: the whole binding is four lines, and a dependency whose only job is
+        //! to call one function is a supply-chain decision made to avoid writing four lines.
+        //!
+        //! The handler runs on a thread the console creates, concurrently with everything else.
+        //! It does exactly one thing — an atomic add — and returns. Anything else (locking,
+        //! allocating, printing) can deadlock against a thread the console has just suspended.
+
+        use windows_sys::Win32::Foundation::{BOOL, FALSE, TRUE};
+        use windows_sys::Win32::System::Console::SetConsoleCtrlHandler;
+
+        /// SAFETY: called by the console on its own thread. The body touches one `AtomicU32`
+        /// and nothing else, so it is safe to run at any point in any other thread's execution.
+        unsafe extern "system" fn handler(ctrl_type: u32) -> BOOL {
+            if super::deliver(ctrl_type) {
+                TRUE
+            } else {
+                FALSE
+            }
+        }
+
+        /// Register the handler.
+        ///
+        /// # Errors
+        /// The OS error, if the console refuses.
+        pub fn install() -> std::io::Result<()> {
+            // SAFETY: `handler` has the signature `PHANDLER_ROUTINE` requires and a `'static`
+            // lifetime; `TRUE` adds rather than removes. The only failure mode is the console
+            // refusing, which is reported rather than ignored.
+            let ok = unsafe { SetConsoleCtrlHandler(Some(handler), TRUE) };
+            if ok == FALSE {
+                return Err(std::io::Error::last_os_error());
+            }
+            Ok(())
+        }
+    }
+
+    /// Install the OS-level handler.
+    ///
+    /// On Windows this registers a console control handler. Everywhere else there is nothing to
+    /// install — Ctrl+C is a keystroke the terminal layer already reads — and this succeeds
+    /// without doing anything, so callers have one code path.
+    ///
+    /// # Errors
+    /// On Windows, the OS error if the console refuses the registration.
+    pub fn install() -> std::io::Result<()> {
+        #[cfg(windows)]
+        {
+            windows_console::install()
+        }
+        #[cfg(not(windows))]
+        {
+            Ok(())
+        }
+    }
+
+    #[cfg(test)]
+    #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn a_break_is_worth_two_interrupts_at_the_door() {
+            // §35.1's rule, applied where the event arrives so nothing downstream repeats it.
+            assert_eq!(weight_of_event(0), Some(1));
+            assert_eq!(weight_of_event(1), Some(2));
+        }
+
+        #[test]
+        fn close_logoff_and_shutdown_are_not_interrupts() {
+            // CTRL_CLOSE_EVENT / CTRL_LOGOFF_EVENT / CTRL_SHUTDOWN_EVENT. Claiming them would
+            // mean the process says it handled a shutdown it did not handle.
+            for t in [2u32, 5, 6, 99] {
+                assert_eq!(weight_of_event(t), None, "{t}");
+            }
+        }
+
+        #[test]
+        fn installing_is_a_no_op_off_windows_and_succeeds_on_it() {
+            install().expect("installing a console handler must not fail");
+        }
+
+        #[test]
+        fn delivery_accumulates_and_take_drains() {
+            // Serialised against the other tests by taking first: `PENDING` is process-wide,
+            // which is what it has to be, so a test that assumes it starts at zero is a test
+            // that fails when the suite is run in parallel.
+            let _ = take_pending();
+            assert!(deliver(0));
+            assert!(deliver(1));
+            assert!(!deliver(2));
+            assert_eq!(take_pending(), 3);
+            assert_eq!(pending(), 0);
+        }
+    }
+}
