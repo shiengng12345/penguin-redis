@@ -20,6 +20,25 @@ use std::fmt;
 /// `ESC` sequence introducers, OSC/DCS/APC/SOS/PM strings, and lone surrogates arriving as
 /// WTF-8. The escaped form is what gets printed; [`SafeText::raw`] returns the untouched
 /// bytes for `:copy`, byte views and exact re-insertion.
+///
+/// ```
+/// use bytes::Bytes;
+/// use pr_core::SafeText;
+///
+/// // A server-supplied string that would clear the screen and retitle the window.
+/// let hostile = SafeText::from_bytes(Bytes::from_static(b"\x1b[2Jbefore\x1b]0;pwned\x07"));
+/// assert!(hostile.was_escaped());
+/// assert!(hostile.as_display().contains("before"));
+/// // Nothing that can drive a terminal survives into the display form...
+/// assert!(!hostile.as_display().chars().any(pr_core::safetext::is_dangerous_char));
+/// // ...and the original bytes are still there for `:copy` and byte views.
+/// assert_eq!(&hostile.raw()[..2], b"\x1b[");
+///
+/// // Ordinary text is untouched and says so.
+/// let plain = SafeText::from_bytes(Bytes::from_static(b"player:10001"));
+/// assert!(!plain.was_escaped());
+/// assert_eq!(plain.as_display(), "player:10001");
+/// ```
 #[derive(Clone, PartialEq, Eq)]
 pub struct SafeText {
     escaped: String,

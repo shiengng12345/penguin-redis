@@ -6,6 +6,7 @@
 
 pub mod analyser;
 pub mod broker;
+pub mod contract;
 pub mod discovery;
 pub mod find;
 pub mod scope;
@@ -14,6 +15,7 @@ pub mod working_set;
 
 pub use analyser::{Analysis, QuoteMode, Span, analyse, submittable};
 pub use broker::{Accepted, Broker, Candidate, Dropped, Stamp};
+pub use contract::{AssistanceSnapshot, CompletionCandidate, CompletionRequest, Provenance};
 pub use discovery::{Budget, Completeness, Cooldown, Discovery, MatchMode, Outcome, Step};
 pub use find::{Finder, Hit, Purpose, Term};
 pub use scope::{Observation, ObservationScope, ObservationStore, Origin};

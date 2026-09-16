@@ -4,6 +4,7 @@
 //! key extraction; remote introspection may report availability and nothing more (ADR-030).
 
 pub mod compile;
+pub mod contract;
 pub mod diff;
 pub mod embedded;
 pub mod precedence;

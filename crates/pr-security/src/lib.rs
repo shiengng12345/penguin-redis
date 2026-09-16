@@ -5,6 +5,7 @@
 //! and [`TrustIdentity`] gives "endpoint fingerprint" a real definition (ADR-010).
 
 pub mod approval;
+pub mod contract;
 pub mod trust;
 
 pub use approval::{

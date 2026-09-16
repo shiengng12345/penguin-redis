@@ -90,7 +90,53 @@ pub struct AuthIdentity {
     pub secret_ref: String,
 }
 
-/// The full identity a profile resolves to.
+/// The full identity a profile resolves to (§21.3, ADR-010).
+///
+/// Four parts, and the credential binds to the **TLS identity and the service identity** —
+/// not to the endpoint. Re-pointing a profile at a different host is therefore a different
+/// identity, which is what stops a password following an address that changed.
+///
+/// ```
+/// use pr_security::trust::{AuthIdentity, Endpoint, ServerIdentity, TlsIdentity, TrustIdentity};
+///
+/// let id = TrustIdentity {
+///     endpoint: Endpoint::Tcp { host: "redis.internal".into(), port: 6379 },
+///     tls_identity: TlsIdentity::Ca {
+///         ca_set_hash: "ca-a".into(),
+///         server_name: "redis.internal".into(),
+///     },
+///     server_identity: ServerIdentity::Standalone { run_id_prefix: None },
+///     auth_identity: AuthIdentity { username: None, secret_ref: "credential:1".into() },
+/// };
+///
+/// // `hash` covers all four parts: it is the whole identity, and a different address is a
+/// // different identity for auditing and approval purposes.
+/// let mut moved = id.clone();
+/// moved.endpoint = Endpoint::Tcp { host: "10.0.0.7".into(), port: 6379 };
+/// assert_ne!(id.hash(), moved.hash());
+///
+/// // `credential_binding_hash` is the one that decides where a secret may be sent, and it
+/// // deliberately leaves the endpoint out (ADR-010). Moving a service to a new address does
+/// // not force the user to re-enter a password...
+/// assert_eq!(id.credential_binding_hash(), moved.credential_binding_hash());
+///
+/// // ...while a server vouched for by a *different CA* does, which is the attack this
+/// // separation exists to stop: the address is the part an attacker can arrange to own.
+/// let mut impostor = id.clone();
+/// impostor.tls_identity = TlsIdentity::Ca {
+///     ca_set_hash: "ca-b".into(),
+///     server_name: "redis.internal".into(),
+/// };
+/// assert_ne!(id.credential_binding_hash(), impostor.credential_binding_hash());
+///
+/// // A restart is not a new identity: `run_id` is excluded on purpose, or every restart
+/// // would invalidate every stored credential and teach people to click through the warning.
+/// let mut restarted = id.clone();
+/// restarted.server_identity = ServerIdentity::Standalone {
+///     run_id_prefix: Some("abc123".into()),
+/// };
+/// assert_eq!(id.credential_binding_hash(), restarted.credential_binding_hash());
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TrustIdentity {
     /// Network location.

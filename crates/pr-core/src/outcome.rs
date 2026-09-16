@@ -104,7 +104,25 @@ impl ServerError {
     }
 }
 
-/// The complete outcome of one request.
+/// The complete outcome of one request (ADR-021).
+///
+/// Four **orthogonal** dimensions, not one status. A server error does not mean the side
+/// effects did not happen, and a successful reply that could not be rendered is not a failed
+/// command — collapsing them into one enum is how "it errored, so nothing changed" gets
+/// believed.
+///
+/// ```
+/// use pr_core::{Delivery, EffectsCertainty, ExecutionOutcome, ExitCode, RenderStatus, Reply};
+///
+/// // Sent, never acknowledged: the reply is unknown *and so are the effects*.
+/// let lost = ExecutionOutcome {
+///     delivery: Delivery::UnknownAfterSend,
+///     reply: Reply::None,
+///     effects: EffectsCertainty::EffectsPossible,
+///     render: RenderStatus::NotRendered,
+/// };
+/// assert_eq!(lost.exit_code(), ExitCode::ResultUnknown);
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ExecutionOutcome {
     /// Transport dimension.

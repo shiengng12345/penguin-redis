@@ -61,6 +61,27 @@ impl TaskScopeHandle {
 
 /// A supervision scope. Every session, subscription, discovery job, tunnel and TUI page
 /// owns one.
+///
+/// Tokio has no scoped tasks and `JoinSet` does not abort on drop, so structured lifetime is
+/// something this type provides rather than something the runtime gives. Dropping a scope
+/// aborts what it owns — which is why a page closing cannot leave a subscription running.
+///
+/// ```
+/// use pr_core::TaskScope;
+///
+/// let scope = TaskScope::new("example");
+/// assert_eq!(scope.name(), "example");
+///
+/// // The live count is the leak detector: a scope that shut down cleanly is back at zero.
+/// let handle = scope.handle();
+/// assert_eq!(handle.live(), 0);
+///
+/// // A child token is how a task learns it should stop -- cooperative, not a kill.
+/// let token = scope.child_token();
+/// assert!(!token.is_cancelled());
+/// drop(scope);
+/// assert!(token.is_cancelled(), "dropping the scope cancels what it owns");
+/// ```
 #[derive(Debug)]
 pub struct TaskScope {
     token: CancellationToken,

@@ -112,6 +112,37 @@ impl Default for RequestBudget {
 }
 
 /// A command about to be executed.
+///
+/// The argv is **exact bytes**, one entry per argument, boundaries preserved — because the
+/// approval hash is computed over these and §23.2 binds an approval to what actually goes on
+/// the wire, not to a rendering of it.
+///
+/// ```
+/// use bytes::Bytes;
+/// use pr_core::{CommandRequest, Effects, RequestOrigin};
+///
+/// // A value that looks like a flag is a value, and a NUL survives.
+/// let req = CommandRequest::new(
+///     vec![
+///         Bytes::from_static(b"SET"),
+///         Bytes::from_static(b"k"),
+///         Bytes::from_static(b"--raw\x00"),
+///     ],
+///     RequestOrigin::User,
+///     Effects::write(),
+/// );
+/// assert_eq!(req.args.len(), 3);
+/// assert_eq!(&req.args[2][..], b"--raw\x00");
+///
+/// // The canonical bytes are length-prefixed, so two different argv splittings cannot
+/// // collide -- which is the whole reason the approval hash is taken over them.
+/// let ambiguous = CommandRequest::new(
+///     vec![Bytes::from_static(b"SET"), Bytes::from_static(b"k --raw\x00")],
+///     RequestOrigin::User,
+///     Effects::write(),
+/// );
+/// assert_ne!(req.canonical_bytes(), ambiguous.canonical_bytes());
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CommandRequest {
     /// Exact argv bytes, one entry per argument, boundaries preserved.

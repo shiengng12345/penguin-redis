@@ -10,6 +10,7 @@
 //! - a path that names a duplicated member without `#n` is an error, never a silent pick
 //! - editing rewrites only the target span; every other byte is untouched
 
+pub mod contract;
 pub mod dom;
 pub mod path;
 

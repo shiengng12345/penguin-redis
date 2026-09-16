@@ -32,3 +32,6 @@ pr-transport = { path = "../pr-transport" }
 pr-tui = { path = "../pr-tui" }
 bytes = { workspace = true }
 thiserror = { workspace = true }
+
+[dev-dependencies]
+bytes = { workspace = true }

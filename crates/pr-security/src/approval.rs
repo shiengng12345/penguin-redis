@@ -40,6 +40,50 @@ pub enum Issuer {
 }
 
 /// A capability to run one exact request (or one exact plan) against one exact target.
+///
+/// The hash is over the **length-prefixed argv bytes**, not over a rendered summary. That is
+/// the fix for the BLOCKER the three-way review found: redaction, truncation, escaping and
+/// Unicode normalisation can all make two genuinely different commands render identically, so
+/// a user could approve what they saw and the kernel could send something else.
+///
+/// ```
+/// use bytes::Bytes;
+/// use pr_core::{CommandRequest, Effects, RequestOrigin};
+/// use pr_security::approval::{ApprovalToken, Epochs, ExecutionContext, Issuer};
+/// use pr_security::trust::{AuthIdentity, Endpoint, ServerIdentity, TlsIdentity, TrustIdentity};
+///
+/// let identity = TrustIdentity {
+///     endpoint: Endpoint::Tcp { host: "redis.internal".into(), port: 6379 },
+///     tls_identity: TlsIdentity::None,
+///     server_identity: ServerIdentity::Standalone { run_id_prefix: None },
+///     auth_identity: AuthIdentity { username: None, secret_ref: "credential:1".into() },
+/// };
+/// let approved = CommandRequest::new(
+///     vec![Bytes::from_static(b"DEL"), Bytes::from_static(b"player:1")],
+///     RequestOrigin::User,
+///     Effects::write(),
+/// );
+/// let token = ApprovalToken::for_request(
+///     "p1", &identity, 0, Epochs::default(), &approved, 10_000, Issuer::Human,
+/// );
+/// let ctx = ExecutionContext {
+///     profile_uuid: "p1",
+///     trust_identity: &identity,
+///     db_index: 0,
+///     epochs: Epochs::default(),
+///     now_ms: 1_000,
+///     actions_used: 0,
+/// };
+/// assert!(token.authorise(&approved, &ctx).is_ok());
+///
+/// // One byte of difference is a refusal: approving `player:1` does not approve `player:2`.
+/// let substituted = CommandRequest::new(
+///     vec![Bytes::from_static(b"DEL"), Bytes::from_static(b"player:2")],
+///     RequestOrigin::User,
+///     Effects::write(),
+/// );
+/// assert!(token.authorise(&substituted, &ctx).is_err());
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ApprovalToken {
     /// Profile this was issued for.

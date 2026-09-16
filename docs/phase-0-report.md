@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 54 |
+| PASS | 55 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 5 |
+| IN-PROGRESS | 4 |
 | BLOCKED | 1 |
 
 ## 环境记录
@@ -134,7 +134,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-J01 | PASS | `docs/adr/ADR-001..030.md` + `README.md` | 30 条全部 accepted；ADR-023/026 的**结论**分别由 V-I03 / SPIKE-001 填入 |
-| V-J02 | IN-PROGRESS | — | 进行中：`pr-core`(SafeText/ExecutionOutcome/CommandRequest/TaskScope)、`pr-security`(TrustIdentity/ApprovalToken)、`pr-json`(JsonNode) 已冻结；`pr-intelligence`/`pr-repl` 待办 |
+| V-J02 | PASS | `crates/{pr-core,pr-intelligence,pr-security,pr-catalog,pr-json}/src/contract.rs`、`crates/prc/tests/contracts.rs`（6 tests）、`docs/contracts/README.md`；十二个类型各自的 doc test | 十二个类型全部冻结，各自带 **runnable doc test** 与 `SCHEMA_VERSION`。补齐的五个：`ResultRecord`（pr-core）、`CompletionRequest` / `CompletionCandidate` / `AssistanceSnapshot`（pr-intelligence）、`LocalCommandSpec`（pr-catalog）。 **doc test 而不是说明文字**：一个例子编译不过的类型，它的文档已经和它漂移了——而这种漂移在有人真的去用它、发现例子只是「愿景」之前是看不见的。测试还要求例子里**出现该类型本身**（只打印常量的例子可以在类型底下变了之后继续编译很久），并且拒绝 `ignore` / `no_run`（它们不会被运行，也就显示不出漂移）。测试跑起来立刻抓到 **7 个既有类型只有散文没有例子**，全部补上。 测试放在 `prc`，因为它是唯一链接全部十二个的 crate——放在任何单个 crate 里只能检查它自己。另有一条测试要求五个 crate 的 `OWNED` 列表合起来**恰好**是这十二个，多一个少一个都红：一个不在任何 `OWNED` 列表里的类型，是没人认领责任的类型。还有一条把 `docs/contracts/README.md` 与代码绑在一起——漂移了的文档比没有文档更糟，因为它被以同样的信任读着，而它是错的。 写 doc test 的过程本身澄清了三处：`TrustIdentity::hash()` 覆盖全部四部分，而 `credential_binding_hash()` **刻意不含 endpoint**（ADR-010）——服务搬了地址不该让人重输密码，但同一地址上换了 CA 背书的服务器必须重新确认，这正是那条分离要防的攻击；`run_id` 也刻意排除，否则每次重启都会作废所有已存凭证，教会用户无视警告。`ApprovalToken` 的例子演示了一个字节的差别就是拒绝（批准 `player:1` 不等于批准 `player:2`）。 类型里而非约定里的几条：`Retention::EvictedForBudget` 的文案是「未保留：为不超出预算而丢弃，重跑可再看」，**不是「不存在」**——客户端预算说明不了服务器上有什么；`reply_bytes` 在淘汰后仍保留，因为「那条回复 400 MiB，没留」有用而「这里什么都没有」没用。`CompletionCandidate` 的 `insert` 与 `display` 不能合成一个：合成后无论选哪个都是 bug——要么往输入缓冲插了转义文本，要么往终端写了裸控制字节（§23.6 禁止后者）。`Provenance::asserts_existence()` 只对真正观察到的名字为真：catalog 里的名字说明「这条命令是这么拼的」，不说明「这个 key 在那里」。`LocalCommandSpec::merge_remote` 只 OR 上风险、永不摘除，且 `unknown` 标志不会被远端清掉——本地 catalog 不认识某条命令是关于本地 catalog 的事实，服务器无权裁决，而这恰恰是一台被攻破的服务器最想声称的那件事。 |
 | V-J03 | PASS | `docs/threat-model/boundaries.toml`（15 条边界的机器可读登记）+ `docs/threat-model/README.md`（给人读的说明）+ `crates/pr-security/tests/threat_model.rs`（8 个测试，全绿） | 15 条信任边界：input / parser / config / connection / errors / trace / history / clipboard / export / crash / suggestion / metadata / plugin / mcp / pipe（V-J03 点名 14 条，`pipe` 是补的）。每条带 `crosses`、`why`（>80 字符的真实理由）、`cases`（SEC-xx）与 `covered_by`（真实文件路径）。 「无未覆盖边界」不是写在文档里的一句话，而是被 8 个测试**双向**强制：(1) 每条边界至少有一个 SEC 用例；(2) **每个 SEC-01…SEC-11 都被某条边界认领**——没人认领的用例是一个「通过了但没人知道它在保护什么」的测试；(3) **每条 `covered_by` 引用的文件必须真实存在**——引用一个被改名的路径，等于一条已经悄悄变成假话的覆盖声明；(4) 每条 `why` 不得用复述自己的名字来解释自己。另有两条针对最容易漏的边界：`errors` 必须引用 `safetext`（§23.5 要求由**类型**而非约定来强制），`suggestion` 必须引用 `zero_send`（§23.7 称其为**新的**信任边界，因为它不像一条边界——补全菜单里的 key 名来自服务器，用户接受一条补全就是服务器在影响用户下一条发什么）。 `README.md` 明写了尚未覆盖的四项（SSH 隧道 V-G03、真实 TLS 握手 V-G04、L2 插件外部进程隔离 V-D09、MCP stdio 通道 V-D08），因为这些 V 项落地时 `no_sec_case_is_unclaimed` 不会提醒——它只检查已列出的用例。 |
 | V-J04 | IN-PROGRESS | — | |
 
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p prc --test contracts` → 6 passed；各 crate 的 `--doc` 全绿（pr-core 7、pr-intelligence 7、pr-catalog 4、pr-security 3、pr-json 2）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 1029 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test find_recall` → 13 passed（canonical 97.8%/98.8%；独立门槛因缺输入而等待并打印说明）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 992 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test find_recall` → 13 passed（canonical 97.8%/98.8%；独立门槛因缺输入而等待并打印说明）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 992 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test working_set_heap` → 3 passed；`--test working_set_budget` → 4 passed；`cargo test -p prc --test budgets` → 12 passed（含 3 个 `f09_*`）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 979 passed / 0 failed。 |

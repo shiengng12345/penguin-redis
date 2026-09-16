@@ -10,6 +10,31 @@ use bytes::Bytes;
 use std::ops::Range;
 
 /// A node in the document.
+///
+/// Every scalar keeps the byte span it came from, so a lexeme is never reconstructed: `1.2300`
+/// stays `1.2300` and `9007199254740993` does not become a float.
+///
+/// ```
+/// use bytes::Bytes;
+/// use pr_json::{Document, Limits};
+///
+/// let src = br#"{"a":1,"a":2,"amount":1.2300}"#;
+/// let doc = Document::parse(Bytes::from_static(src), Limits::default()).unwrap();
+///
+/// // Both duplicate members are kept and each is addressable; `serde_json` loses one.
+/// assert_eq!(doc.duplicate_members(), vec![("a".to_string(), 2)]);
+/// assert_eq!(doc.number_lexeme(doc.get("$.a#2").unwrap()), Some("2"));
+///
+/// // Naming the duplicate without an occurrence is an error, never a silent pick.
+/// assert!(doc.get("$.a").is_err());
+///
+/// // And a number keeps the digits the server actually sent, trailing zeros and all.
+/// assert_eq!(doc.number_lexeme(doc.get("$.amount").unwrap()), Some("1.2300"));
+///
+/// // Every node knows the span it came from, which is why editing rewrites nothing else.
+/// let node: &pr_json::JsonNode = doc.get("$.amount").unwrap();
+/// assert_eq!(doc.raw(node), b"1.2300");
+/// ```
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct JsonNode {
     /// Byte range in the source buffer covering exactly this node.
