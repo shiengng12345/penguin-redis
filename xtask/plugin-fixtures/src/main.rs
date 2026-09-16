@@ -43,7 +43,7 @@ fn main() {
         "abort" => std::process::abort(),
         // An infinite loop that produces nothing: the host must kill it rather than wait.
         "hang" => loop {
-            std::thread::sleep(std::time::Duration::from_secs(3600));
+            std::thread::sleep(std::time::Duration::from_hours(1));
         },
         // An infinite loop that produces *a lot*: the host must truncate and kill without
         // growing to match. A host that reads to end of stream dies here, not the plugin.

@@ -21,6 +21,17 @@ use pr_render::plugin::{Grant, Limits, PluginFailure, PluginHost, fixture_plugin
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
+/// RSS growth in bytes, or 0 if it shrank.
+///
+/// `saturating_sub` rather than a cast pair: the interesting direction is growth, and a
+/// process whose RSS fell during the test has not failed this assertion.
+fn grew_by(after: Option<u64>, before: Option<u64>) -> Option<u64> {
+    match (after, before) {
+        (Some(a), Some(b)) => Some(a.saturating_sub(b)),
+        _ => None,
+    }
+}
+
 fn root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
@@ -162,8 +173,7 @@ fn a_flooding_plugin_is_truncated_and_the_host_does_not_grow_to_match() {
         PluginFailure::OutputTooLarge { limit: 256 * 1024 },
         "expected the output budget to stop it, got {err:?}"
     );
-    if let (Some(a), Some(b)) = (pr_core::mem::rss_bytes(), before) {
-        let grew = a as i64 - b as i64;
+    if let Some(grew) = grew_by(pr_core::mem::rss_bytes(), before) {
         assert!(
             grew < 64 * 1024 * 1024,
             "the host grew by {grew} bytes while refusing an unbounded plugin"
@@ -197,8 +207,7 @@ fn an_out_of_memory_plugin_is_the_one_that_dies() {
         ),
         "expected the plugin to be stopped, got {err:?}"
     );
-    if let (Some(a), Some(b)) = (pr_core::mem::rss_bytes(), before) {
-        let grew = a as i64 - b as i64;
+    if let Some(grew) = grew_by(pr_core::mem::rss_bytes(), before) {
         assert!(
             grew < 64 * 1024 * 1024,
             "the host grew by {grew} bytes while a plugin exhausted memory"

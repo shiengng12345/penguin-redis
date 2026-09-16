@@ -132,7 +132,7 @@ fn handle<B: Backend>(line: &str, backend: &B) -> Option<String> {
                 "description": t.description(),
             })).collect::<Vec<_>>(),
         })),
-        "tools/call" => return call(id, &v, backend, is_notification),
+        "tools/call" => return call(&id, &v, backend, is_notification),
         "ping" => Ok(serde_json::json!({})),
         other => Err((code::METHOD_NOT_FOUND, other.to_owned())),
     };
@@ -147,7 +147,7 @@ fn handle<B: Backend>(line: &str, backend: &B) -> Option<String> {
 }
 
 fn call<B: Backend>(
-    id: serde_json::Value,
+    id: &serde_json::Value,
     v: &serde_json::Value,
     backend: &B,
     is_notification: bool,
@@ -155,13 +155,13 @@ fn call<B: Backend>(
     let params = v.get("params");
     let name = params.and_then(|p| p.get("name")).and_then(|n| n.as_str());
     let Some(name) = name else {
-        return (!is_notification).then(|| error(&id, code::INVALID_PARAMS, "no tool name"));
+        return (!is_notification).then(|| error(id, code::INVALID_PARAMS, "no tool name"));
     };
     let Some(tool) = Tool::parse(name) else {
         // The closed list, enforced. There is no arbitrary-command tool to fall through to.
         return (!is_notification).then(|| {
             error(
-                &id,
+                id,
                 code::METHOD_NOT_FOUND,
                 &format!(
                     "{name} is not a tool; Penguin exposes a closed list and no \
@@ -209,8 +209,8 @@ fn call<B: Backend>(
         return None;
     }
     Some(match result {
-        Ok(r) => ok(&id, &r),
-        Err((c, m)) => error(&id, c, &m),
+        Ok(r) => ok(id, &r),
+        Err((c, m)) => error(id, c, &m),
     })
 }
 

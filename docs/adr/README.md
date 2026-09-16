@@ -35,3 +35,4 @@
 | [ADR-030](ADR-030.md) | 本地签名 catalog / overlay 是 effects、危险性、审批等级与 key extraction 的唯一权威；远端 metadata 只补充 availability 与文档 | accepted | V-D07、V-F01 |
 | [ADR-031](ADR-031.md) | `pr-protocol` 自研 codec 是唯一 kernel 协议边界；`redis-rs` 降为互操作测试对象 | accepted | V-B01、V-J04 |
 | [ADR-032](ADR-032.md) | TLS 用 rustls + 显式 CA 集合；不存在关闭校验的开关 | accepted | V-G04、V-J04 |
+| [ADR-033](ADR-033.md) | 显式发现的 SCAN 次数上限改为 200，与「20 req/s × 10 s」对齐 | accepted | V-F07、V-J04 |

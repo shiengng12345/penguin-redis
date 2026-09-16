@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 52 |
+| PASS | 53 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 8 |
+| IN-PROGRESS | 7 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -94,7 +94,7 @@
 | V-F04 | PASS | `crates/pr-catalog/tests/grammar_table.rs` · 19 tests（§11.7 十一行逐行）· `src/spec.rs` grammar walker | 真实语法树 walker 而非位置表：子命令非 key、HSET field/value 交替且 value 位不枚举、ZADD score/member 不互换（带选项时仍正确）、SET/ZADD 互斥组按版本过滤且冲突可解释不暗改、XADD 嵌套 choice、EVAL numkeys（解析失败时取 0 个 key）、XREAD STREAMS 成对切分、key 名为 NX/GET 由位置决定、ZRANGE BYSCORE/BYLEX 模式、二进制参数无损、模块命令分类 |
 | V-F05 | PASS | `crates/pr-intelligence/src/broker.rs` · 11 tests | 到达时校验 revision+scope+序号；过期结果丢弃且**不显示**；焦点跟 `CandidateId` 不跟索引（ASSIST-028）；候选消失时焦点不静默落到别处 |
 | V-F06 | PASS | `crates/pr-intelligence/src/scope.rs` · 14 tests | 六元组 scope（profile UUID + 服务身份 + DB + auth/policy/**topology** epoch）；逐项验证任一变化都不泄漏；field 绑定 parent key；schema hint 不主张存在性 |
-| V-F07 | IN-PROGRESS | — | |
+| V-F07 | PASS | `crates/pr-intelligence/src/discovery.rs`、`crates/pr-intelligence/tests/discovery.rs`（19 tests，常驻）、`crates/pr-intelligence/tests/discovery_live.rs`（5 tests，10⁶ key + 真实 ACL）、`tests/assistance-network/discovery/README.md`、[ADR-033](adr/ADR-033.md) | **实测（10⁶ key + 10 个稀疏 `player:*` needle，`DEBUG POPULATE` + 按名散开的 needle）** | 预算 | 停在哪 | 用时 | SCAN 次数 | 命中 | |---|---|---:|---:|---:| | §12.5 原始（50 次） | **SCAN 次数** | 2.58 s（10 s 预算） | 50 | 2 / 10 | | ADR-033 调整后（200 次） | **时间** | 10.0 s | 189~190 | 1~2 / 10 | | 走到底 | cursor 归零 | 0.39 s | 1000 | **10 / 10** | 原始默认**不是空的**，「稀疏前缀有结果并报告完成度」满足。但它在 10 秒里只用掉 2.58 秒就停了——**卡住它的是 SCAN 次数，不是用户实际感受到的那个限制**。50×20 req/s = 2.5 s，而 10 s×20 req/s = **200**：两个默认值描述的不是同一个停止点，其中一个在另一个的四分之一处悄悄先赢了。按 V-F07 回退条款「调高默认值（不是删功能）并记 ADR」→ ADR-033 把 `max_scans` 改为 200。**速率与时长都不变**，对服务器的压力上限没有任何变化。这条关系写成不变量测试而不是一个数字：以后改了速率或时长而没改次数，会在那里失败。 **needle 命中数不是断言对象。** 走到 19% 时 10 个 needle 的期望命中约 2 个，一次跑出 1 个不是回归。断言的是确定量：SCAN 次数 > 50、用满时间预算、每个命中确实以 `player:` 开头、时间预算真的封住运行。§32.5 说 flaky 测试要定位而不是靠重跑掩盖——第一版我写了 `matched >= 2`，那是在断言一枚硬币，实测里它确实红了一次，已改掉。 **没有任何礼貌的预算能在 10⁶ key 上找全**：走完整表需要 1000 次 SCAN，20 req/s 下是 50 秒。这是 SCAN 本身的性质（R08：COUNT 是提示、无二级索引、无快照）。所以保障不是「找得全」而是**说清楚没找全**，并由类型表达：只有 cursor 归零的 `Completeness::Exhausted` 的 `is_conclusive()` 为真。 **两种匹配模式对着真服务器验**：`player:[` 在字面前缀下发 `player:\[*` 并命中 `player:[1]`，在 glob 下原样发送且不命中——两边结果不同，这就是「不存在无声变成另一个匹配条件的路径」的可验证含义。转义是**逐字节**的：key 是字节，未必是 UTF-8。预览同时显示原字节与转义结果（只显示一边就会藏起关键的那一边，而藏的是哪一边取决于犯的是哪种错）。 **空结果永远不说「key 不存在」**（§12.4 明文禁止）：客户端预算说明不了服务器上有什么，被告知「不存在」的用户会停止寻找。有命中时同样报覆盖度——看到三条就以为是全部、因为没人说可能还有更多的用户，是被遗漏误导的。 **SCAN 的真实保证逐条兑现**：空页 + 非零 cursor **不结束扫描**（在这里停下就会对存在的 key 报找不到）；重复元素显示一次计数一次但 `keys_seen` 如实记录；没有任何地方从 cursor 值推算百分比。 **NOPERM 冷却对着真实 ACL 验**，不是模拟的错误——要测的是「服务器真发过来时我们认得出」。作用域是 (profile, database)，与 ACL 规则的作用域一致；全局冷却会连累一个本来允许扫描的 profile。**人可以手动清掉**：冷却是用来阻止自动重试撞 ACL 墙的，不是用来跟一个刚改好权限的人争论。 速率限制返回 `Step::Wait` 而不是失败：运行仍在其它预算之内，只是还不能问。 |
 | V-F08 | IN-PROGRESS | — | |
 | V-F09 | IN-PROGRESS | — | |
 | V-F10 | PASS | `crates/pr-intelligence/tests/zero_send.rs` · 11 tests | transport spy 计**尝试次数**；分析/候选/接受/焦点/可提交性检查/Guide 组装/换主题/丢弃过期结果/scope 失效，以及完整离线编辑会话 —— 全部 0 条业务命令 |
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-intelligence --test discovery` → 19 passed（无需服务器）；`--test discovery_live -- --ignored` → 5 passed（26 s，含 10⁶ key 与真实 NOPERM）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 969 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-render --test plugin_isolation` → 17 passed（10.9 s，含真实 OOM 与 flood）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 950 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-mcp` → 3 + 9 + 17 = 29 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 933 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-transport` → 11 + 3 passed；`cargo test -p prc --bins` → 41 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo test --workspace` → 904 passed / 0 failed；`ci/check-differential.sh` 仍然逐字节可复现。 |

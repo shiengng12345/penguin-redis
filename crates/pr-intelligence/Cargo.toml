@@ -20,3 +20,7 @@ thiserror = { workspace = true }
 [dev-dependencies]
 proptest = { workspace = true }
 pr-render = { path = "../pr-render" }
+# V-F07's live half drives the discovery state machine against a real server.
+pr-protocol = { path = "../pr-protocol" }
+pr-transport = { path = "../pr-transport" }
+bytes = { workspace = true }

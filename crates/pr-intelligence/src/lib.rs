@@ -6,8 +6,10 @@
 
 pub mod analyser;
 pub mod broker;
+pub mod discovery;
 pub mod scope;
 
 pub use analyser::{Analysis, QuoteMode, Span, analyse, submittable};
 pub use broker::{Accepted, Broker, Candidate, Dropped, Stamp};
+pub use discovery::{Budget, Completeness, Cooldown, Discovery, MatchMode, Outcome, Step};
 pub use scope::{Observation, ObservationScope, ObservationStore, Origin};

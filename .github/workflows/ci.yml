@@ -212,6 +212,23 @@ jobs:
         if: failure()
         run: cat tests/differential/report/*.json || true
 
+  # ---------------------------------------------------------------- Discovery (V-F07)
+  discovery:
+    name: explicit discovery on a million keys
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      # The pure half runs in the ordinary test job. This one adds a real server with 10^6
+      # keys and a real ACL refusal, which is what ADR-033's numbers were measured against.
+      - name: 10^6 keys, two match modes, a real NOPERM
+        run: cargo test -p pr-intelligence --test discovery_live -- --ignored --nocapture --test-threads=1
+
   # ---------------------------------------------------------------- Large values (V-H02)
   large-values:
     name: 1 GiB synthetic blob + real 512 MB Redis string

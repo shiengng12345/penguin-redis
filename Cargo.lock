@@ -1168,10 +1168,13 @@ dependencies = [
 name = "pr-intelligence"
 version = "0.0.0"
 dependencies = [
+ "bytes",
  "pr-catalog",
  "pr-core",
+ "pr-protocol",
  "pr-render",
  "pr-repl",
+ "pr-transport",
  "proptest",
  "thiserror 2.0.20",
 ]
