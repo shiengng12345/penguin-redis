@@ -5,8 +5,23 @@
 //! cancellation), NET-07 (SSH cleanup), PERF-03 (repeated TUI open/close) and LIFE-01
 //! (no daemon after exit) all depend on this type actually cancelling its children.
 //!
-//! Contract: dropping a `TaskScope` cancels its token, then aborts every task it spawned.
-//! Nothing outlives its scope, so there is never a Penguin task left running after exit.
+//! Contract, in the order §31.1 states it: **cancel the token, wait a bounded time, then
+//! abort**. Each step does a different job, and the middle one is the reason the first exists:
+//!
+//! 1. `cancel()` is a *signal*. A task that watches its token gets to finish — flush a
+//!    journal entry, send `UNSUBSCRIBE`, close a tunnel.
+//! 2. The bounded wait is how long that cleanup may take.
+//! 3. `abort()` is the hard stop for anything that did not, or could not, leave.
+//!
+//! The wrapper around a spawned future therefore does **not** race the future against the
+//! token. An earlier version did, with `select!`, and it made every one of those three steps
+//! a no-op: cancellation dropped the user's future immediately, so cooperative cleanup never
+//! ran, and `shutdown` reported a clean drain for tasks that had simply been discarded. V-H04
+//! found it by asking sixteen cooperative tasks to record that they had finished; eleven did.
+//!
+//! Nothing outlives its scope either way — `Drop` still aborts — but "nothing is running" and
+//! "everything finished what it was doing" are different promises, and only one of them is
+//! worth making to a journal.
 
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -87,7 +102,15 @@ impl TaskScope {
     }
 
     /// Spawn a task into the scope. The future receives a [`CancellationToken`].
-    pub fn spawn<F, Fut, T>(&mut self, f: F) -> JoinHandle<Option<T>>
+    ///
+    /// The token is the task's to observe. Nothing here races it: a task that watches the
+    /// token decides for itself when it has finished cleaning up, and a task that ignores it
+    /// is stopped by `abort()` after the bounded wait. Cancelling a task *for* it would make
+    /// both of those impossible to distinguish.
+    ///
+    /// A handle resolves to `Err(JoinError)` when the task was aborted or panicked, which is
+    /// Tokio's own signal and needs no wrapper of ours.
+    pub fn spawn<F, Fut, T>(&mut self, f: F) -> JoinHandle<T>
     where
         F: FnOnce(CancellationToken) -> Fut,
         Fut: Future<Output = T> + Send + 'static,
@@ -98,26 +121,29 @@ impl TaskScope {
         // future without running the rest of its body. An RAII guard is the only way to
         // make the count trustworthy for leak detection (PERF-03).
         let guard = LiveGuard::new(Arc::clone(&self.live));
-        let fut = f(token.clone());
+        let fut = f(token);
         let handle = tokio::spawn(async move {
             let _guard = guard;
-            tokio::select! {
-                () = token.cancelled() => None,
-                v = fut => Some(v),
-            }
+            fut.await
         });
         self.aborts.push(handle.abort_handle());
         handle
     }
 
     /// Cancel cooperatively and wait, bounded, for tasks to finish.
-    /// Returns `true` if the scope drained within `timeout_ms`.
+    ///
+    /// Returns `true` only if every task left *on its own* within `timeout_ms`. A `false`
+    /// means at least one had to be aborted, and the caller may not assume that task's
+    /// cleanup ran — which is exactly the distinction §24.5 needs before writing "done" to a
+    /// journal.
     pub async fn shutdown(&mut self, timeout_ms: u64) -> bool {
         self.token.cancel();
         let deadline = std::time::Duration::from_millis(timeout_ms);
         let drained = tokio::time::timeout(deadline, async {
             while self.live.load(Ordering::SeqCst) > 0 {
-                tokio::task::yield_now().await;
+                // Sleeping rather than yielding: a hot spin for the whole timeout would burn
+                // a core while waiting for a task that is, by definition, not ready.
+                tokio::time::sleep(std::time::Duration::from_millis(1)).await;
             }
         })
         .await
@@ -160,7 +186,7 @@ mod tests {
         let mut scope = TaskScope::new("test");
         let h = scope.handle();
         let j = scope.spawn(|_tok| async { 42u32 });
-        assert_eq!(j.await.unwrap(), Some(42));
+        assert_eq!(j.await.unwrap(), 42);
         settle().await;
         assert_eq!(h.live(), 0);
     }
@@ -197,9 +223,10 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn shutdown_cancels_tasks_at_their_await_points() {
-        // A task that only sleeps is still cancellable: the scope wraps every future in a
-        // select! against the token, so cancellation lands at the next await.
+    async fn shutdown_aborts_a_task_that_ignores_its_token_and_says_so() {
+        // A task that only sleeps never observes cancellation, so it does *not* drain — it is
+        // aborted after the bounded wait. Reporting that honestly is the point: the caller
+        // knows this task's cleanup did not run.
         let mut scope = TaskScope::new("sleeper");
         let h = scope.handle();
         scope.spawn(|_tok| async {
@@ -208,10 +235,36 @@ mod tests {
             }
         });
         assert!(
-            scope.shutdown(1000).await,
-            "sleeping tasks cancel at their await points"
+            !scope.shutdown(100).await,
+            "a task that ignores its token has not drained, whatever else happened to it"
         );
-        assert_eq!(h.live(), 0);
+        settle().await;
+        assert_eq!(
+            h.live(),
+            0,
+            "but it was aborted, so nothing is left running"
+        );
+    }
+
+    #[tokio::test]
+    async fn a_cooperative_task_gets_to_finish_its_cleanup() {
+        // The whole reason the token exists. An earlier implementation raced the future
+        // against the token with `select!`, which dropped the future the moment cancellation
+        // arrived — the cleanup below never ran, and `shutdown` still reported success.
+        use std::sync::Arc;
+        use std::sync::atomic::AtomicBool;
+        let cleaned = Arc::new(AtomicBool::new(false));
+        let mut scope = TaskScope::new("cooperative");
+        let c = Arc::clone(&cleaned);
+        scope.spawn(move |tok| async move {
+            tok.cancelled().await;
+            c.store(true, Ordering::SeqCst);
+        });
+        assert!(scope.shutdown(1000).await);
+        assert!(
+            cleaned.load(Ordering::SeqCst),
+            "the task was discarded instead of being allowed to clean up"
+        );
     }
 
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
