@@ -48,7 +48,7 @@ SET mv:c03:b 2
 |---|---|---|---|---|---|---|---|---|
 | MV-V-C03-macos-terminal-001 | macOS Terminal.app | | | | | | | |
 | MV-V-C03-macos-iterm2-001 | iTerm2 | | | | | | | |
-| MV-V-C03-macos-kitty-001 | kitty | | | | | | | |
+| MV-V-C03-macos-kitty-001 | kitty 0.48.2 | 0.48.2 | 成对 | 是 | 是 | 是 | **否** | 否 |
 | MV-V-C03-macos-alacritty-001 | Alacritty | | | | | | | |
 | MV-V-C03-macos-wezterm-001 | WezTerm | | | | | | | |
 | MV-V-C03-win-wt-001 | Windows Terminal | | | | | | | |
@@ -65,10 +65,30 @@ SET mv:c03:b 2
 - **无标记且未进审阅视图** → 时序启发式漏检。把该终端的实际到达间隔抓下来（`script` / `cat -v` 录制），加进 `paste_matrix.rs` 的 corpus，调整阈值并补测试。**不接受**「该终端标为 plain-only」除非两条路径都已证明失败——V-C03 的回退条款是最后手段，不是第一选择。
 - **半对标记** → 按无标记处理，并在支持矩阵注明；半对标记比没有更危险，因为结束标记丢失会让后续键入被当成粘贴内容。
 
+## 首条真实终端记录（kitty，自动采集）
+
+`MV-V-C03-macos-kitty-001` 由 [`ci/terminals/record-kitty.sh`](../../ci/terminals/record-kitty.sh)
+生成，逐屏输出存档在 [`records/kitty-macos-001.md`](records/kitty-macos-001.md)，**可重复运行**。
+
+它不是「手工试过了」。kitty 有 remote control，于是这份记录里的每一步都由 kitty 自己执行：
+`send-text --bracketed-paste auto` **只在窗口里的程序真的打开了 DECSET 2004 时**才包标记，
+所以它检验的是 kitty 自己的模式记账，不是我们的；`get-text` 读回的是真正渲染出来的屏幕。
+PTY 回答不了这个问题，因为在 PTY 里我们就是终端，标记永远成对。
+
+八屏都在记录里，其中四屏是要害：
+
+- 粘贴三行 → 进审阅视图，`-- pasted 3 line(s), nothing has run --`，**一条都没跑**。
+- 在审阅视图里按 Enter → **屏幕逐字节不变**。
+- ↓ + Backspace 删掉 `FLUSHALL` → 变成 2 行；按 `1` 逐条提交，只出现另外两条，`FLUSHALL` 从未被提交。
+- 手敲同样三行（每字符 60 ms，无 bracketed paste）→ **没有**误进审阅视图，三行各自正常提交。
+
+仍需人工的部分：其余终端（Terminal.app、iTerm2、Alacritty、WezTerm、Windows Terminal、conhost、
+tmux、SSH）没有 remote control，只能由人粘贴一次。编号已分配。
+
 ## 状态
 
 | 字段 | 值 |
 |---|---|
 | 自动化部分 | **PASS**（0 漏检；误判 0/7；真实 PTY 上 bracketed paste 全流程） |
-| 人工部分 | 待填 —— 记录编号已分配，未执行 |
-| 阻塞 Phase 1？ | 否。「不自动执行」这一条在两条路径上都已自动化验证 |
+| 人工部分 | **首条已执行**：`MV-V-C03-macos-kitty-001`（kitty 0.48.2 / macOS，自动采集且可重复）。其余终端编号已分配，未执行 |
+| 阻塞 Phase 1？ | 否。「不自动执行」这一条在两条路径上都已自动化验证，并在一个真实终端上复核过 |

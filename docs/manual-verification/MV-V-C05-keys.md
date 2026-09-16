@@ -48,6 +48,7 @@ PR_KEYPROBE=1 <prc 所在目录>/pr-terminal-demo
 | MV-V-C05-macos-terminal-pinyin-001 | Terminal.app | 拼音 | 英文 | | | | | | | | | | | |
 | MV-V-C05-macos-terminal-pinyin-002 | Terminal.app | 拼音 | 中文 | | | | | | | | | | | |
 | MV-V-C05-macos-iterm2-pinyin-001 | iTerm2 | 拼音 | 中文 | | | | | | | | | | | |
+| MV-V-C05-macos-kitty-encoder-001 | kitty 0.48.2 | 不经过（见下） | — | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 | MV-V-C05-macos-kitty-pinyin-001 | kitty | 拼音 | 中文 | | | | | | | | | | | |
 | MV-V-C05-macos-wezterm-pinyin-001 | WezTerm | 拼音 | 中文 | | | | | | | | | | | |
 | MV-V-C05-win-wt-ime-001 | Windows Terminal | 微软拼音 | 中文 | | | | | | | | | | | |
@@ -63,10 +64,28 @@ macOS 的 F1–F6 默认是系统亮度/调度中心，除非勾选「将 F1、F
 - **键被拦截 + 文字入口不可用** → **不通过**。按 V-C05 的回退条款，该键在该平台默认重映射并写入文档；同时补 `entries.rs` 的测试。
 - **某功能既无键也无文字入口** → 这是 §14.2 表格与实现不一致，`entries.rs` 的测试本应拦住，先补测试再补实现。
 
+## 首条真实终端记录（kitty 的按键编码器，自动采集）
+
+`MV-V-C05-macos-kitty-encoder-001` 由 [`ci/terminals/record-kitty.sh`](../../ci/terminals/record-kitty.sh)
+生成，输出存档在 [`records/kitty-macos-001.md`](records/kitty-macos-001.md)。用的是 `kitty @ send-key` 而**不是** `send-text`：
+后者把字节直接写进 pty，只能证明我们的解码器认得我们自己写的转义序列（PTY 测试早就证明了）；
+前者走 kitty 自己的按键编码器，且只在「当前键盘模式支持该键」时才投递，所以答案是 kitty 的。
+
+结果：F1–F6、Ctrl+R/P/N、Ctrl+Space **十个全部送达**，解码逐个正确。
+
+**这条记录不能说明什么，必须写清楚。** remote control 从 kitty 内部注入按键，**绕过了 OS 与输入法
+那一层**。真人按下时，macOS 的输入法切换仍会先吃掉 Ctrl+Space，F1–F6 在未勾选「用作标准功能键」时
+仍归系统。所以 `MV-V-C05-macos-kitty-pinyin-001` 这类带输入法的行**依然需要人**，编号保留。
+「文字入口全可用」这一列对本行填 `—`：本次采集跑的是 keyprobe，不是 `prc` REPL，没有验证它，
+不能借着同一行的其他 ✓ 顺手声称。
+
+这正好把三层分开了：**编码器层**（kitty，已测，全过）、**OS / 输入法层**（只有人能测）、
+**通过标准层**（§14.2 的文字入口，与前两层都无关，已由测试保证）。
+
 ## 状态
 
 | 字段 | 值 |
 |---|---|
 | 自动化部分 | **PASS**（文字入口完备性 + 裸 PTY 送达矩阵） |
-| 人工部分 | 待填 —— 记录编号已分配，未执行 |
+| 人工部分 | **首条已执行**：`MV-V-C05-macos-kitty-encoder-001`（终端编码器层，自动采集且可重复）。输入法层编号已分配，未执行 |
 | 阻塞 Phase 1？ | 否。验收标准（文字入口在所有组合可用）已由类型与测试保证，与终端拦截与否无关 |

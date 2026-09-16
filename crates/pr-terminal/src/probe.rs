@@ -195,12 +195,20 @@ pub fn run_on_terminal(
 
     let result = run(policy, true, |bytes| {
         let mut out = std::io::stdout();
-        out.write_all(bytes).ok()?;
+        // `run` hands us the whole probe sequence, query included. The query is stripped and
+        // asked through crossterm instead — see `ask_where_the_cursor_is`.
+        let asks = bytes.ends_with(b"\x1b[6n");
+        let body = if asks {
+            &bytes[..bytes.len() - 4]
+        } else {
+            bytes
+        };
+        out.write_all(body).ok()?;
         out.flush().ok()?;
-        if !bytes.ends_with(b"\x1b[6n") {
+        if !asks {
             return Some(Vec::new());
         }
-        read_report(timeout)
+        ask_where_the_cursor_is(timeout)
     });
 
     if !was_raw {
@@ -209,50 +217,70 @@ pub fn run_on_terminal(
     result
 }
 
-/// Collect bytes until a cursor position report is complete, or the deadline passes.
-fn read_report(timeout: std::time::Duration) -> Option<Vec<u8>> {
-    use crossterm::event::{Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-
-    let deadline = std::time::Instant::now() + timeout;
-    let mut buf: Vec<u8> = Vec::new();
-    while std::time::Instant::now() < deadline {
-        let left = deadline.saturating_duration_since(std::time::Instant::now());
-        if !crossterm::event::poll(left).ok()? {
-            break;
-        }
-        // crossterm decodes the report for us when it recognises it; otherwise the bytes
-        // arrive as ordinary keys and are reassembled here.
-        // A resize, a mouse move or a focus change mid-probe is not the report; waiting
-        // through them is the point of the loop.
-        if let Event::Key(KeyEvent {
-            code,
-            modifiers,
-            kind: KeyEventKind::Press,
-            ..
-        }) = crossterm::event::read().ok()?
-        {
-            if let KeyCode::Char(c) = code {
-                if modifiers.contains(KeyModifiers::CONTROL) && c == '[' {
-                    buf.push(0x1b);
-                } else {
-                    let mut b = [0u8; 4];
-                    buf.extend_from_slice(c.encode_utf8(&mut b).as_bytes());
-                }
-            } else if code == KeyCode::Esc {
-                buf.push(0x1b);
-            }
-        }
-        if buf.contains(&b'R') && parse_cursor_report(&buf).is_some() {
-            return Some(buf);
-        }
-    }
-    None
+/// Ask the terminal where the cursor is, and give up after `timeout` rather than hang.
+///
+/// **This must go through `crossterm::cursor::position`, not through `crossterm::event::read`.**
+/// crossterm's event reader recognises `CSI <row> ; <col> R` and consumes it as an internal
+/// event; it is never surfaced as an `Event`. A hand-rolled reader built on `event::read`
+/// therefore waits for bytes that have already been swallowed, and reports
+/// [`ProbeError::NoReply`] against a terminal that answered perfectly well. That is exactly
+/// what this function used to do, and no unit test could see it: the tests drive [`run`]
+/// through a fake exchange closure, and the fake terminal always answers.
+///
+/// It was found by running `prc --probe-width` inside a real kitty window
+/// (`ci/terminals/record-kitty.sh`), which is the entire argument for having that recording.
+///
+/// `position()` blocks on crossterm's own internal timeout, which is longer than §14.6's
+/// "give up rather than hang" allows, so the wait happens on a helper thread and the caller
+/// stops waiting at `timeout`. A thread left behind is bounded by crossterm's own deadline and
+/// the process is about to print one table and exit.
+fn ask_where_the_cursor_is(timeout: std::time::Duration) -> Option<Vec<u8>> {
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(crossterm::cursor::position());
+    });
+    let (col, row) = rx.recv_timeout(timeout).ok()?.ok()?;
+    // Back to the one-based form the rest of the module parses, so there is one representation
+    // of a cursor report and one place that understands it.
+    Some(format!("\x1b[{};{}R", u32::from(row) + 1, u32::from(col) + 1).into_bytes())
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
+
+    /// The reply path must not be built on `event::read`.
+    ///
+    /// This is a source assertion because the defect it guards is invisible to every other
+    /// kind of test: [`run`] is exercised through a fake exchange closure, and a fake terminal
+    /// always answers. Against a real one, crossterm swallows `CSI <row>;<col> R` as an
+    /// internal event, so a reader built on `event::read` waits for something that no longer
+    /// exists and reports "the terminal did not report a cursor position" about a terminal
+    /// that did. Found by running `prc --probe-width` in a real kitty window.
+    #[test]
+    fn the_cursor_report_is_read_through_crossterm_and_not_hand_rolled() {
+        let src = include_str!("probe.rs");
+        // Strip this test's own body first: the explanation above names the very thing it
+        // forbids, and a check that fails on its own documentation gets deleted.
+        let code = src
+            .split("#[cfg(test)]")
+            .next()
+            .expect("the module has a non-test part");
+        let code: String = code
+            .lines()
+            .filter(|l| !l.trim_start().starts_with("//"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        assert!(
+            code.contains("crossterm::cursor::position"),
+            "the probe must ask crossterm for the position"
+        );
+        assert!(
+            !code.contains("event::read"),
+            "the cursor report never arrives as an Event; reading one waits forever"
+        );
+    }
     use pr_render::AmbiguousWidth;
 
     /// A terminal that answers cursor reports according to a width rule of its own.

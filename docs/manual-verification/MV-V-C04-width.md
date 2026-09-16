@@ -54,7 +54,7 @@ prc @dev --output pretty HGETALL <一个含中文/emoji/组合字符的 hash>
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | MV-V-C04-macos-terminal-001 | macOS Terminal.app | | | | | | | | | | | | |
 | MV-V-C04-macos-iterm2-001 | iTerm2 | | | | | | | | | | | | |
-| MV-V-C04-macos-kitty-001 | kitty | | | | | | | | | | | | |
+| MV-V-C04-macos-kitty-001 | kitty 0.48.2 | 0.48.2 | 默认 | en_US.UTF-8 | 2 | 1 | 1 | 1 | 1 | 2 | 0 | 0 分歧 → `Padded` | 对齐 |
 | MV-V-C04-macos-alacritty-001 | Alacritty | | | | | | | | | | | | |
 | MV-V-C04-macos-wezterm-001 | WezTerm | | | | | | | | | | | | |
 | MV-V-C04-win-wt-001 | Windows Terminal | | | | | | | | | | | | |
@@ -70,10 +70,31 @@ CJK locale 要单独跑一遍：同一终端设 `LANG=zh_CN.UTF-8` 与 `LANG=en_
 - 某终端**探测出分歧**：默认切 `CursorReset`，框线应当仍对齐。若不对齐 → 真 bug。
 - 某终端**探测一致但目视不齐**：说明代表字符集没覆盖到该终端实际用到的字符类别，扩充 `representative_chars()` 并补自动化测试。
 
+## 首条真实终端记录（kitty，自动采集）—— **并且它抓到了一个真 bug**
+
+`MV-V-C04-macos-kitty-001` 由 [`ci/terminals/record-kitty.sh`](../../ci/terminals/record-kitty.sh)
+生成（在一个真实 kitty 窗口里跑 `prc --probe-width`），输出存档在 [`records/kitty-macos-001.md`](records/kitty-macos-001.md)。
+
+第一次跑出来的不是一张表，是一行字：**`width probe: the terminal did not report a cursor position`**。
+kitty 当然回答了 `CSI 6 n`；被吞掉的是我们自己。`run_on_terminal` 原先用 `crossterm::event::read`
+去收那份报告，而 crossterm 认得 `CSI <row>;<col> R` 并把它当**内部事件**消费掉，从不作为 `Event`
+交出来。于是探测器在等一件已经被吃掉的东西，然后对着一个回答得好好的终端报告「它没回答」。
+
+**没有任何单元测试能看见这个缺陷**：`probe::run` 是拿一个假的 exchange closure 驱动的，而假终端
+永远会回答。它只在一个真实终端里现形——这就是这份记录存在的全部理由。
+
+修法是改走 crossterm 支持的 `cursor::position()`（等待放在辅助线程上，好让 §14.6 的 500 ms
+「放弃而不是挂起」仍然成立），并加了一条源码断言测试
+`the_cursor_report_is_read_through_crossterm_and_not_hand_rolled`，因为下一个人很可能会觉得
+「自己读字节更直接」。
+
+修好之后 kitty 的实测：七个代表字符**全部**与 narrow 策略一致（`LANG=en_US.UTF-8`），
+`0 disagreement(s); tables will draw Padded`。
+
 ## 状态
 
 | 字段 | 值 |
 |---|---|
 | 自动化部分 | **PASS**（见上表证据） |
-| 人工部分 | 待填 —— 记录编号已分配，未执行 |
+| 人工部分 | **首条已执行**：`MV-V-C04-macos-kitty-001`（kitty 0.48.2 / macOS，自动采集且可重复），并因此修掉一个真实缺陷。其余终端编号已分配，未执行 |
 | 阻塞 Phase 1？ | 否。§14.6 的契约是「在声明的策略下一致 + 有降级路径」，两者均已自动化验证 |
