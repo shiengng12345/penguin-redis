@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 3 |
+| PASS | 4 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 60 |
+| IN-PROGRESS | 59 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -78,7 +78,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-E01 | IN-PROGRESS | — | |
+| V-E01 | PASS | `crates/pr-json/` · 17 tests · `docs/spikes/SPIKE-004.md` | occurrence DOM；重复成员保留+`#n` 寻址；数字词法逐字节保留；歧义路径拒绝；span 局部重写 |
 | V-E02 | IN-PROGRESS | — | |
 | V-E03 | IN-PROGRESS | — | |
 | V-E04 | IN-PROGRESS | — | |
@@ -134,7 +134,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-J01 | PASS | `docs/adr/ADR-001..030.md` + `README.md` | 30 条全部 accepted；ADR-023/026 的**结论**分别由 V-I03 / SPIKE-001 填入 |
-| V-J02 | IN-PROGRESS | — | 进行中：`pr-core`(SafeText/ExecutionOutcome/CommandRequest/TaskScope)、`pr-security`(TrustIdentity/ApprovalToken) 已冻结；`pr-json`/`pr-intelligence`/`pr-repl` 待办 |
+| V-J02 | IN-PROGRESS | — | 进行中：`pr-core`(SafeText/ExecutionOutcome/CommandRequest/TaskScope)、`pr-security`(TrustIdentity/ApprovalToken)、`pr-json`(JsonNode) 已冻结；`pr-intelligence`/`pr-repl` 待办 |
 | V-J03 | IN-PROGRESS | — | |
 | V-J04 | IN-PROGRESS | — | |
 
@@ -152,3 +152,4 @@
 |---|---|
 | 2026-09-16 | 建立报告；workspace 骨架；环境记录 |
 | 2026-09-16 | V-A03 / V-I01 / V-J01 → PASS；pr-core + pr-security 契约冻结；CI workflow 与 4 个 gate 脚本落地 |
+| 2026-09-16 | V-E01 → PASS（pr-json occurrence DOM，SPIKE-004）；workspace 85 tests 全绿 |

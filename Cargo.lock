@@ -273,6 +273,11 @@ version = "0.0.0"
 [[package]]
 name = "pr-json"
 version = "0.0.0"
+dependencies = [
+ "bytes",
+ "proptest",
+ "thiserror",
+]
 
 [[package]]
 name = "pr-mcp"
