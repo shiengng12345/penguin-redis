@@ -6,7 +6,9 @@
 
 pub mod approval;
 pub mod contract;
+pub mod diagnostics;
 pub mod secrets;
+pub mod sink;
 pub mod trust;
 pub mod uri;
 
@@ -15,6 +17,7 @@ pub use approval::{
     preview, request_hash,
 };
 pub use secrets::{REDACTED, SecretSet, scrub, scrub_str};
+pub use sink::{Destination, Emitted, EmittedBytes, emit, emit_bytes};
 pub use trust::{
     Advisory, AuthIdentity, DiscoveryBounds, Endpoint, KnownNodes, RebindVerdict, RedirectDecision,
     RotationVerdict, RotationWindow, ServerIdentity, TlsIdentity, TrustIdentity,

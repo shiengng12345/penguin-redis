@@ -1242,6 +1242,7 @@ dependencies = [
  "pr-core",
  "pr-json",
  "pr-protocol",
+ "pr-security",
  "proptest",
  "serde_json",
  "thiserror 2.0.20",

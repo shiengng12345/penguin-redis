@@ -227,6 +227,22 @@ impl Emitter {
         self
     }
 
+    /// The wire trace as it may be **written to a file**, with registered secrets removed
+    /// (§23.4's `--trace-wire` path, V-D06).
+    ///
+    /// [`Emitter::wire_trace`] returns what actually crossed the socket, which is what a test
+    /// comparing against the wire needs. This returns what a person may keep. They differ by
+    /// exactly one thing — an `AUTH` argument — and that is the whole reason both exist.
+    ///
+    /// The return type is the proof: a writer takes [`EmittedBytes`], which nothing but
+    /// [`pr_security::emit_bytes`] can build.
+    #[must_use]
+    pub fn wire_trace_for_file(&self) -> Option<pr_security::EmittedBytes> {
+        self.trace
+            .as_deref()
+            .map(|t| pr_security::emit_bytes(pr_security::Destination::TraceWire, t))
+    }
+
     /// The wire trace, if one was requested.
     #[must_use]
     pub fn wire_trace(&self) -> Option<&[u8]> {

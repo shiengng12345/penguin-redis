@@ -24,6 +24,9 @@ pub enum Fast {
     Version,
     /// `--probe-width` (§14.6): measure this terminal and report what it does.
     ProbeWidth,
+    /// `--diagnostics` (§23.4): the support bundle, which says what this build is and nothing
+    /// about the session.
+    Diagnostics,
     /// Nothing special; carry on to the normal path.
     None,
 }
@@ -40,6 +43,7 @@ pub fn fast_path(argv: &[String]) -> Fast {
             "--help" => return Fast::Help,
             "--version" | "-V" => return Fast::Version,
             "--probe-width" => return Fast::ProbeWidth,
+            "--diagnostics" => return Fast::Diagnostics,
             _ => {}
         }
     }
@@ -73,6 +77,7 @@ pub fn help() -> String {
         "OTHER:\n",
         "    --mcp-stdio           speak JSON-RPC over stdin/stdout for an MCP host\n",
         "    --probe-width         measure this terminal's character widths (§14.6)\n",
+        "    --diagnostics         print a support bundle: build and platform, no session data\n",
         "    --tui                 open the terminal UI\n",
         "    --help                this text\n",
         "    --version             version and the catalog it was built from\n",

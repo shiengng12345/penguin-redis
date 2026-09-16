@@ -20,7 +20,29 @@ use startup::{Fast, Probe};
 const PROBE_ENV: &str = "PR_PHASE0_PROBE";
 
 fn main() {
+    // Before anything can panic. §23.4's crash-report path: a panic message is assembled from
+    // whatever was in scope, which is exactly how a password held in a local reaches somebody's
+    // terminal and then a bug report. The hook removes registered secrets; installing it after
+    // the first line of work would leave that line uncovered.
+    let _ = pr_security::secrets::scrub_panics();
+
     let argv: Vec<String> = std::env::args().skip(1).collect();
+
+    // V-D06's audit harness drives the crash-report path through a real process: register the
+    // value, then panic with it in the message. Checked here, before the argument contract, for
+    // the same reason the other probes are.
+    if let Ok(secret) = std::env::var("PR_PHASE0_PANIC") {
+        let _ = pr_security::secrets::remember(secret.as_bytes());
+        // The workspace bans `panic!` in shipped code, and this is the one place where
+        // panicking *is* the behaviour under test: §23.4's crash-report path can only be
+        // audited by producing a crash with a secret in its message. Reaching the same state
+        // through an `unwrap` on a `None` would satisfy the lint and hide what the line does,
+        // which is the worse of the two.
+        #[allow(clippy::panic)]
+        {
+            panic!("deliberate panic for the V-D06 audit, carrying {secret} in its message");
+        }
+    }
 
     // WIN-02: write the byte canary and nothing else, so a test can compare what came out of
     // the pipe with what went in. Checked before the argument contract for the same reason the
@@ -84,6 +106,10 @@ fn main() {
         }
         Fast::Version => {
             print!("{}", startup::version());
+            std::process::exit(ExitCode::Success as i32);
+        }
+        Fast::Diagnostics => {
+            println!("{}", pr_security::diagnostics::build_info());
             std::process::exit(ExitCode::Success as i32);
         }
         Fast::ProbeWidth => {

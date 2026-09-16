@@ -52,6 +52,14 @@ pub enum ArgError {
          certificate names something other than the address you are connecting to"
     )]
     InsecureTlsRefused(String),
+    /// A connection URI that is not one.
+    ///
+    /// **The URI is not in the message**, only the shape of what was wrong. §23.4's first
+    /// named secret path is a URI parse error, because the failure case is the one a person
+    /// pastes into a terminal, a chat window and a bug report — with the password still in it.
+    /// `pr_security::uri::UriError` is built so it has nowhere to put one.
+    #[error("--{0}: {1}")]
+    Uri(String, pr_security::uri::UriError),
     /// Unknown flag.
     #[error("unknown option: {0}")]
     Unknown(String),
@@ -111,8 +119,13 @@ pub enum Target {
         host: Option<String>,
         /// Port, if given.
         port: Option<u16>,
-        /// Full URL, if given.
-        url: Option<String>,
+        /// Full URL, if given, already parsed.
+        ///
+        /// Parsed rather than kept as a string: the string contains the password, and a
+        /// `#[derive(Debug)]` anywhere above it would print it. `uri::Redis` hides the
+        /// password in its own `Debug`, and parsing registers it with `pr_security::secrets`
+        /// so every other sink scrubs it from then on.
+        url: Option<pr_security::uri::Redis>,
     },
 }
 
@@ -208,7 +221,7 @@ pub fn parse(argv: &[String]) -> Result<Invocation, ArgError> {
     let mut profile: Option<String> = None;
     let mut direct_host: Option<String> = None;
     let mut direct_port: Option<u16> = None;
-    let mut direct_url: Option<String> = None;
+    let mut direct_url: Option<pr_security::uri::Redis> = None;
     let mut seen_target_flags: Vec<String> = Vec::new();
     // NET-01: any flag that would disable verification, refused once the profile is known.
     let mut weakening: Option<String> = None;
@@ -280,7 +293,13 @@ pub fn parse(argv: &[String]) -> Result<Invocation, ArgError> {
             "-s" | "-u" | "--user" | "--askpass" | "--sentinel" | "--cluster" => {
                 seen_target_flags.push(a.to_owned());
                 if a == "-u" {
-                    direct_url = Some(need(&mut i, "-u")?);
+                    {
+                        let raw = need(&mut i, "-u")?;
+                        direct_url = Some(
+                            pr_security::uri::parse(&raw)
+                                .map_err(|e| ArgError::Uri("u".to_owned(), e))?,
+                        );
+                    }
                 } else if matches!(a, "-s" | "--user") {
                     let _ = need(&mut i, a)?;
                 }
