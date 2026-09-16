@@ -188,9 +188,10 @@ fn a_one_gibibyte_synthetic_blob_streams_without_being_held() {
 
 /// The real source: a 512 MB string, Redis's documented maximum [R52], on a pinned server.
 ///
-/// `#[ignore]` because it needs Docker and half a gigabyte; run by the `differential` CI job's
-/// sibling step. The synthetic test above runs unconditionally, so the incremental property is
-/// never untested — this one adds "and against a real server at its real limit".
+/// `#[ignore]` because it needs Docker and half a gigabyte; run by the `large-values` CI job
+/// (the `#[ignore]` attribute below names it too, and they used to disagree). The synthetic
+/// test above runs unconditionally, so the incremental property is never untested — this one
+/// adds "and against a real server at its real limit".
 #[test]
 #[ignore = "needs Docker and 512 MB; run by the large-values CI step with --ignored"]
 fn a_real_redis_512_mb_string_streams_too() {

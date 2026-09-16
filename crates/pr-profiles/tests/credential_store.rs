@@ -36,7 +36,7 @@ impl Drop for Cleanup {
 }
 
 #[test]
-#[ignore = "touches the real OS credential store; run by the credentials CI job with --ignored"]
+#[ignore = "touches the real OS credential store; run by the shared-files CI job with --ignored"]
 fn a_secret_round_trips_through_the_platform_store() {
     let store = PlatformStore;
     let r = scratch_ref("roundtrip");
@@ -69,7 +69,7 @@ fn a_secret_round_trips_through_the_platform_store() {
 }
 
 #[test]
-#[ignore = "touches the real OS credential store; run by the credentials CI job with --ignored"]
+#[ignore = "touches the real OS credential store; run by the shared-files CI job with --ignored"]
 fn the_store_reports_the_platform_it_actually_is() {
     // A store that claims to be the Windows Credential Manager on macOS would make every
     // diagnostic about credentials misleading.
@@ -86,7 +86,7 @@ fn the_store_reports_the_platform_it_actually_is() {
 }
 
 #[test]
-#[ignore = "touches the real OS credential store; run by the credentials CI job with --ignored"]
+#[ignore = "touches the real OS credential store; run by the shared-files CI job with --ignored"]
 fn two_references_do_not_collide() {
     // Secret references are per-profile. If two profiles shared an entry, changing one
     // profile's password would silently change the other's -- the 「凭证误绑定」 half of LIFE-03.

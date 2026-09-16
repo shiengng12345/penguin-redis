@@ -400,6 +400,10 @@ jobs:
       # survived contact with the code.
       - name: ADR ledger is complete
         run: ./ci/check-adr-ledger.sh
+      # An #[ignore]d test that no job runs is indistinguishable from dead code. This found a
+      # reason string naming a `credentials` job that has never existed.
+      - name: every ignored test names a CI job that exists
+        run: ./ci/check-ignored-tests-have-a-job.sh
       # V-F08 / ADR-034: §16.4's held-out gate turns itself on when an independently written
       # corpus appears. Printed here so the waiting state is visible in every run rather than
       # only in a document.
