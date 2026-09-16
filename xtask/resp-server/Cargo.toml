@@ -5,6 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
+publish = false
 description = "Penguin Redis — V-A03 synthetic RESP2/3 server: programmable frames, streamed types, push/attribute, malformed corpora, chunked/delayed delivery"
 
 [lints]

@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 0 |
+| PASS | 3 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 63 |
+| IN-PROGRESS | 60 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -31,9 +31,9 @@
 |---|---|---|---|
 | V-A01 | IN-PROGRESS | — | |
 | V-A02 | IN-PROGRESS | — | |
-| V-A03 | IN-PROGRESS | — | |
+| V-A03 | PASS | `xtask/resp-server/` · `fixtures/protocol/` (316 samples / 12 categories) · 15 tests | RESP2/3 encoder incl. streamed+push+attribute; scripted delivery; 1 GiB streamer; hostile corpus每类≥20 |
 | V-A04 | IN-PROGRESS | — | |
-| V-A05 | IN-PROGRESS | — | |
+| V-A05 | IN-PROGRESS | — | CI workflow + 8 个 gate job 已写；**待首次 push 后确认三平台全绿** |
 | V-A06 | IN-PROGRESS | — | |
 
 ## Track B · 协议与执行内核
@@ -43,7 +43,7 @@
 | V-B01 | IN-PROGRESS | — | |
 | V-B02 | IN-PROGRESS | — | |
 | V-B03 | IN-PROGRESS | — | |
-| V-B04 | IN-PROGRESS | — | |
+| V-B04 | IN-PROGRESS | — | `pr-core::outcome` 四维度+退出码映射已实现并测试；待 V-A03 组合矩阵全量 |
 | V-B05 | IN-PROGRESS | — | |
 | V-B06 | IN-PROGRESS | — | |
 | V-B07 | IN-PROGRESS | — | |
@@ -66,8 +66,8 @@
 |---|---|---|---|
 | V-D01 | IN-PROGRESS | — | |
 | V-D02 | IN-PROGRESS | — | |
-| V-D03 | IN-PROGRESS | — | |
-| V-D04 | IN-PROGRESS | — | |
+| V-D03 | IN-PROGRESS | — | `pr-security::approval` 实现+10 测试通过（含 SEC-10 同摘要不同字节）；待接入 kernel |
+| V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
 | V-D05 | IN-PROGRESS | — | |
 | V-D06 | IN-PROGRESS | — | |
 | V-D07 | IN-PROGRESS | — | |
@@ -116,7 +116,7 @@
 | V-H01 | IN-PROGRESS | — | |
 | V-H02 | IN-PROGRESS | — | |
 | V-H03 | IN-PROGRESS | — | |
-| V-H04 | IN-PROGRESS | — | |
+| V-H04 | IN-PROGRESS | — | `pr-core::scope::TaskScope` 实现，含 1000 次开关与阻塞任务测试；待接入真实会话 |
 | V-H05 | IN-PROGRESS | — | |
 | V-H06 | IN-PROGRESS | — | |
 
@@ -124,7 +124,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-I01 | IN-PROGRESS | — | |
+| V-I01 | PASS | `compatibility/manifest.toml` · CI job `manifest-pinned` | 5 服务器 target 全部 digest 固定；无 `latest`；gate 脚本强制 |
 | V-I02 | IN-PROGRESS | — | |
 | V-I03 | IN-PROGRESS | — | |
 | V-I04 | IN-PROGRESS | — | |
@@ -133,8 +133,8 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-J01 | IN-PROGRESS | — | |
-| V-J02 | IN-PROGRESS | — | |
+| V-J01 | PASS | `docs/adr/ADR-001..030.md` + `README.md` | 30 条全部 accepted；ADR-023/026 的**结论**分别由 V-I03 / SPIKE-001 填入 |
+| V-J02 | IN-PROGRESS | — | 进行中：`pr-core`(SafeText/ExecutionOutcome/CommandRequest/TaskScope)、`pr-security`(TrustIdentity/ApprovalToken) 已冻结；`pr-json`/`pr-intelligence`/`pr-repl` 待办 |
 | V-J03 | IN-PROGRESS | — | |
 | V-J04 | IN-PROGRESS | — | |
 
@@ -151,3 +151,4 @@
 | 日期 | 变更 |
 |---|---|
 | 2026-09-16 | 建立报告；workspace 骨架；环境记录 |
+| 2026-09-16 | V-A03 / V-I01 / V-J01 → PASS；pr-core + pr-security 契约冻结；CI workflow 与 4 个 gate 脚本落地 |

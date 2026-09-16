@@ -1,0 +1,26 @@
+# cargo-deny — Safety gate (v2.1 §34.2, §35.5 supply chain).
+[graph]
+all-features = true
+
+[advisories]
+yanked = "deny"
+ignore = []
+
+[licenses]
+# Workspace crates carry license = "TBD-ADR-023" until V-I03 concludes; they are unpublished,
+# so cargo-deny skips them. Third-party dependencies must be permissive.
+private = { ignore = true }
+# ADR-023 records the licence decision for prc itself; dependencies must be permissive.
+allow = ["MIT", "Apache-2.0", "Apache-2.0 WITH LLVM-exception", "BSD-2-Clause", "BSD-3-Clause", "ISC", "Unicode-3.0", "CC0-1.0", "Zlib"]
+confidence-threshold = 0.9
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"        # no `version = "*"` (v2.1 §31.1)
+allow-wildcard-paths = true  # intra-workspace path deps are not floating versions
+deny = []
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
