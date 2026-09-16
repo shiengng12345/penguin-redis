@@ -41,3 +41,4 @@
 | [ADR-036](ADR-036.md) | 「粘贴绝不自动执行」不依赖终端能力：bracketed paste 与时序启发式并存，`plain-only` 是最后手段 | accepted | V-C03、V-J04 |
 | [ADR-037](ADR-037.md) | 宽度分歧由「每格重置光标」降级绘制承担；`CSI 6 n` 只在 TTY 且用户触发 | accepted | V-C04、V-J04 |
 | [ADR-038](ADR-038.md) | 每个功能至少一条纯文字入口；重映射不得连带移除文字入口 | accepted | V-C05、V-J04 |
+| [ADR-039](ADR-039.md) | 用途搜索按概念与语料双路排序，名次融合；已作废语料进索引，live held-out 绝不进 | accepted | V-F08、V-J04 |
