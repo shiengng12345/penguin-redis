@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 39 |
+| PASS | 40 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 23 |
+| IN-PROGRESS | 22 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -58,7 +58,7 @@
 | V-C04 | PASS | `crates/pr-terminal/tests/width_matrix.rs` 12 tests · `crates/pr-terminal/src/probe.rs` 12 tests · `crates/pr-render/src/table.rs` `DrawMode::CursorReset` · `xtask/pty-harness/src/screen.rs` `CellWidth` · `docs/manual-verification/MV-V-C04-width.md` | 降级绘制不能靠「渲染完再读回自己的输出」证明——那只说明渲染器同意自己。测试改为**用一种宽度模型渲染、用另一种模型显示**：屏幕模型的 `CellWidth::UnicodeWide` 扮演 CJK 终端，narrow 策略渲染的 padded 表格右边框逐行漂移（先断言这个漂移真的发生，否则降级测试是空的），`CursorReset` 每个单元格边界发绝对光标移动，框线仍对齐。`CSI 6 n` 探测：仅 TTY、仅用户触发（`prc --probe-width`），非 TTY 直接拒绝且**一个字节都不写**，无应答 500 ms 放弃而非挂起，一处分歧即切换。过程中修正屏幕模型两个真实错误：组合字符被强制成 1 列（终端会合成到前一格，格子改存 grapheme cluster），以及 box-drawing 按 Ambiguous 判宽（真实终端特例化为窄，否则任何 TUI 都是坏的）。真实终端差异 → `MV-V-C04-*` 人工记录，编号已分配 |
 | V-C05 | PASS | `crates/pr-repl/src/entries.rs` 9 tests · `crates/pr-terminal/tests/key_matrix.rs` 4 tests · `docs/manual-verification/MV-V-C05-keys.md` | 验收标准是「每个功能至少一条文字入口在所有组合可用」，不是「每个快捷键都能用」——后者不可能成立。§14.2 八行做成数据，测试断言：除「取消输入」（Ctrl+C 是唯一每个终端都送达的键）外每个功能都有文字入口、每条入口都能 parse、全是可直接键入的 ASCII、`Ctrl+Space` 不作任何默认键、重映射**不能**连带移除文字入口。裸 PTY 实测（macOS）：F1(SS3/CSI)、F2(SS3/CSI)、F3、F4、F5、F6、Ctrl+R/P/N **全部送达**；`Ctrl+Space`（NUL）**未送达**，与 §14.2 预判一致。终端 × 输入法（含 macOS F 键默认被系统占用的两种设置）→ `MV-V-C05-*` 人工记录，编号已分配 |
 | V-C06 | PASS | `crates/pr-render/src/theme.rs` · 14 tests | Dark/Light/High-contrast 三套 token 全定义；WCAG 对比度自动校验；24bit→256→16→mono 量化后 JSON token 仍可分辨；**mono 保留 bold、plain 零转义** |
-| V-C07 | IN-PROGRESS | — | |
+| V-C07 | PASS | `docs/spikes/SPIKE-003.md` · Windows CI 上的 `pty_owner.rs` 11 + `key_matrix.rs` 4 + `width_matrix.rs` 12 + `pty-harness` 36 tests · `crates/prc/src/binout.rs` 4 tests + `win_02_binary_output_reaches_a_pipe_byte_for_byte` · `crates/pr-core/src/signal.rs` 9 tests | **这个 spike 的真正价值是证明了 V-A01 的 Windows 路径此前从未执行过**（harness 自己的测试在 Windows 上全被 `#[ignore]`，注释写着「V-C07 covers Windows」）。第一次真跑 ConPTY 连续暴露 3 个 P0：① ConPTY 启动发 `ESC[6n` 并阻塞等待，harness 不应答则子进程输出一字节都发不出；② crossterm 在 Windows 同时投递 `KeyEventKind::Release`，每个字符被输入两次；③ **粘贴的三条命令全部自动执行，含 `FLUSHALL`**——crossterm 在 Windows 根本不投递 `Event::Paste`，而 §14.1 的时序兜底当时只是个没人调用的纯函数。全部已修并有测试守住。WIN-01：同一套 fixture 在 ConPTY 下通过，前提是断言**渲染后的屏幕**而非字节流（ConPTY 转发的是自身缓冲区差量）。WIN-02：canary 由会被文本模式破坏的字节组成（`\r\n`、裸 `\r`、裸 `\n`、`\x1a`、`\0`、`\xff\xfe`、多字节 UTF-8），管道往返逐字节一致；真实 Windows 风险不是 CRLF 转换而是控制台走 `WriteConsoleW` 无法承载非法 UTF-8，`write_binary` 把失败变成一句可操作的解释。Ctrl+C 六态语义 + Ctrl+Break≡两次 Ctrl+C（把规则跑两遍而非开特例，七种状态逐一对照）。**限制已记录**：`SetConsoleCtrlHandler` 的 OS 投递层尚未接线（需要封装 unsafe 的 crate，与 TLS 栈一起在 ADR-023 决定）；legacy conhost 属人工记录，非一级目标 |
 
 ## Track D · 安全与凭证
 
@@ -180,3 +180,4 @@
 | 2026-09-16 | V-C04 → PASS（Unicode 宽度矩阵）；新增 `DrawMode::CursorReset` 降级绘制、`CSI 6 n` 探测与 `prc --probe-width`；屏幕模型改为 grapheme cluster 格子；651 tests |
 | 2026-09-16 | V-C03 → PASS（bracketed paste 与时序启发式）；paste-staging 接入 coordinator，`Action::SubmitMany` 让「一次粘贴多条命令」必须被显式处理；687 tests |
 | 2026-09-16 | V-C05 → PASS（按键可达性）；§14.2 表格入代码 + `PR_KEYPROBE` 键位探针；700 tests |
+| 2026-09-16 | V-C07 → PASS（SPIKE-003 Windows ConPTY）；WIN-01 / WIN-02 通过；Ctrl+C / Ctrl+Break 语义层完成；719 tests |

@@ -13,6 +13,7 @@ pub mod request;
 pub mod safetext;
 pub mod scope;
 pub mod session;
+pub mod signal;
 
 pub use mem::{rss_available, rss_bytes, rss_of};
 pub use outcome::{
@@ -23,3 +24,4 @@ pub use request::{CommandRequest, Effects, RequestBudget, RequestOrigin};
 pub use safetext::SafeText;
 pub use scope::{TaskScope, TaskScopeHandle};
 pub use session::{Protocol, ReconnectLosses, ReplyMode, SessionRefusal, SessionState, TxState};
+pub use signal::{Activity, Interrupts, Response, Signal};

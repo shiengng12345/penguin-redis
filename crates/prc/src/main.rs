@@ -6,6 +6,7 @@
 //! them cannot answer that.
 
 mod args;
+mod binout;
 mod startup;
 
 use pr_core::ExitCode;
@@ -19,6 +20,19 @@ const PROBE_ENV: &str = "PR_PHASE0_PROBE";
 
 fn main() {
     let argv: Vec<String> = std::env::args().skip(1).collect();
+
+    // WIN-02: write the byte canary and nothing else, so a test can compare what came out of
+    // the pipe with what went in. Checked before the argument contract for the same reason the
+    // other probes are: a measurement must not depend on the thing being measured.
+    if std::env::var(PROBE_ENV).as_deref() == Ok("binary-out") {
+        match binout::write_binary(&binout::canary()) {
+            Ok(()) => std::process::exit(ExitCode::Success as i32),
+            Err(e) => {
+                eprintln!("prc: {e}");
+                std::process::exit(ExitCode::LocalFailure as i32);
+            }
+        }
+    }
 
     // Measurement first, so a probe run never depends on the argument contract.
     if let Ok(name) = std::env::var(PROBE_ENV) {

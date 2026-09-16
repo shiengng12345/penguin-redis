@@ -197,6 +197,46 @@ fn an_unknown_probe_is_refused_rather_than_silently_ignored() {
     assert!(stderr.contains("nosuch"), "{stderr}");
 }
 
+// ================================================ WIN-02
+#[test]
+fn win_02_binary_output_reaches_a_pipe_byte_for_byte() {
+    // §35.1: no CRLF translation, on any platform. The canary carries the bytes a text-mode
+    // pipeline mangles — a CRLF pair, bare `\r` and `\n`, Ctrl+Z, NUL and invalid UTF-8 —
+    // because a test with a friendly string would pass on a platform that corrupts data.
+    let mut c = Command::new(PRC);
+    c.env("PR_PHASE0_PROBE", "binary-out");
+    let out = c.output().expect("prc runs");
+    assert_eq!(
+        out.status.code(),
+        Some(0),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+
+    let expected: Vec<u8> = {
+        let mut v = Vec::new();
+        v.extend_from_slice(b"start\r\n\r\n\x1a\0");
+        v.extend_from_slice(&[0xff, 0xfe]);
+        v.extend_from_slice("中文".as_bytes());
+        v.extend_from_slice(b"end");
+        v
+    };
+    assert_eq!(
+        out.stdout, expected,
+        "bytes were altered on the way out:\n  got {:?}\n  want {:?}",
+        out.stdout, expected
+    );
+    assert_eq!(
+        out.stdout.windows(3).filter(|w| *w == b"\r\r\n").count(),
+        0,
+        "a CRLF pair was translated into CR CR LF"
+    );
+    assert!(
+        !out.stdout.ends_with(b"\n") || out.stdout.ends_with(b"end"),
+        "no delimiter may be appended: --bytes is the blob and nothing else"
+    );
+}
+
 #[test]
 fn every_probe_reports_the_whole_catalog() {
     // If a probe quietly measured an empty catalog, its RSS would pass any budget.
