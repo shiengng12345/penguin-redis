@@ -16,9 +16,12 @@ pub enum Proto {
 /// Errors from encoding.
 #[derive(Debug, Error, PartialEq, Eq)]
 pub enum EncodeError {
-    /// A RESP3-only frame that has no RESP2 wire form (push, attribute, streamed types).
+    /// A RESP3-only frame that has no RESP2 wire form (attribute, streamed types).
     #[error("frame {0} has no RESP2 representation")]
     NoResp2Form(&'static str),
+    /// A frame that cannot be expressed on the wire at all, in any protocol.
+    #[error("frame cannot be encoded: {0}")]
+    UnrepresentableFrame(&'static str),
 }
 
 const CRLF: &[u8] = b"\r\n";
@@ -115,8 +118,9 @@ fn encode_streamed(f: &Frame, proto: Proto, out: &mut Vec<u8>) -> Result<(), Enc
             out.extend_from_slice(b"$?\r\n");
             for c in chunks {
                 if c.is_empty() {
-                    // an empty chunk would be read as the terminator; skip it deliberately
-                    continue;
+                    // `;0` is the terminator, so an empty chunk has no representation.
+                    // Refuse loudly: silently dropping it would be undetectable data loss.
+                    return Err(EncodeError::UnrepresentableFrame("empty streamed chunk"));
                 }
                 put_len(out, b';', c.len());
                 out.extend_from_slice(c);
@@ -210,9 +214,12 @@ pub fn encode(f: &Frame, proto: Proto, out: &mut Vec<u8>) -> Result<(), EncodeEr
         | Frame::BigNumber(_)
         | Frame::BulkError(_)
         | Frame::Verbatim { .. } => unreachable!("handled by encode_scalar"),
+        // RESP2 has no push type, but a RESP2 subscriber genuinely receives pub/sub
+        // messages as plain arrays — so this down-converts rather than refusing, otherwise
+        // RESP2 pub/sub fixtures could not be produced at all.
         Frame::Push(v) => match proto {
-            Proto::Resp3 => {
-                put_len(out, b'>', v.len());
+            Proto::Resp3 | Proto::Resp2 => {
+                put_len(out, if proto == Proto::Resp3 { b'>' } else { b'*' }, v.len());
                 for x in v {
                     encode(x, proto, out)?;
                 }
@@ -286,7 +293,8 @@ mod tests {
         assert_eq!(to_vec(&attr, Proto::Resp2), Err(EncodeError::NoResp2Form("attribute")));
         let push = Frame::Push(vec![Frame::simple("message")]);
         assert_eq!(r3(&push), b">1\r\n+message\r\n");
-        assert_eq!(to_vec(&push, Proto::Resp2), Err(EncodeError::NoResp2Form("push")));
+        // RESP2 subscribers receive pub/sub messages as arrays, so this down-converts.
+        assert_eq!(r2(&push), b"*1\r\n+message\r\n");
     }
 
     #[test]
@@ -298,6 +306,22 @@ mod tests {
         let m = Frame::StreamedMap(vec![(Frame::simple("k"), Frame::Integer(1))]);
         assert_eq!(r3(&m), b"%?\r\n+k\r\n:1\r\n.\r\n");
         assert_eq!(to_vec(&s, Proto::Resp2), Err(EncodeError::NoResp2Form("streamed-bulk")));
+    }
+
+    #[test]
+    fn empty_streamed_chunk_is_refused_not_dropped() {
+        // `;0` is the terminator; an empty chunk has no wire form. Silently skipping it would
+        // be undetectable data loss, which is the one thing this server must never do.
+        let s = Frame::StreamedBulk(vec![Bytes::from_static(b"a"), Bytes::new()]);
+        assert_eq!(to_vec(&s, Proto::Resp3), Err(EncodeError::UnrepresentableFrame("empty streamed chunk")));
+    }
+
+    #[test]
+    fn literal_null_forms_are_emitted_verbatim_in_both_protocols() {
+        assert_eq!(r3(&Frame::NullBulk), b"$-1\r\n");
+        assert_eq!(r2(&Frame::NullBulk), b"$-1\r\n");
+        assert_eq!(r3(&Frame::NullArray), b"*-1\r\n");
+        assert_eq!(r2(&Frame::NullArray), b"*-1\r\n");
     }
 
     #[test]

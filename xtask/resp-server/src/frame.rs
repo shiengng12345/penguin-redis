@@ -17,11 +17,13 @@ pub enum Frame {
     Integer(i64),
     /// `$len\r\n<bytes>\r\n` — binary-safe, may contain NUL / invalid UTF-8.
     Bulk(Bytes),
-    /// `$-1\r\n` (RESP2 null bulk string)
+    /// Literal `$-1\r\n`, emitted verbatim in **both** protocols. This is deliberate: a
+    /// fixture needs to be able to put a RESP2-style null on a RESP3 connection to check the
+    /// client's reaction. Use [`Frame::Null`] for the protocol-adaptive form.
     NullBulk,
-    /// `*-1\r\n` (RESP2 null array)
+    /// Literal `*-1\r\n`, emitted verbatim in both protocols (see [`Frame::NullBulk`]).
     NullArray,
-    /// `_\r\n` (RESP3 null)
+    /// Protocol-adaptive null: `_\r\n` in RESP3, `$-1\r\n` in RESP2.
     Null,
     /// `*n\r\n...`
     Array(Vec<Frame>),
