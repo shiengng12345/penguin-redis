@@ -40,6 +40,18 @@ pub enum ArgError {
     /// A TLS option that would loosen a profile's verification.
     #[error("--{0} would weaken @{1}'s TLS verification")]
     TlsWeakening(String, String),
+    /// A TLS option that would disable verification entirely.
+    ///
+    /// NET-01: 「拒绝或显式配置；**无静默 insecure**」. Rejected everywhere, not only when a
+    /// profile is present — a flag that works without a profile is a flag that gets used.
+    /// The message names the configured alternative, because refusing without saying what to
+    /// do instead is how a workaround gets invented.
+    #[error(
+        "{0} would disable TLS verification, and there is no such mode. \
+         Use --tls-ca <file> to trust a private CA, or --tls-name <name> when the server's \
+         certificate names something other than the address you are connecting to"
+    )]
+    InsecureTlsRefused(String),
     /// Unknown flag.
     #[error("unknown option: {0}")]
     Unknown(String),
@@ -121,8 +133,29 @@ pub struct Invocation {
     pub plain: bool,
     /// `--tui`.
     pub tui: bool,
+    /// TLS configuration (§21.1, §21.3). There is no field for disabling verification.
+    pub tls: TlsArgs,
     /// Redis command and its arguments, exact bytes.
     pub command: Vec<Bytes>,
+}
+
+/// How TLS was configured on the command line.
+///
+/// Every field either turns verification **on** or tells it what to check. §21.1's NET-01
+/// requires that no field can turn it off, so there is none — the loosening flags are refused
+/// during parsing and never reach a value.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct TlsArgs {
+    /// `--tls`, or implied by any of the others.
+    pub enabled: bool,
+    /// `--tls-ca <file>`: the CA set that must have signed the server's certificate.
+    pub ca: Option<String>,
+    /// `--tls-name <name>`: the name to verify, separate from the address (§21.3).
+    pub name: Option<String>,
+    /// `--tls-cert <file>`: client certificate.
+    pub cert: Option<String>,
+    /// `--tls-key <file>`: client key.
+    pub key: Option<String>,
 }
 
 /// Flags that change *which server or identity* we talk to. Combining any of these with an
@@ -142,6 +175,25 @@ const TARGET_FLAGS: &[&str] = &[
 /// TLS flags that would *loosen* verification; never allowed to override a profile.
 const TLS_WEAKENING: &[&str] = &["--insecure", "--no-verify", "--tls-verify=none"];
 
+/// TLS options that *configure* verification rather than removing it.
+///
+/// These exist so that refusing [`TLS_WEAKENING`] is a redirection rather than the removal of
+/// a capability: §21.3 separates the TCP target, the verified name and the trusted CA, and
+/// each of those is something an operator can set.
+pub const TLS_CONFIGURING: &[(&str, &str)] = &[
+    ("--tls", "                 require TLS"),
+    (
+        "--tls-ca",
+        " FILE         the CA set that must have signed the server certificate",
+    ),
+    (
+        "--tls-name",
+        " NAME       the name to verify, when it differs from the address",
+    ),
+    ("--tls-cert", " FILE       client certificate"),
+    ("--tls-key", " FILE        client private key"),
+];
+
 fn is_profile(tok: &str) -> bool {
     tok.len() > 1 && tok.starts_with('@')
 }
@@ -158,6 +210,8 @@ pub fn parse(argv: &[String]) -> Result<Invocation, ArgError> {
     let mut direct_port: Option<u16> = None;
     let mut direct_url: Option<String> = None;
     let mut seen_target_flags: Vec<String> = Vec::new();
+    // NET-01: any flag that would disable verification, refused once the profile is known.
+    let mut weakening: Option<String> = None;
     let mut i = 0usize;
 
     let set_output = |inv: &mut Invocation, m: OutputMode| -> Result<(), ArgError> {
@@ -262,19 +316,67 @@ pub fn parse(argv: &[String]) -> Result<Invocation, ArgError> {
             "--color" => inv.color = Some(need(&mut i, "--color")?),
             "--plain" => inv.plain = true,
             "--tui" => inv.tui = true,
+            "--tls" => inv.tls.enabled = true,
+            "--tls-ca" => {
+                inv.tls.enabled = true;
+                inv.tls.ca = Some(need(&mut i, "--tls-ca")?);
+            }
+            // §21.3: the verified name is configured separately from the address, because a
+            // node announcing an address you can reach does not get to choose the name its
+            // certificate is checked against.
+            "--tls-name" => {
+                inv.tls.enabled = true;
+                inv.tls.name = Some(need(&mut i, "--tls-name")?);
+            }
+            "--tls-cert" => {
+                inv.tls.enabled = true;
+                inv.tls.cert = Some(need(&mut i, "--tls-cert")?);
+            }
+            "--tls-key" => {
+                inv.tls.enabled = true;
+                inv.tls.key = Some(need(&mut i, "--tls-key")?);
+            }
             other => {
-                if TLS_WEAKENING.contains(&other) || other.starts_with("--tls-verify=") {
-                    seen_target_flags.push(other.to_owned());
-                    if TLS_WEAKENING.contains(&other) {
-                        // Recorded now; rejected below only when a profile is present.
-                        seen_target_flags.push(format!("__weaken{other}"));
-                    }
-                } else {
-                    return Err(ArgError::Unknown(other.to_owned()));
+                // NET-01: refused here, unconditionally. The previous shape recorded these and
+                // rejected them only when a profile was present, which meant
+                // `prc -h host --insecure` was accepted and silently ignored — a silent
+                // insecure in the exact sense §21.1 forbids, and the worse kind, because the
+                // operator believes the flag did something.
+                // Recorded rather than refused on the spot, because `@prod` may still be
+                // ahead of us in argv and the message is more useful when it can say *whose*
+                // verification would have been weakened. It is refused either way, below.
+                if TLS_WEAKENING.contains(&other) {
+                    weakening.get_or_insert_with(|| other.to_owned());
+                    i += 1;
+                    continue;
                 }
+                if let Some(v) = other.strip_prefix("--tls-verify=") {
+                    if v == "full" {
+                        inv.tls.enabled = true;
+                    } else {
+                        weakening.get_or_insert_with(|| other.to_owned());
+                    }
+                    i += 1;
+                    continue;
+                }
+                return Err(ArgError::Unknown(other.to_owned()));
             }
         }
         i += 1;
+    }
+
+    // NET-01: 「拒绝或显式配置；无静默 insecure」. Refused whether or not a profile is
+    // present. Before V-G04 this was checked only inside the profile branch, so
+    // `prc -h host --insecure` parsed, was ignored, and left the operator believing the flag
+    // had done something.
+    if let Some(w) = weakening {
+        return match &profile {
+            Some(p) => Err(ArgError::TlsWeakening(
+                w.trim_start_matches('-').to_owned(),
+                p.clone(),
+            )),
+            None => Err(ArgError::InsecureTlsRefused(w)),
+        };
     }
 
     // Resolve the target and apply the R26 matrix.
@@ -528,5 +630,106 @@ mod tests {
             "argv boundaries come from the OS, not re-split"
         );
         assert_eq!(i.command.len(), 3, "SET, k, \"a b\"");
+    }
+
+    // ---------------------------------------------------------------- V-G04 / NET-01
+    //
+    // 「拒绝或显式配置；无静默 insecure」. The refusal and the alternative are one requirement:
+    // refusing without saying what to do instead is how a workaround gets invented.
+
+    #[test]
+    fn a_flag_that_would_disable_verification_is_refused_with_no_profile_too() {
+        // The gap V-G04 found. These used to be recorded and then silently ignored when no
+        // profile was present, which is the worst kind of silent insecure: the operator
+        // believes the flag did something.
+        for flag in ["--insecure", "--no-verify", "--tls-verify=none"] {
+            let err = p(&["-h", "redis.internal", flag]).unwrap_err();
+            assert!(
+                matches!(err, ArgError::InsecureTlsRefused(ref f) if f == flag),
+                "{flag} was not refused: {err:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_refusal_names_the_configured_alternative() {
+        // An operator who is only told "no" reaches for the next workaround. The two things
+        // §21.3 separates -- the trusted CA and the verified name -- are both named.
+        let msg = p(&["-h", "10.0.0.7", "--insecure"])
+            .unwrap_err()
+            .to_string();
+        assert!(msg.contains("--tls-ca"), "{msg}");
+        assert!(msg.contains("--tls-name"), "{msg}");
+    }
+
+    #[test]
+    fn a_profile_still_gets_the_more_specific_refusal() {
+        // With a profile, the interesting fact is *whose* verification would be weakened.
+        let err = p(&["@prod", "--insecure"]).unwrap_err();
+        assert!(
+            matches!(err, ArgError::TlsWeakening(_, ref prof) if prof == "prod"),
+            "{err:?}"
+        );
+    }
+
+    #[test]
+    fn every_configuring_tls_flag_parses_and_turns_verification_on() {
+        // The flags that make the refusal a redirection rather than a removal.
+        let inv = p(&[
+            "-h",
+            "10.0.0.7",
+            "--tls-ca",
+            "/etc/penguin/ca.pem",
+            "--tls-name",
+            "redis.internal",
+            "--tls-cert",
+            "/etc/penguin/client.pem",
+            "--tls-key",
+            "/etc/penguin/client.key",
+        ])
+        .unwrap();
+        assert!(inv.tls.enabled);
+        assert_eq!(inv.tls.ca.as_deref(), Some("/etc/penguin/ca.pem"));
+        assert_eq!(inv.tls.name.as_deref(), Some("redis.internal"));
+        assert_eq!(inv.tls.cert.as_deref(), Some("/etc/penguin/client.pem"));
+        assert_eq!(inv.tls.key.as_deref(), Some("/etc/penguin/client.key"));
+        // Every flag the help table advertises must actually parse. The two are generated
+        // from one list, and this is what proves the list is not fiction.
+        for (flag, _) in TLS_CONFIGURING {
+            let argv: Vec<&str> = if *flag == "--tls" {
+                vec!["-h", "h", flag]
+            } else {
+                vec!["-h", "h", flag, "value"]
+            };
+            let inv = p(&argv).unwrap_or_else(|e| panic!("{flag} does not parse: {e}"));
+            assert!(inv.tls.enabled, "{flag} did not turn TLS on");
+        }
+    }
+
+    #[test]
+    fn the_verified_name_is_not_taken_from_the_address() {
+        // §21.3 in the argument contract: connecting to an address while checking a different
+        // name is configured, not inferred.
+        let inv = p(&["-h", "10.0.0.7", "--tls-name", "redis.internal"]).unwrap();
+        assert_eq!(inv.tls.name.as_deref(), Some("redis.internal"));
+        match &inv.target {
+            Target::Direct { host, .. } => assert_eq!(host.as_deref(), Some("10.0.0.7")),
+            other => panic!("expected a direct target, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn tls_verify_full_is_the_only_accepted_value() {
+        assert!(p(&["-h", "h", "--tls-verify=full"]).unwrap().tls.enabled);
+        for bad in [
+            "--tls-verify=none",
+            "--tls-verify=optional",
+            "--tls-verify=off",
+        ] {
+            assert!(
+                matches!(p(&["-h", "h", bad]), Err(ArgError::InsecureTlsRefused(_))),
+                "{bad} was not refused"
+            );
+        }
     }
 }

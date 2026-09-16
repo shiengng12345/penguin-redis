@@ -77,6 +77,25 @@ pub fn help() -> String {
         "    --version             version and the catalog it was built from\n",
     )
     .to_owned()
+        + &tls_section()
+}
+
+/// The TLS section of `--help`, generated from the parser's own flag table.
+///
+/// Generated rather than written out, so a flag added to the parser cannot quietly go
+/// undocumented — and the closing sentence is part of the contract, not decoration: refusing
+/// `--insecure` only works as a redirection if the destination is written where people look.
+fn tls_section() -> String {
+    let mut s = String::from("\nTLS (\u{a7}21.1, \u{a7}21.3):\n");
+    for (flag, detail) in crate::args::TLS_CONFIGURING {
+        let _ = writeln!(s, "    {flag}{detail}");
+    }
+    s.push_str(
+        "  There is no option that disables verification. If a certificate does not verify,\n\
+         \x20 configure the CA or the name above; reachability is not a reason to stop \
+         checking.\n",
+    );
+    s
 }
 
 /// Version text, including which pinned servers the catalog was captured from.
@@ -336,5 +355,19 @@ mod tests {
             .parse()
             .expect("rss is a number on this platform");
         assert!(n > 1024 * 1024, "implausibly small: {n}");
+    }
+
+    #[test]
+    fn help_lists_every_tls_flag_that_configures_verification_and_none_that_removes_it() {
+        // A flag nobody can find is a flag nobody uses, and the refusal in `args` only works
+        // as a redirection if the destination is written down where people look.
+        let h = help();
+        for (flag, _) in crate::args::TLS_CONFIGURING {
+            assert!(h.contains(flag), "--help does not mention {flag}");
+        }
+        for banned in ["--insecure", "--no-verify", "--tls-verify=none"] {
+            assert!(!h.contains(banned), "--help advertises {banned}");
+        }
+        assert!(h.contains("no option that disables verification"));
     }
 }

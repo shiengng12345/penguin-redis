@@ -28,6 +28,15 @@ crossterm = "0.29"   # ADR-022: the single event source and raw-mode owner
 ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }  # §31.1 TUI layout
 tracing = "0.1"
 unicode-width = "0.2"
+# V-G04 / ADR-032. rustls with an explicit CA set: there is no "accept anything" mode to
+# accidentally reach for. `ring` rather than the default provider so no C toolchain is needed
+# on any of the three CI runners.
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12", "logging"] }
+# PEM parsing comes from rustls-pki-types itself: `rustls-pemfile` is unmaintained
+# (RUSTSEC-2025-0134) and its functionality moved here. Taking the maintained path is cheaper
+# than carrying a deny.toml exception that outlives the reason for it.
+rustls-pki-types = { version = "1", features = ["std"] }
+rcgen = "0.14"   # test fixtures only: certificates are generated, never committed (they expire)
 # V-B01 / SPIKE-002 / ADR-031: an INTEROP TEST SUBJECT, never a product dependency.
 # It appears only in dev-dependencies; `ci/check-redis-rs-is-dev-only.sh` keeps it that way.
 redis = { version = "1", default-features = false, features = ["tokio-comp"] }

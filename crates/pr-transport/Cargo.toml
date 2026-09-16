@@ -15,3 +15,9 @@ workspace = true
 bytes = { workspace = true }
 thiserror = { workspace = true }
 pr-protocol = { path = "../pr-protocol" }
+rustls = { workspace = true }
+rustls-pki-types = { workspace = true }
+blake3 = { workspace = true }
+
+[dev-dependencies]
+rcgen = { workspace = true }

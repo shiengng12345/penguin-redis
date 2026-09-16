@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 49 |
+| PASS | 50 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 11 |
+| IN-PROGRESS | 10 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -106,7 +106,7 @@
 | V-G01 | PASS | `ci/topology/cluster-{up,down}.sh` · `crates/pr-routing/` 11 tests + 5 个 `topology_cluster_*` 实跑 | 6 节点 cluster_state:ok / 16384 slots；hash tag CRC16 与真服务器 7 个 key 逐一吻合；CROSSSLOT 不被当重定向 |
 | V-G02 | PASS | `ci/topology/sentinel-{up,down}.sh` · 3 个 `topology_sentinel_*` | 1 primary + 1 replica + 3 sentinel；根因是缺 `sentinel resolve-hostnames yes`（6.2+ 默认拒绝主机名） |
 | V-G03 | IN-PROGRESS | — | |
-| V-G04 | IN-PROGRESS | — | |
+| V-G04 | PASS | `crates/pr-transport/src/tls.rs`、`crates/pr-transport/tests/tls_matrix.rs`（11 tests）、`crates/prc/src/args.rs`（6 tests）、`tests/topology/tls/README.md`、[ADR-032](adr/ADR-032.md) | NET-01 通过：错名 / 过期 / 未知 CA 三项均被拒**且错误分别指向名字、有效期、签发者**；client cert 要求满足时连上、不满足时被拒；连 `127.0.0.1` 验 `redis.internal` 通过，同一张证书改用地址当验证名则被拒（SNI 独立的两面）；空 / 非 PEM 的 CA bundle 报错而**不回退**到系统根或空集。 每张证书都在测试运行时由自签 CA 现场签发。把它们提交进仓库会更糟：一个 `notAfter` 固定的 fixture 会变成一个在没人挑的日子突然变红的测试，而「已过期」那一格最终会和「有效」那一格没有区别。 **「无静默 insecure」是两件事。** 第一件：**没有那个开关**——不是默认关闭，是不存在。`there_is_no_configuration_that_turns_verification_off` 在源码上断言 `dangerous`、`ServerCertVerifier`、`accept_invalid` 这些标识符不出现在 TLS 模块的**代码**里，先剥掉注释与字符串字面量——否则「这里没有 insecure 模式」这句说明本身会触发检查，而人们修这种失败的方式是把说明删掉。第二件：**拒绝必须是重定向**，`--tls-ca` / `--tls-name` / `--tls-cert` / `--tls-key` 就是去处，`--help` 的 TLS 段由 parser 自己的 flag 表生成（两边不会漂移），拒绝的错误信息里点名。只说「不行」而不说「那该怎么办」，是变通方案被发明出来的方式。 **在命令行侧发现并修掉一个真实缺口**：`--insecure` / `--no-verify` / `--tls-verify=none` 之前**只在有 profile 时**被拒绝。没有 profile 时（`prc -h host --insecure`）它被记录下来然后静默忽略——正是 §21.1 禁止的静默 insecure，而且是更坏的一种：操作者以为这个 flag 起了作用。现在两种情况都拒绝，有 profile 时给更具体的那条（说出是谁的验证会被削弱）；因为 `@prod` 可能出现在 flag 之后，判定被推迟到 profile 已知时再做。 栈选 rustls 0.23 + `ring`（ADR-032）：rustls 默认就没有「接受任何证书」模式，要绕过必须显式实现 `ServerCertVerifier` 并调 `dangerous()`——一段任何 review 都看得见的代码，而不是一个 `bool`。`ring` 而非默认 provider，是为了三个 CI runner 都不需要 C 工具链。 `ca_set_hash`（blake3 over CA 集合的 DER 字节，按出现顺序）就是 §21.3 的 `TrustIdentity::Ca { ca_set_hash, server_name }`：两个不同 CA 为同一个名字背书是两个不同的 trust identity；往集合里加一个 CA 也会改变它——放宽「谁可以背书」是身份的改变，不是细节。`TlsConfig` 的 `Debug` 手写而非 derive，私钥不进 panic message / 日志 / 诊断包（§23.4），并有测试守住。 顺带把 `rustls-pemfile` 换成 `rustls-pki-types` 自带的 PEM API：前者已不再维护（RUSTSEC-2025-0134）。走维护中的那条路，比在 `deny.toml` 里留一条活得比理由更久的例外更便宜。 |
 | V-G05 | IN-PROGRESS | — | |
 
 ## Track H · 资源预算与性能基线
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-transport` → 11 + 3 passed；`cargo test -p prc --bins` → 41 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo test --workspace` → 904 passed / 0 failed；`ci/check-differential.sh` 仍然逐字节可复现。 |
 | 2026-09-16 | `cargo test -p pr-protocol --test large_values` → synthetic 1 GiB 通过（42.5 s）；`-- --ignored` → 真 Redis 512 MB 通过（27.4 s）；`cargo test -p pr-protocol` → 64 + 10 + 2 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 886 passed / 0 failed。 |
 | 2026-09-16 | `cargo run -p differential` → 5 cases, all layers agree（报告已提交，二次运行逐字节一致）；`cargo test -p differential -- --ignored` → 4 passed（含 2 个 negative control）；`cargo test -p differential` → 14 passed（8 纯函数 + 6 报告一致性）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 873 passed / 0 failed。V-H01 基线已按前次备注重测并记入 `benches/baseline/README.md`。 |
 | 2026-09-16 | `cargo test -p pr-protocol --test spike_002_redis_rs` → 19 passed；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 851 passed / 0 failed。 |

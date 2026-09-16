@@ -21,6 +21,25 @@ use std::io::{Read, Write};
 use std::net::{TcpStream, ToSocketAddrs};
 use std::time::Duration;
 
+/// Open a TCP connection with the timeouts a one-shot needs.
+///
+/// Shared with [`crate::tls`], which needs the same socket before it can hand it to rustls.
+///
+/// # Errors
+/// [`CallError::Io`] if the connection fails, [`CallError::Unresolved`] if the name does not
+/// resolve.
+pub fn connect_tcp(host: &str, port: u16, timeout: Duration) -> Result<TcpStream, CallError> {
+    let addr = (host, port)
+        .to_socket_addrs()?
+        .next()
+        .ok_or_else(|| CallError::Unresolved(format!("{host}:{port}")))?;
+    let stream = TcpStream::connect_timeout(&addr, timeout)?;
+    stream.set_read_timeout(Some(timeout))?;
+    stream.set_write_timeout(Some(timeout))?;
+    stream.set_nodelay(true)?;
+    Ok(stream)
+}
+
 /// Why a one-shot call did not produce a reply.
 #[derive(Debug, thiserror::Error)]
 pub enum CallError {
@@ -42,31 +61,34 @@ pub enum CallError {
 }
 
 /// A blocking connection that can carry one command at a time.
+///
+/// Generic over the transport so plaintext and TLS share one command path. §31.2's warning
+/// about two subtly different semantics applies here too: a TLS client that framed replies
+/// slightly differently from the plaintext one would be a second protocol implementation.
 #[derive(Debug)]
-pub struct Oneshot {
-    stream: TcpStream,
+pub struct Oneshot<S = TcpStream> {
+    stream: S,
     decoder: Decoder,
 }
 
-impl Oneshot {
-    /// Connect to `host:port`.
+impl Oneshot<TcpStream> {
+    /// Connect to `host:port` in plaintext.
     ///
     /// # Errors
     /// [`CallError::Io`] if the connection fails, [`CallError::Unresolved`] if the name does
     /// not resolve.
     pub fn connect(host: &str, port: u16, timeout: Duration) -> Result<Self, CallError> {
-        let addr = (host, port)
-            .to_socket_addrs()?
-            .next()
-            .ok_or_else(|| CallError::Unresolved(format!("{host}:{port}")))?;
-        let stream = TcpStream::connect_timeout(&addr, timeout)?;
-        stream.set_read_timeout(Some(timeout))?;
-        stream.set_write_timeout(Some(timeout))?;
-        stream.set_nodelay(true)?;
-        Ok(Self {
+        Ok(Self::over(connect_tcp(host, port, timeout)?))
+    }
+}
+
+impl<S: Read + Write> Oneshot<S> {
+    /// Wrap an already-established transport, such as a completed TLS handshake.
+    pub fn over(stream: S) -> Self {
+        Self {
             stream,
             decoder: Decoder::with_defaults(),
-        })
+        }
     }
 
     /// Send a command and read one reply.
