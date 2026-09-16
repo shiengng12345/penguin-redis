@@ -138,8 +138,12 @@ mod platform {
             if needed == 0 {
                 return Err(last_error());
             }
-            let mut buf = vec![0u8; needed as usize];
-            // SAFETY: `buf` is `needed` bytes, which is what the call above asked for.
+            // `Vec<u64>`, not `Vec<u8>`: the buffer is read back as a `TOKEN_USER`, which
+            // contains a pointer and therefore wants 8-byte alignment. A `Vec<u8>` promises
+            // alignment 1, so the cast is undefined behaviour that happens to work — and
+            // clippy's `cast_ptr_alignment` says so, on Windows only, where the code compiles.
+            let mut buf = vec![0u64; (needed as usize).div_ceil(8)];
+            // SAFETY: `buf` is at least `needed` bytes, which is what the call above asked for.
             let ok = unsafe {
                 GetTokenInformation(
                     token,
@@ -153,7 +157,7 @@ mod platform {
                 return Err(last_error());
             }
             // SAFETY: on success the buffer holds a `TOKEN_USER` whose `User.Sid` points into
-            // it; `buf` outlives this borrow.
+            // it; `buf` outlives this borrow and is aligned for `TOKEN_USER`.
             let sid = unsafe { (*buf.as_ptr().cast::<TOKEN_USER>()).User.Sid };
             let mut out: *mut u16 = std::ptr::null_mut();
             // SAFETY: `sid` is valid for the lifetime of `buf`; the returned string is freed
@@ -241,7 +245,7 @@ mod platform {
             if rc == 0 {
                 Ok(())
             } else {
-                Err(std::io::Error::from_raw_os_error(rc as i32))
+                Err(std::io::Error::from_raw_os_error(rc.cast_signed()))
             }
         };
         // SAFETY: `descriptor` came from `ConvertStringSecurityDescriptorToSecurityDescriptorW`,
@@ -268,7 +272,7 @@ mod platform {
             )
         };
         if rc != 0 || descriptor.is_null() {
-            return Err(std::io::Error::from_raw_os_error(rc as i32));
+            return Err(std::io::Error::from_raw_os_error(rc.cast_signed()));
         }
         let mut out: *mut u16 = std::ptr::null_mut();
         let mut len = 0u32;
@@ -300,14 +304,90 @@ mod platform {
         sddl_of(path)
     }
 
+    /// The account field of one SDDL ACE.
+    ///
+    /// An ACE is `type;flags;rights;object_guid;inherit_object_guid;account_sid[;…])`, so the
+    /// account is field 5. Matching the SID anywhere in the ACE text instead would also accept
+    /// it appearing in a rights or GUID field, which is a strange thing to be lenient about in
+    /// the one function whose job is to say "nobody else can read this".
+    fn ace_trustee(ace: &str) -> Option<&str> {
+        ace.split(')').next()?.split(';').nth(5)
+    }
+
+    /// How Windows itself spells this SID in an SDDL ACE.
+    ///
+    /// `ConvertSecurityDescriptorToStringSecurityDescriptorW` renders well-known accounts with
+    /// two-letter aliases: the built-in Administrator comes back as `LA`, `SYSTEM` as `SY`.
+    /// Comparing the DACL we read against the `S-1-5-21-…` form we wrote therefore fails on any
+    /// machine whose user happens to be well known — which is every GitHub Windows runner, where
+    /// the DACL we had just set read back as `D:PAI(A;;FA;;;LA)` and the check called it unsafe.
+    ///
+    /// So ask the OS to spell our own ACE, and compare its spelling with its spelling.
+    fn canonical_trustee(sid: &str) -> std::io::Result<String> {
+        let sddl: Vec<u16> = format!("D:P(A;;FA;;;{sid})")
+            .encode_utf16()
+            .chain(Some(0))
+            .collect();
+        let mut descriptor: PSECURITY_DESCRIPTOR = std::ptr::null_mut();
+        // SAFETY: `sddl` is NUL-terminated; the descriptor is freed below on both paths.
+        let ok = unsafe {
+            ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                sddl.as_ptr(),
+                SDDL_REVISION_1,
+                &raw mut descriptor,
+                std::ptr::null_mut(),
+            )
+        };
+        if ok == 0 || descriptor.is_null() {
+            return Err(last_error());
+        }
+        let mut out: *mut u16 = std::ptr::null_mut();
+        let mut len = 0u32;
+        // SAFETY: `descriptor` is owned here; `out` is freed below.
+        let ok = unsafe {
+            ConvertSecurityDescriptorToStringSecurityDescriptorW(
+                descriptor,
+                SDDL_REVISION_1,
+                DACL_SECURITY_INFORMATION,
+                &raw mut out,
+                &raw mut len,
+            )
+        };
+        let result = if ok == 0 || out.is_null() {
+            Err(last_error())
+        } else {
+            // SAFETY: `out` is a NUL-terminated wide string from the call above.
+            let s = unsafe { widestring_to_string(out) };
+            // SAFETY: documented to be freed with `LocalFree`.
+            unsafe { LocalFree(out.cast::<core::ffi::c_void>() as HLOCAL) };
+            s.split('(')
+                .nth(1)
+                .and_then(ace_trustee)
+                .map(str::to_owned)
+                .ok_or_else(|| {
+                    std::io::Error::new(
+                        std::io::ErrorKind::InvalidData,
+                        format!("Windows returned an SDDL this code cannot parse: {s}"),
+                    )
+                })
+        };
+        // SAFETY: `descriptor` came from `ConvertStringSecurityDescriptorToSecurityDescriptorW`.
+        unsafe { LocalFree(descriptor.cast::<core::ffi::c_void>() as HLOCAL) };
+        result
+    }
+
     pub(super) fn is_user_only(path: &Path) -> std::io::Result<bool> {
         let sddl = sddl_of(path)?;
         let sid = current_user_sid()?;
+        let canonical = canonical_trustee(&sid)?;
         // Protected, and every allow-ACE names this user. `D:P` is what says "inherit
         // nothing"; without it the parent directory could still be granting access.
-        let protected = sddl.starts_with("D:P") || sddl.contains("D:PAI") || sddl.contains("D:P(");
-        let aces: Vec<&str> = sddl.split("(").skip(1).collect();
-        let only_me = !aces.is_empty() && aces.iter().all(|a| a.contains(&sid));
+        let protected = sddl.starts_with("D:P");
+        let aces: Vec<&str> = sddl.split('(').skip(1).collect();
+        let only_me = !aces.is_empty()
+            && aces
+                .iter()
+                .all(|a| ace_trustee(a).is_some_and(|who| who == sid || who == canonical));
         Ok(protected && only_me)
     }
 }

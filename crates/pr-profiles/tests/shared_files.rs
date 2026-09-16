@@ -244,10 +244,17 @@ fn inode_of(p: &Path) -> u64 {
 #[cfg(windows)]
 fn inode_of(p: &Path) -> u64 {
     use std::os::windows::fs::MetadataExt as _;
-    // Windows has no inode; the creation time serves the same purpose here -- a file replaced
-    // by rename has the creation time of the temp file, not of the file it replaced.
+    // NTFS's file index is the identity here. The creation time is **not**: NTFS has file
+    // system tunnelling, which deliberately restores the original creation timestamp when a
+    // name is recreated within about fifteen seconds of being removed. That is exactly what an
+    // atomic replace does, so a creation-time comparison reports "modified in place" about the
+    // very operation it is supposed to prove happened -- and it did, on every Windows CI run.
+    //
+    // `file_index` is `None` on a volume that has no such notion; there the test cannot make
+    // its claim and says so rather than passing.
     let m = std::fs::metadata(p).unwrap();
-    m.creation_time() ^ m.file_size().rotate_left(17)
+    m.file_index()
+        .expect("this filesystem reports no file index, so identity cannot be checked here")
 }
 
 // ---------------------------------------------------------------------------------------------

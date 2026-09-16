@@ -32,10 +32,23 @@ pub struct RecordingProxy {
 impl RecordingProxy {
     /// Listen on an ephemeral port and forward to `upstream`.
     ///
+    /// **Binds `0.0.0.0`, not `127.0.0.1`.** The baseline side is `redis-cli` running *inside* a
+    /// container of the pinned image, and it reaches this proxy through
+    /// `host.docker.internal:host-gateway`. On Docker Desktop that resolves to something the
+    /// host's loopback answers, so a loopback bind happened to work; on a Linux runner it
+    /// resolves to the bridge gateway (`172.17.0.1`), and a loopback-bound listener refuses the
+    /// connection. The symptom was not a protocol difference — it was
+    /// `Could not connect to Redis ... Connection refused` on the baseline side and a perfectly
+    /// good result on ours, reported as four undeclared differences per case.
+    ///
+    /// The open port lives for one command on an ephemeral number inside a test harness, and it
+    /// forwards to a throwaway container. That is the trade being made deliberately rather than
+    /// by accident.
+    ///
     /// # Errors
     /// Propagates the listen failure.
     pub fn start(upstream: String) -> std::io::Result<Self> {
-        let listener = TcpListener::bind(("127.0.0.1", 0))?;
+        let listener = TcpListener::bind(("0.0.0.0", 0))?;
         let port = listener.local_addr()?.port();
         listener.set_nonblocking(true)?;
         let (stop, stopped) = mpsc::channel();
