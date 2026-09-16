@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 20 |
+| PASS | 22 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 42 |
+| IN-PROGRESS | 40 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -69,7 +69,7 @@
 | V-D03 | IN-PROGRESS | — | `pr-security::approval` 实现+10 测试通过（含 SEC-10 同摘要不同字节）；待接入 kernel |
 | V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
 | V-D05 | IN-PROGRESS | — | |
-| V-D06 | IN-PROGRESS | — | |
+| V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
 | V-D07 | IN-PROGRESS | — | |
 | V-D08 | IN-PROGRESS | — | |
 | V-D09 | IN-PROGRESS | — | |
@@ -118,7 +118,7 @@
 | V-H03 | IN-PROGRESS | — | |
 | V-H04 | IN-PROGRESS | — | `pr-core::scope::TaskScope` 实现，含 1000 次开关与阻塞任务测试；待接入真实会话 |
 | V-H05 | IN-PROGRESS | — | |
-| V-H06 | IN-PROGRESS | — | |
+| V-H06 | PASS | `crates/pr-repl/src/history.rs` · 19 tests | rusqlite bundled + WAL 多连接共享 + `user_version` schema 版本（更新的文件拒绝打开）；0600 权限；scope 按 profile/identity/db 隔离 |
 
 ## Track I · 兼容矩阵、catalog 与许可
 
@@ -165,3 +165,4 @@
 | 2026-09-16 | V-C06 → PASS（三主题 token + 量化降级）；测试暴露 mono/plain 语义混淆并分离；270 tests 全绿 |
 | 2026-09-16 | V-E02 → PASS（TableModel + 显示宽度策略）；299 tests 全绿 |
 | 2026-09-16 | V-E05 / V-B04 → PASS（generic RESP 渲染、outcome 组合矩阵）；327 tests 全绿 |
+| 2026-09-16 | V-H06 / V-D06 → PASS（history 存储与按环境脱敏）；346 tests 全绿 |
