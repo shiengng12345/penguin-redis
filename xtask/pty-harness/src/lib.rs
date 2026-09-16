@@ -26,8 +26,23 @@ pub enum PtyError {
     #[error("io: {0}")]
     Io(#[from] std::io::Error),
     /// Waited for output that never arrived.
-    #[error("timed out after {0:?} waiting for {1:?}")]
-    Timeout(Duration, String),
+    ///
+    /// Carries what *did* arrive, escaped. A timeout that only says what it wanted is close
+    /// to useless on a CI runner you cannot attach to: the interesting question is always
+    /// whether the child printed something else, or nothing at all.
+    #[error(
+        "timed out after {waited:?} waiting for {needle:?}; received {received} byte(s): {got}"
+    )]
+    Timeout {
+        /// How long the wait lasted.
+        waited: Duration,
+        /// What it was waiting for.
+        needle: String,
+        /// How many bytes arrived in total.
+        received: usize,
+        /// Those bytes, escaped and truncated.
+        got: String,
+    },
     /// Serialising a recording.
     #[error("json: {0}")]
     Json(#[from] serde_json::Error),
@@ -335,10 +350,13 @@ impl PtySession {
             }
             std::thread::sleep(Duration::from_millis(5));
         }
-        Err(PtyError::Timeout(
-            timeout,
-            String::from_utf8_lossy(needle).into_owned(),
-        ))
+        let buf = self.buf.lock().map(|g| g.clone()).unwrap_or_default();
+        Err(PtyError::Timeout {
+            waited: timeout,
+            needle: String::from_utf8_lossy(needle).into_owned(),
+            received: buf.len(),
+            got: escape(&buf[..buf.len().min(4096)]),
+        })
     }
 
     /// Current size.
@@ -453,13 +471,23 @@ mod tests {
 
     #[test]
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
-    fn wait_for_times_out_with_the_needle_named() {
+    fn wait_for_times_out_with_the_needle_and_what_arrived() {
         let s = PtySession::spawn(sh("printf 'x'"), 80, 24).unwrap();
         let e = s
             .wait_for(b"never-appears", Duration::from_millis(300))
             .unwrap_err();
         match e {
-            PtyError::Timeout(_, n) => assert_eq!(n, "never-appears"),
+            PtyError::Timeout {
+                needle,
+                received,
+                got,
+                ..
+            } => {
+                assert_eq!(needle, "never-appears");
+                // The output that *did* arrive is what makes a CI failure diagnosable.
+                assert!(received >= 1, "the child did print something");
+                assert!(got.contains('x'), "and the timeout says so: {got:?}");
+            }
             other => panic!("expected timeout, got {other:?}"),
         }
     }

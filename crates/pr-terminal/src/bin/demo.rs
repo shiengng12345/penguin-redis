@@ -19,6 +19,7 @@
 //! | `Esc` | close the menu, or leave the alternate screen |
 //! | `Ctrl-D` on an empty line | quit |
 
+use std::io::Write as _;
 use std::time::Duration;
 
 use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
@@ -62,6 +63,12 @@ fn translate(ev: &Event) -> Option<Input> {
 }
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
+    // Printed before anything else touches the terminal, so a PTY test that times out can
+    // tell "the process never started" apart from "the coordinator never painted". Windows
+    // CI needed exactly this distinction.
+    println!("demo starting");
+    let _ = std::io::stdout().flush();
+
     let (cols, rows) = crossterm::terminal::size().unwrap_or((80, 24));
     let mut co = Coordinator::new(Stdout::new(), cols, rows)?;
     co.set_prompt("penguin@r2/0> ");

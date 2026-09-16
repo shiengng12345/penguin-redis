@@ -22,6 +22,17 @@ const CTRL_T: &[u8] = b"\x14"; // enter the alternate screen
 const CTRL_D: &[u8] = b"\x04"; // quit on an empty line
 const ESC: &[u8] = b"\x1b";
 
+/// Spawn the demo and wait until it has printed its pre-terminal banner.
+///
+/// Separating this from the first prompt is what tells a failing run whether the process
+/// started at all — on Windows that was the whole question.
+fn demo_started() -> PtySession {
+    let p = demo();
+    p.wait_for(b"demo starting", T)
+        .expect("the demo process started");
+    p
+}
+
 fn demo() -> PtySession {
     let mut cmd = CommandBuilder::new(env!("CARGO_BIN_EXE_pr-terminal-demo"));
     // The runners have no terminfo database, so the program must not depend on one. A fixed
@@ -63,7 +74,7 @@ fn visible(p: &PtySession) -> String {
 
 #[test]
 fn a_real_session_edits_a_line_through_the_coordinator() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).expect("the first prompt");
     // Bracketed paste is enabled by the owner, not by the editor (§14.1).
     assert!(
@@ -91,7 +102,7 @@ fn a_real_session_edits_a_line_through_the_coordinator() {
 
 #[test]
 fn the_dropdown_is_drawn_and_erased_in_place() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(b"HG").unwrap();
     p.wait_for(b"HG", T).unwrap();
@@ -118,7 +129,7 @@ fn the_dropdown_is_drawn_and_erased_in_place() {
 
 #[test]
 fn assist_062_a_push_burst_does_not_corrupt_the_line_being_typed() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(b"HGETALL play").unwrap();
     p.wait_for(b"HGETALL play", T).unwrap();
@@ -156,7 +167,7 @@ fn assist_062_a_push_burst_does_not_corrupt_the_line_being_typed() {
 
 #[test]
 fn ux_12_the_draft_comes_back_from_the_alternate_screen() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(b"HGET player:10001 conf").unwrap();
     p.wait_for(b"HGET player:10001 conf", T).unwrap();
@@ -204,7 +215,7 @@ fn ux_12_the_draft_comes_back_from_the_alternate_screen() {
 
 #[test]
 fn notices_that_arrive_during_the_tui_are_printed_after_it_comes_down() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(CTRL_T).unwrap();
     p.wait_for(b"penguin TUI", T).unwrap();
@@ -231,7 +242,7 @@ fn notices_that_arrive_during_the_tui_are_printed_after_it_comes_down() {
 
 #[test]
 fn a_resize_is_handled_by_the_same_owner() {
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(b"GET some:key").unwrap();
     p.wait_for(b"GET some:key", T).unwrap();
@@ -252,7 +263,7 @@ fn a_resize_is_handled_by_the_same_owner() {
 fn the_recording_is_replayable_and_names_the_platform() {
     // V-A01 gave us a deterministic recording format; V-C02 is the first real user of it, so
     // the golden really does describe a session rather than a synthetic script.
-    let mut p = demo();
+    let mut p = demo_started();
     p.wait_for(b"penguin@r2/0>", T).unwrap();
     p.send(b"PING").unwrap();
     p.wait_for(b"PING", T).unwrap();
