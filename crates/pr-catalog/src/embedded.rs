@@ -22,6 +22,7 @@ const VALKEY_JSON: &[u8] = include_bytes!("../snapshots/valkey-8.1.json");
 const VALKEY_SUM: &str = include_str!("../snapshots/valkey-8.1.json.blake3");
 
 static LOADED: AtomicBool = AtomicBool::new(false);
+static INTEGRITY: OnceLock<Option<String>> = OnceLock::new();
 static REDIS: OnceLock<Vec<CommandSpec>> = OnceLock::new();
 static VALKEY: OnceLock<Vec<CommandSpec>> = OnceLock::new();
 static MERGED: OnceLock<Merged> = OnceLock::new();
@@ -37,29 +38,60 @@ pub fn is_loaded() -> bool {
 
 /// Parse an embedded snapshot, verifying its fingerprint.
 ///
-/// # Panics
-/// If an embedded snapshot does not match its digest. That is not a recoverable condition:
-/// the binary was built from a catalog nobody signed off, and every policy decision made
-/// from it would be untrustworthy. The build-time gate (`ci/check-catalog-snapshots.sh`)
-/// makes reaching this impossible in a released build.
-fn parse(bytes: &'static [u8], sum: &'static str) -> Snapshot {
+/// A failure returns `None` and is recorded in [`integrity_error`] rather than aborting.
+/// Crashing would be one wrong answer; returning an *empty* catalog is the fail-closed one,
+/// because an empty catalog classifies every command `unknown`, which §20.2 treats as maximum
+/// risk. The startup path reads [`integrity_error`] and refuses to run, so nothing depends on
+/// a user noticing the degradation — but if some path ever forgets to check, the failure mode
+/// is "everything needs approval", not "everything looks harmless".
+fn parse(bytes: &'static [u8], sum: &'static str) -> Option<Snapshot> {
     LOADED.store(true, Ordering::Release);
     match snapshot::load(bytes, sum) {
-        Ok(s) => s,
-        Err(e) => panic!("the embedded catalog snapshot is not the one that was reviewed: {e}"),
+        Ok(s) => Some(s),
+        Err(e) => {
+            let _ = INTEGRITY.set(Some(format!(
+                "the embedded catalog snapshot is not the one that was reviewed: {e}"
+            )));
+            None
+        }
+    }
+}
+
+/// The reason the embedded catalog could not be trusted, if there is one.
+///
+/// `None` once something has successfully loaded, and `None` before anything has tried —
+/// callers that need certainty force a load first, which is what the startup check does.
+#[must_use]
+pub fn integrity_error() -> Option<&'static str> {
+    INTEGRITY.get().and_then(Option::as_deref)
+}
+
+/// Load everything and report whether the embedded catalog verified.
+///
+/// # Errors
+/// The message describing which snapshot failed and why.
+pub fn verify() -> Result<(), &'static str> {
+    let _ = merged();
+    match integrity_error() {
+        Some(e) => Err(e),
+        None => Ok(()),
     }
 }
 
 /// The compiled Redis catalog.
 #[must_use]
 pub fn redis() -> &'static [CommandSpec] {
-    REDIS.get_or_init(|| compile(&parse(REDIS_JSON, REDIS_SUM), Family::Redis))
+    REDIS.get_or_init(|| {
+        parse(REDIS_JSON, REDIS_SUM).map_or_else(Vec::new, |s| compile(&s, Family::Redis))
+    })
 }
 
 /// The compiled Valkey catalog.
 #[must_use]
 pub fn valkey() -> &'static [CommandSpec] {
-    VALKEY.get_or_init(|| compile(&parse(VALKEY_JSON, VALKEY_SUM), Family::Valkey))
+    VALKEY.get_or_init(|| {
+        parse(VALKEY_JSON, VALKEY_SUM).map_or_else(Vec::new, |s| compile(&s, Family::Valkey))
+    })
 }
 
 /// Both families merged, with the divergence recorded.
@@ -81,11 +113,20 @@ pub fn lookup(name: &str) -> Option<&'static CommandSpec> {
 /// Provenance of what is embedded, for `prc --version` and bug reports.
 #[must_use]
 pub fn provenance() -> [(&'static str, String); 2] {
-    let r = parse(REDIS_JSON, REDIS_SUM).provenance;
-    let v = parse(VALKEY_JSON, VALKEY_SUM).provenance;
+    let describe = |s: Option<Snapshot>| {
+        s.map_or_else(
+            || "unverified".to_owned(),
+            |s| {
+                format!(
+                    "{} from {}",
+                    s.provenance.server_version, s.provenance.image
+                )
+            },
+        )
+    };
     [
-        ("redis", format!("{} from {}", r.server_version, r.image)),
-        ("valkey", format!("{} from {}", v.server_version, v.image)),
+        ("redis", describe(parse(REDIS_JSON, REDIS_SUM))),
+        ("valkey", describe(parse(VALKEY_JSON, VALKEY_SUM))),
     ]
 }
 
@@ -117,6 +158,13 @@ mod tests {
         assert!(m.redis_only.iter().any(|n| n == "HEXPIRE"));
         assert!(m.valkey_only.iter().any(|n| n == "COMMANDLOG"));
         assert!(m.effect_conflicts.is_empty(), "{:?}", m.effect_conflicts);
+    }
+
+    #[test]
+    fn the_shipped_catalog_verifies() {
+        // If this fails, the binary was built from a catalog nobody reviewed.
+        assert_eq!(verify(), Ok(()));
+        assert!(integrity_error().is_none());
     }
 
     #[test]

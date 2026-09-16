@@ -12,7 +12,7 @@ pub mod spec;
 pub use compile::{
     DELIBERATELY_UNKNOWN, Merged, OVERRIDES, Override, compile, compile_command, merge,
 };
-pub use embedded::{lookup, merged};
+pub use embedded::{integrity_error, lookup, merged, verify};
 pub use precedence::{Availability, LocalSpec, RemoteReport, Resolved, resolve};
 pub use snapshot::{LoadError, RawArg, RawCommand, Snapshot, load};
 pub use spec::{

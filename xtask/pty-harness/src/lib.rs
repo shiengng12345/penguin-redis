@@ -229,7 +229,7 @@ pub struct PtySession {
 
 /// Device Status Report — "where is the cursor?".
 ///
-/// ConPTY sends this as it starts and **blocks** until the terminal answers. A harness that
+/// `ConPTY` sends this as it starts and **blocks** until the terminal answers. A harness that
 /// ignores it never sees a single byte of the child's output, which is exactly how the first
 /// Windows run of the V-C02 tests failed: four bytes received, `ESC [ 6 n`, and then silence.
 const DSR_CURSOR: &[u8] = b"\x1b[6n";
@@ -437,7 +437,7 @@ impl PtySession {
 
     /// How many terminal queries the harness has answered on the child's behalf.
     ///
-    /// Zero on a session where nothing asked; on Windows, ConPTY asks as it starts, so a zero
+    /// Zero on a session where nothing asked; on Windows, `ConPTY` asks as it starts, so a zero
     /// here alongside a stalled child is the signature of the failure this exists to prevent.
     #[must_use]
     pub fn auto_replies(&self) -> usize {
@@ -554,7 +554,7 @@ mod tests {
         // The harness has to behave like a terminal. ConPTY asks this as it starts and blocks
         // until it is answered — an unanswered query means the child's output never arrives,
         // which is how every V-C02 PTY test failed on the first Windows run.
-        let mut s = PtySession::spawn(
+        let s = PtySession::spawn(
             sh("printf '\\033[6n'; sleep 0.4; printf 'after-query'"),
             80,
             24,
@@ -594,7 +594,7 @@ mod tests {
     #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
     fn a_query_split_across_two_reads_is_still_answered() {
         // The sequence is four bytes; a read boundary can fall anywhere inside it.
-        let mut s = PtySession::spawn(
+        let s = PtySession::spawn(
             sh("printf '\\033['; sleep 0.3; printf '6n'; sleep 0.4; printf 'done'"),
             80,
             24,
