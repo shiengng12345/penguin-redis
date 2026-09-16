@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 35 |
+| PASS | 36 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 27 |
+| IN-PROGRESS | 26 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -116,7 +116,7 @@
 | V-H01 | PASS | `crates/prc/tests/budgets.rs` 8 tests（CI 三平台跑）· `benches/baseline/README.md` · `crates/pr-core/src/mem.rs` 4 tests | `prc` 刻意链接整条依赖图（tokio / rusqlite bundled / keyring / crossterm / ratatui / blake3 / serde_json / 内嵌 catalog 586 条命令）——只链一半无法回答「依赖有没有先把预算吃掉」。release 实测：`--help` p95 **4.86 ms**（预算 100 ms，余 95 ms）、idle REPL **5.0 MiB**（预算 30，余 25）、idle TUI **6.5 MiB**（预算 60，余 53）、binary 1.6 MiB。CI 断言跑 debug build（更大更慢，通过即保守成立）。`--help` 便宜是**结构性**的而非计时侥幸：catalog 懒编译，测试断言 `--help` 不打印 catalog provenance 而 `--version` 打印。RSS 测量补齐 Windows（`tasklist`）——此前 `rss_bytes()` 在 Windows 返回 `None`，预算根本无从检查。**未链接**：TLS 栈与 `redis-rs`（`pr-transport` 仍为空），上述 headroom 就是它们要装得下的空间，落地后必须重测 |
 | V-H02 | IN-PROGRESS | — | |
 | V-H03 | IN-PROGRESS | — | |
-| V-H04 | IN-PROGRESS | — | `pr-core::scope::TaskScope` 实现，含 1000 次开关与阻塞任务测试；待接入真实会话 |
+| V-H04 | PASS | `crates/pr-core/tests/task_soak.rs` 10 tests · `crates/prc/tests/tui_cycle.rs` 3 tests · `crates/pr-core/src/scope.rs` 8 unit tests | 测试抓到 `TaskScope::spawn` 的**真实设计缺陷**：原实现用 `select!` 让 token 与用户 future 竞速，取消时直接 drop future——协作式清理从来跑不到（16 个任务只有 11 个执行了 cleanup），且 `shutdown` 对永不退出的任务也返回 `drained = true`，这个返回值等于谎话。改为不竞速：token 只是信号，有界等待给清理时间，超时才 `abort`，`shutdown` 的 `true` 现在真的表示「每个任务自己走完了」（§24.5 写 journal 前要的正是这个区分）。覆盖：无视 token 的任务、panic 的任务、阻塞线程的任务、飞行中被 drop 的 scope、嵌套 scope 互不影响、每 scope 独立计数。PERF-03：1000 次 TUI 开关（真 coordinator + 真 Ratatui frame），warmup 后前 450 次 +32 KB、后 450 次 **+0 B**，终端 token 每轮都归还 |
 | V-H05 | IN-PROGRESS | — | |
 | V-H06 | PASS | `crates/pr-repl/src/history.rs` · 19 tests | rusqlite bundled + WAL 多连接共享 + `user_version` schema 版本（更新的文件拒绝打开）；0600 权限；scope 按 profile/identity/db 隔离 |
 
@@ -176,3 +176,4 @@
 | 2026-09-16 | V-B06 → PASS（push 帧与 one-shot 输出契约）；PTY harness 补 DSR 应答器——Windows CI 显示 ConPTY 启动发 `ESC[6n` 并阻塞等待，harness 不应答导致子进程输出永远发不出（V-A01 的 Windows 路径此前全被 `#[ignore]`，V-C02 是第一次真跑）；catalog 嵌入二进制并 fail-closed；558 tests |
 | 2026-09-16 | V-H01 → PASS（启动与空闲基线）；`prc` 链接全依赖图，`pr-tui` 接入 Ratatui，RSS 测量补 Windows 路径；三项预算余量 95 ms / 25 MiB / 53 MiB 并记入 `benches/baseline/` |
 | 2026-09-16 | PTY harness 补屏幕模型（`Screen`，14 tests）与 DSR 应答器；Windows 上 crossterm 的 `KeyEventKind::Release` 导致每个字符输入两次，translate 搬进 `pr-terminal::bridge` 并加 8 个测试；`tasklist` RSS 解析被千位分隔符截断（48 MB 读成 120 KB）已修；603 tests |
+| 2026-09-16 | V-H04 → PASS（任务监督 leak detection / PERF-03）；修正 `TaskScope` 的取消语义（`select!` 竞速使协作清理永远跑不到、`shutdown` 返回值失真）；617 tests |
