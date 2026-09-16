@@ -268,6 +268,124 @@ fn every_supported_terminal_gets_the_mode_enabled() {
     );
 }
 
+// ================================================ the live path, not just the pure function
+/// Feed a line of text as individual keystrokes `step_ms` apart, Enter included.
+fn feed(
+    co: &mut Coordinator<Capture>,
+    text: &str,
+    step_ms: u64,
+    clock: &mut std::time::Instant,
+) -> Vec<Action> {
+    let mut actions = Vec::new();
+    for c in text.chars() {
+        *clock += std::time::Duration::from_millis(step_ms);
+        let k = if c == '\n' { Key::Enter } else { Key::Char(c) };
+        actions.push(co.handle_at(Input::Key(k), *clock));
+    }
+    // A moment of quiet, the way an idle event loop provides it.
+    *clock += std::time::Duration::from_millis(50);
+    co.tick(*clock);
+    actions
+}
+
+#[test]
+fn assist_082_a_burst_of_keystrokes_is_caught_without_bracketed_paste() {
+    // The failure this prevents was observed, not imagined: the first Windows CI run of the
+    // bracketed-paste tests executed all three pasted commands, because ConPTY delivers pasted
+    // text as ordinary key presses — Enter included — and crossterm reports no `Event::Paste`
+    // there at all. §14.1's timing fallback is the only thing between a pasted FLUSHALL and a
+    // FLUSHALL.
+    let _c = claim();
+    let mut co = Coordinator::new(Capture::new(), 80, 24).unwrap();
+    co.start();
+    let mut clock = std::time::Instant::now();
+
+    let actions = feed(&mut co, "SET a 1\nFLUSHALL\nSET b 2\n", 1, &mut clock);
+
+    assert!(
+        actions.iter().all(|a| *a == Action::None),
+        "something was submitted: {actions:?}"
+    );
+    let st = co.staging().expect("the burst went to review");
+    assert_eq!(st.lines()[..3], ["SET a 1", "FLUSHALL", "SET b 2"]);
+    assert_eq!(co.text(), "", "and nothing was left half-typed");
+}
+
+#[test]
+fn ordinary_typing_still_submits_normally() {
+    // The other half. If the fallback swallowed real Enters the REPL would be unusable, which
+    // is a worse outcome than the one it prevents.
+    let _c = claim();
+    let mut co = Coordinator::new(Capture::new(), 80, 24).unwrap();
+    co.start();
+    let mut clock = std::time::Instant::now();
+
+    let actions = feed(&mut co, "GET mykey\n", 90, &mut clock);
+    assert_eq!(
+        actions.last(),
+        Some(&Action::Submit("GET mykey".into())),
+        "typing was held back: {actions:?}"
+    );
+    assert!(co.staging().is_none());
+
+    // And again, so a second command is not affected by the first.
+    let actions = feed(&mut co, "PING\n", 90, &mut clock);
+    assert_eq!(actions.last(), Some(&Action::Submit("PING".into())));
+}
+
+#[test]
+fn a_fast_typed_single_line_lands_in_the_buffer_rather_than_running() {
+    // A hundred characters a second sustained is not typing, but it is also not worth a modal.
+    // It costs one Enter and costs nobody a command they did not read.
+    let _c = claim();
+    let mut co = Coordinator::new(Capture::new(), 80, 24).unwrap();
+    co.start();
+    let mut clock = std::time::Instant::now();
+
+    let actions = feed(&mut co, "DBSIZE\n", 1, &mut clock);
+    assert!(actions.iter().all(|a| *a == Action::None), "{actions:?}");
+    assert!(co.staging().is_none(), "one line needs no review");
+    assert_eq!(co.text(), "DBSIZE", "it is in the buffer, unsubmitted");
+}
+
+#[test]
+fn a_burst_with_no_newline_is_just_fast_typing() {
+    // Holding a key down, or a very fast typist mid-word. Nothing has completed, so nothing
+    // can have been executed and nothing needs review.
+    let _c = claim();
+    let mut co = Coordinator::new(Capture::new(), 80, 24).unwrap();
+    co.start();
+    let mut clock = std::time::Instant::now();
+
+    feed(&mut co, "HGETALL player:10001", 2, &mut clock);
+    assert!(co.staging().is_none());
+    assert_eq!(co.text(), "HGETALL player:10001");
+}
+
+#[test]
+fn a_burst_interrupted_by_a_pause_is_released_before_the_next_key() {
+    // The user pastes two lines and then starts typing. The paste must be dealt with, and the
+    // typing must not be swallowed into it.
+    let _c = claim();
+    let mut co = Coordinator::new(Capture::new(), 80, 24).unwrap();
+    co.start();
+    let mut clock = std::time::Instant::now();
+
+    for c in "GET a\nGET b\n".chars() {
+        clock += std::time::Duration::from_millis(1);
+        let k = if c == '\n' { Key::Enter } else { Key::Char(c) };
+        co.handle_at(Input::Key(k), clock);
+    }
+    assert!(co.pending_paste() > 0, "the burst is still being held");
+
+    // No tick; the next keystroke arrives after a human pause instead.
+    clock += std::time::Duration::from_millis(400);
+    co.handle_at(Input::Key(Key::Char('P')), clock);
+
+    let st = co.staging().expect("the burst was released");
+    assert_eq!(st.lines()[..2], ["GET a", "GET b"]);
+}
+
 // ================================================ staging behaviour
 #[test]
 fn ux_11_a_pasted_block_is_never_executed_line_by_line_on_arrival() {

@@ -24,10 +24,34 @@ fn coordinator() -> Coordinator<Capture> {
     co
 }
 
+/// A clock that only ever moves forward.
+///
+/// `Instant::now()` barely advances between two consecutive calls, so two keys "pressed" with
+/// it look simultaneous — and to §14.1's fallback, simultaneous means pasted. The tests need
+/// time to pass at a human rate, not at the machine's.
+fn next_at(step_ms: u64) -> std::time::Instant {
+    use std::sync::LazyLock;
+    use std::sync::atomic::{AtomicU64, Ordering};
+    static BASE: LazyLock<std::time::Instant> = LazyLock::new(std::time::Instant::now);
+    static ELAPSED: AtomicU64 = AtomicU64::new(0);
+    let ms = ELAPSED.fetch_add(step_ms, Ordering::SeqCst) + step_ms;
+    *BASE + std::time::Duration::from_millis(ms)
+}
+
+/// Type at a human speed.
+///
+/// The timestamps matter: §14.1's fallback treats input arriving faster than 10 ms apart as a
+/// paste, so a test that feeds keys in a tight loop is testing the paste path whether it meant
+/// to or not. Fifty milliseconds a character is a brisk but ordinary typist.
 fn type_str(co: &mut Coordinator<Capture>, s: &str) {
     for c in s.chars() {
-        co.handle(Input::Key(Key::Char(c)));
+        co.handle_at(Input::Key(Key::Char(c)), next_at(50));
     }
+}
+
+/// Press one key, at a human speed after whatever came before.
+fn press(co: &mut Coordinator<Capture>, k: Key) -> Action {
+    co.handle_at(Input::Key(k), next_at(200))
 }
 
 /// What is left on the screen, with our own cursor movements removed — an approximation of
@@ -155,7 +179,7 @@ fn assist_062_typing_still_works_during_a_flood() {
     co.start();
     // Interleave a keystroke with a burst, the way the event loop actually would.
     for (i, ch) in "HGETALL k".chars().enumerate() {
-        co.handle(Input::Key(Key::Char(ch)));
+        press(&mut co, Key::Char(ch));
         for j in 0..3 {
             co.handle(Input::Message(Notice {
                 text: format!("burst {i}.{j}"),
@@ -174,8 +198,8 @@ fn assist_062_the_menu_survives_a_notice() {
     co.start();
     type_str(&mut co, "HG");
     co.open_menu(vec!["HGET".into(), "HGETALL".into(), "HGETDEL".into()]);
-    co.handle(Input::Key(Key::Down));
-    co.handle(Input::Key(Key::Down));
+    press(&mut co, Key::Down);
+    press(&mut co, Key::Down);
     assert_eq!(co.menu().unwrap().focused, Some(1));
 
     co.sink_mut().clear();
@@ -237,9 +261,9 @@ fn accepting_a_candidate_edits_the_line_and_does_not_submit() {
         "notificationConfig".into(),
         "notificationEnabled".into(),
     ]);
-    co.handle(Input::Key(Key::Down));
+    press(&mut co, Key::Down);
 
-    let action = co.handle(Input::Key(Key::Enter));
+    let action = press(&mut co, Key::Enter);
     assert_eq!(
         action,
         Action::None,
@@ -250,7 +274,7 @@ fn accepting_a_candidate_edits_the_line_and_does_not_submit() {
 
     // And *then* Enter submits.
     assert_eq!(
-        co.handle(Input::Key(Key::Enter)),
+        press(&mut co, Key::Enter),
         Action::Submit("HGET player:10001 notificationConfig".into())
     );
     assert_eq!(co.text(), "", "the line is cleared after submission");
@@ -264,7 +288,7 @@ fn typing_invalidates_a_menu_computed_for_older_text() {
     type_str(&mut co, "HG");
     co.open_menu(vec!["HGET".into()]);
     assert!(co.menu().is_some());
-    co.handle(Input::Key(Key::Char('E')));
+    press(&mut co, Key::Char('E'));
     assert!(
         co.menu().is_none(),
         "a candidate list for `HG` must not stay open over `HGE` (§12.8)"
@@ -291,15 +315,15 @@ fn scenario_h_the_draft_survives_a_tui_round_trip() {
     );
 
     // F1 opens help; §15.8 requires the box and its cursor to be untouched.
-    co.handle(Input::Key(Key::Function(1)));
+    press(&mut co, Key::Function(1));
     assert!(co.tui_help_open());
     assert_eq!(co.tui_box(), text_before, "help disturbed the command box");
-    co.handle(Input::Key(Key::Function(1)));
+    press(&mut co, Key::Function(1));
     assert!(!co.tui_help_open());
     assert_eq!(co.tui_box(), text_before);
 
     // Esc with help closed returns to the REPL, carrying the uncommitted draft.
-    co.handle(Input::Key(Key::Esc));
+    press(&mut co, Key::Esc);
     assert_eq!(co.surface(), Surface::Repl);
     assert_eq!(co.text(), text_before, "UX-12: the original input is back");
     assert_eq!(co.cursor(), cursor_before, "and so is the cursor");
@@ -314,7 +338,7 @@ fn scenario_h_returning_from_the_tui_does_not_execute_the_draft() {
     type_str(&mut co, "FLUSHALL");
     co.enter_alternate();
     // Leaving must produce no Submit — §15.8 is explicit that the draft is carried, not run.
-    let action = co.handle(Input::Key(Key::Esc));
+    let action = press(&mut co, Key::Esc);
     assert_eq!(action, Action::None);
     assert_eq!(co.text(), "FLUSHALL", "still only a draft");
     assert_eq!(co.surface(), Surface::Repl);
@@ -326,16 +350,16 @@ fn escape_inside_the_tui_closes_help_before_it_closes_the_tui() {
     let mut co = coordinator();
     co.start();
     co.enter_alternate();
-    co.handle(Input::Key(Key::Function(1)));
+    press(&mut co, Key::Function(1));
     assert!(co.tui_help_open());
-    co.handle(Input::Key(Key::Esc));
+    press(&mut co, Key::Esc);
     assert_eq!(
         co.surface(),
         Surface::Alternate,
         "the first Esc closed the overlay, not the whole TUI"
     );
     assert!(!co.tui_help_open());
-    co.handle(Input::Key(Key::Esc));
+    press(&mut co, Key::Esc);
     assert_eq!(co.surface(), Surface::Repl);
 }
 
@@ -485,7 +509,7 @@ fn the_three_choices_are_the_only_ways_out() {
     co.start();
     co.handle(Input::Paste(b"GET a\nGET b\n".to_vec()));
     assert_eq!(
-        co.handle(Input::Key(Key::Char('1'))),
+        press(&mut co, Key::Char('1')),
         Action::SubmitMany(vec!["GET a".into(), "GET b".into()])
     );
     assert!(co.staging().is_none());
@@ -496,7 +520,7 @@ fn the_three_choices_are_the_only_ways_out() {
     co.start();
     co.handle(Input::Paste(b"EVAL \"return 1\"\n0\n".to_vec()));
     assert_eq!(
-        co.handle(Input::Key(Key::Char('2'))),
+        press(&mut co, Key::Char('2')),
         Action::Submit("EVAL \"return 1\"\n0".into())
     );
     drop(co);
@@ -505,7 +529,7 @@ fn the_three_choices_are_the_only_ways_out() {
     let mut co = coordinator();
     co.start();
     co.handle(Input::Paste(b"FLUSHALL\nFLUSHDB\n".to_vec()));
-    assert_eq!(co.handle(Input::Key(Key::Esc)), Action::None);
+    assert_eq!(press(&mut co, Key::Esc), Action::None);
     assert!(co.staging().is_none());
     assert_eq!(co.text(), "", "cancelling leaves nothing behind");
 }
@@ -516,11 +540,11 @@ fn a_dangerous_line_can_be_removed_before_anything_runs() {
     let mut co = coordinator();
     co.start();
     co.handle(Input::Paste(b"GET a\nFLUSHALL\nGET b\n".to_vec()));
-    co.handle(Input::Key(Key::Down)); // focus FLUSHALL
+    press(&mut co, Key::Down); // focus FLUSHALL
     assert_eq!(co.staging().unwrap().focused(), 1);
-    co.handle(Input::Key(Key::Backspace));
+    press(&mut co, Key::Backspace);
     assert_eq!(
-        co.handle(Input::Key(Key::Char('1'))),
+        press(&mut co, Key::Char('1')),
         Action::SubmitMany(vec!["GET a".into(), "GET b".into()])
     );
 }
@@ -547,15 +571,15 @@ fn ctrl_c_clears_the_line_and_ctrl_d_quits_only_when_it_is_empty() {
     let mut co = coordinator();
     co.start();
     type_str(&mut co, "FLUSHALL");
-    assert_eq!(co.handle(Input::Key(Key::Ctrl('d'))), Action::None);
+    assert_eq!(press(&mut co, Key::Ctrl('d')), Action::None);
     assert_eq!(
         co.text(),
         "FLUSHALL",
         "Ctrl-D on a written line does nothing"
     );
-    assert_eq!(co.handle(Input::Key(Key::Ctrl('c'))), Action::None);
+    assert_eq!(press(&mut co, Key::Ctrl('c')), Action::None);
     assert_eq!(co.text(), "");
-    assert_eq!(co.handle(Input::Key(Key::Ctrl('d'))), Action::Quit);
+    assert_eq!(press(&mut co, Key::Ctrl('d')), Action::Quit);
 }
 
 #[test]
@@ -582,10 +606,7 @@ fn a_submitted_line_enters_scrollback_before_the_next_prompt() {
     co.start();
     type_str(&mut co, "PING");
     co.sink_mut().clear();
-    assert_eq!(
-        co.handle(Input::Key(Key::Enter)),
-        Action::Submit("PING".into())
-    );
+    assert_eq!(press(&mut co, Key::Enter), Action::Submit("PING".into()));
     let seen = visible(co.sink());
     let submitted = seen
         .find("penguin> PING")

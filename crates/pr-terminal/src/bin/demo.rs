@@ -80,9 +80,13 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
 
     while alive {
         // The keyboard is served first so a burst of notices cannot starve it (ASSIST-062).
-        let input = if crossterm::event::poll(Duration::from_millis(10))? {
+        let input = if crossterm::event::poll(Duration::from_millis(5))? {
             translate(&crossterm::event::read()?)
         } else {
+            // Quiet. Let the coordinator decide whether a burst of input has ended — on a
+            // terminal without bracketed paste that is the only thing that turns a pasted
+            // block into a review instead of into three executed commands (§14.1).
+            co.tick(std::time::Instant::now());
             mailbox.take()
         };
 

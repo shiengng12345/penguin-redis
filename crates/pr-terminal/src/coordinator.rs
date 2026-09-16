@@ -21,7 +21,7 @@ use crate::paint::{
     DISABLE_BRACKETED_PASTE, ENABLE_BRACKETED_PASTE, ENTER_ALTERNATE, HIDE_CURSOR, LEAVE_ALTERNATE,
     Painter, SHOW_CURSOR, Sink,
 };
-use crate::paste::{Choice, Staging, needs_staging};
+use crate::paste::{BURST_GAP, Choice, Staging, needs_staging};
 use pr_render::WidthPolicy;
 use pr_repl::LineBuffer;
 
@@ -139,6 +139,12 @@ pub struct Coordinator<S: Sink> {
     frames: usize,
     /// Notices printed into scrollback.
     printed: usize,
+    /// When the last key arrived, for the §14.1 timing fallback.
+    last_key_at: Option<std::time::Instant>,
+    /// Lines completed inside the current burst, held back from execution.
+    pending_paste: Vec<u8>,
+    /// Whether the burst has written into the edit buffer as well.
+    burst_touched_buffer: bool,
 }
 
 impl<S: Sink> Coordinator<S> {
@@ -166,6 +172,9 @@ impl<S: Sink> Coordinator<S> {
             pending: Vec::new(),
             frames: 0,
             printed: 0,
+            last_key_at: None,
+            pending_paste: Vec::new(),
+            burst_touched_buffer: false,
         })
     }
 
@@ -308,6 +317,34 @@ impl<S: Sink> Coordinator<S> {
 
     /// Handle one input and repaint.
     pub fn handle(&mut self, input: Input) -> Action {
+        self.handle_at(input, std::time::Instant::now())
+    }
+
+    /// Nothing is pending from a burst that has not finished yet.
+    #[must_use]
+    pub fn pending_paste(&self) -> usize {
+        self.pending_paste.len()
+    }
+
+    /// Let time pass.
+    ///
+    /// The timing fallback needs a moment of quiet to decide a burst has ended; the event
+    /// loop calls this when its poll times out. Without it, a paste that arrives without
+    /// bracketing would sit in limbo until the user pressed another key.
+    pub fn tick(&mut self, at: std::time::Instant) {
+        let quiet = self
+            .last_key_at
+            .is_none_or(|p| at.saturating_duration_since(p) >= BURST_GAP);
+        if quiet && !self.pending_paste.is_empty() {
+            self.flush_burst();
+        }
+    }
+
+    /// Handle one input that arrived at `at`, and repaint.
+    ///
+    /// The timestamp is a parameter so the §14.1 timing fallback can be tested with a script
+    /// instead of by typing quickly and hoping.
+    pub fn handle_at(&mut self, input: Input, at: std::time::Instant) -> Action {
         match input {
             Input::Resize { cols, rows } => {
                 self.cols = cols;
@@ -340,15 +377,87 @@ impl<S: Sink> Coordinator<S> {
                 }
                 Action::None
             }
-            Input::Key(k) if self.staging.is_some() => self.staging_key(k),
+            Input::Key(k) if self.staging.is_some() => {
+                self.last_key_at = Some(at);
+                self.staging_key(k)
+            }
             Input::Key(k) => match self.surface {
-                Surface::Repl => self.repl_key(k),
+                Surface::Repl => self.repl_key_at(k, at),
                 Surface::Alternate => {
                     self.tui_key(k);
                     Action::None
                 }
             },
         }
+    }
+
+    /// Handle a REPL key, applying §14.1's timing fallback.
+    ///
+    /// Where bracketed paste works the terminal tells us and none of this runs. Where it does
+    /// not — and Windows `ConPTY` does not: crossterm delivers pasted text there as ordinary key
+    /// presses, Enter included — this is the only thing standing between a pasted `FLUSHALL`
+    /// and a `FLUSHALL`. The first Windows CI run of the paste tests executed all three pasted
+    /// commands, which is exactly the failure §14.1 forbids.
+    fn repl_key_at(&mut self, k: Key, at: std::time::Instant) -> Action {
+        let bursty = self
+            .last_key_at
+            .is_some_and(|p| at.saturating_duration_since(p) < BURST_GAP);
+        self.last_key_at = Some(at);
+
+        // A gap ended the burst: release whatever it held before handling this key normally.
+        if !bursty && !self.pending_paste.is_empty() {
+            self.flush_burst();
+        }
+
+        if bursty {
+            match k {
+                Key::Enter => {
+                    // A line completed *inside a burst* is not a submission. Hold it.
+                    let line = self.buffer.text().to_owned();
+                    self.pending_paste.extend_from_slice(line.as_bytes());
+                    self.pending_paste.push(b'\n');
+                    self.buffer.set_text("");
+                    self.burst_touched_buffer = false;
+                    self.menu = None;
+                    self.repaint();
+                    return Action::None;
+                }
+                Key::Char(_) | Key::Backspace => self.burst_touched_buffer = true,
+                _ => {}
+            }
+        }
+
+        self.repl_key(k)
+    }
+
+    /// Decide what a finished burst was.
+    ///
+    /// Multi-line, or longer than a person can be expected to have read, goes to review. A
+    /// single line goes back into the edit buffer **unsubmitted** — which costs a very fast
+    /// typist one extra Enter, and costs nobody a command they did not read.
+    fn flush_burst(&mut self) {
+        let mut content = std::mem::take(&mut self.pending_paste);
+        if self.burst_touched_buffer {
+            content.extend_from_slice(self.buffer.text().as_bytes());
+            self.buffer.set_text("");
+        }
+        self.burst_touched_buffer = false;
+        if content.is_empty() {
+            return;
+        }
+        // The final newline is the Enter we withheld, not a line separator. Counting it would
+        // put a single fast-typed command behind a modal, and the protection is the same
+        // either way: with it stripped the line lands in the buffer unsubmitted, so running it
+        // still takes one deliberate keypress.
+        let content: &[u8] = content.strip_suffix(b"\n").unwrap_or(&content);
+        if needs_staging(content) {
+            self.staging = Some(Staging::new(content));
+            self.menu = None;
+        } else {
+            let text = String::from_utf8_lossy(content).into_owned();
+            let _ = self.buffer.insert(&text);
+        }
+        self.repaint();
     }
 
     fn repl_key(&mut self, k: Key) -> Action {

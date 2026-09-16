@@ -49,6 +49,21 @@ fn demo_started() -> PtySession {
     p
 }
 
+/// Type a line the way a person does, and submit it.
+///
+/// Pacing matters here for the same reason it matters in the unit tests: §14.1 treats input
+/// arriving faster than 10 ms apart as a paste, so a test that writes a whole line into the
+/// pty in one go is exercising the paste path whether it meant to or not. This is the path for
+/// tests that mean "the user typed this and pressed Enter".
+fn type_and_submit(p: &mut PtySession, text: &str) {
+    for b in text.bytes() {
+        p.send(&[b]).unwrap();
+        std::thread::sleep(Duration::from_millis(20));
+    }
+    std::thread::sleep(Duration::from_millis(40));
+    p.send(b"\r").unwrap();
+}
+
 /// Quit cleanly, so every test also covers the shutdown path.
 fn quit(p: &mut PtySession) {
     p.send(CTRL_C).unwrap();
@@ -354,9 +369,7 @@ fn the_harness_answers_the_terminal_queries_the_child_makes() {
 fn the_recording_is_replayable_and_the_screen_model_understands_it() {
     let mut p = demo_started();
     p.wait_for_screen(PROMPT, T).unwrap();
-    p.send(b"PING").unwrap();
-    p.wait_for_screen("PING", T).unwrap();
-    p.send(b"\r").unwrap();
+    type_and_submit(&mut p, "PING");
     p.wait_for_screen("submitted: PING", T)
         .expect("the submitted line reached the application");
     p.send(CTRL_D).unwrap();
