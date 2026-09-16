@@ -1,0 +1,945 @@
+[
+  {
+    "id": "V-A01",
+    "title": "V-A01 · PTY harness",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "harness"
+    ],
+    "deps": [],
+    "body": "**Track** A · 基础设施与 harness\n**类型** harness\n**排雷对象** Phase 2、2A、4、7\n**v2.1 依据** §32.1 PTY E2E、§32.4、R20\n**依赖** 无\n\n### 验证什么\n**PTY harness**：macOS/Linux PTY + Windows ConPTY 统一驱动；resize、粘贴（含 bracketed）、颜色能力声明、录制回放\n\n### 方法\n用 harness 在 3 平台跑 10 个基线场景（回显、resize、Ctrl+C、alternate screen 进出、粘贴、颜色 reset）\n\n### 任务\n- [ ] 选定 PTY 驱动（Unix `openpty` + Windows ConPTY），封装统一 `PtySession` API\n- [ ] 实现录制（输入事件 + 输出字节 + 时间戳）与回放 diff\n- [ ] 编写 10 个基线场景 fixture\n- [ ] 在 macOS / Linux / Windows runner 各跑一遍并归档录制\n\n### 通过标准（验收）\n3 平台同一 fixture 全过；录制可回放 diff\n\n### 产出\n`tests/pty/harness/`、`fixtures/pty/baseline/`\n\n### 不通过时\n换 PTY 驱动库；**无 PTY harness 不得进入 Phase 2**\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-A02",
+    "title": "V-A02 · Differential harness",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "harness"
+    ],
+    "deps": [
+      "V-A05"
+    ],
+    "body": "**Track** A · 基础设施与 harness\n**类型** harness\n**排雷对象** Phase 1、2、5、7\n**v2.1 依据** §32.2、§20.4\n**依赖** V-A05\n\n### 验证什么\n**Differential harness** vs 固定 `redis-cli` baseline：两套独立同初态 Redis，四层比对（argv bytes / response / 最终状态 / 输出+exit）\n\n### 方法\n用骨架 `prc`（只做透传）跑 CMD-01~05\n\n### 任务\n- [ ] 容器化两套独立 Redis（同 image digest、同初始 dump）\n- [ ] 实现四层比对器：argv bytes / response frames / 最终 `DEBUG` 状态快照 / stdout+stderr+exit\n- [ ] 实例化附录 B.2 模板为 JSON 报告格式\n- [ ] 跑 CMD-01~05，确认写命令不共用实例\n\n### 通过标准（验收）\n5 条案例产出四层比对报告；写命令不共用实例\n\n### 产出\n`tests/differential/`、附录 B.2 模板实例化\n\n### 不通过时\n修 harness；不允许用「同实例先后执行」替代\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-A03",
+    "title": "V-A03 · Synthetic RESP server",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "harness"
+    ],
+    "deps": [],
+    "body": "**Track** A · 基础设施与 harness\n**类型** harness\n**排雷对象** Phase 1、5\n**v2.1 依据** §19.3、§32.3、R16、R17\n**依赖** 无\n\n### 验证什么\n**Synthetic RESP server**：可编程发送任意 RESP2/3 帧（streamed string/aggregate、push、attribute、畸形、1 GiB blob、半包、乱序 push）\n\n### 方法\n生成 §32.3 列出的全部 fuzz 类别\n\n### 任务\n- [ ] 实现可脚本化 RESP2/3 帧生成器（含 streamed、push、attribute、畸形）\n- [ ] 支持按脚本延迟、半包切分、乱序 push、断开\n- [ ] 生成 §32.3 每类 ≥ 20 个 fixture\n- [ ] 提供 1 GiB blob 流式发送而不在内存物化\n\n### 通过标准（验收）\n每类至少 20 个 fixture；server 可按脚本延迟/断开\n\n### 产出\n`xtask/resp-server/`、`fixtures/protocol/`\n\n### 不通过时\n无回退；这是 Phase 1 的必需工具\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-A04",
+    "title": "V-A04 · Fault injection",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "harness"
+    ],
+    "deps": [],
+    "body": "**Track** A · 基础设施与 harness\n**类型** harness\n**排雷对象** Phase 1、3、5、7\n**v2.1 依据** §32.1 Fault injection、§30.5\n**依赖** 无\n\n### 验证什么\n**Fault injection**：断网、半包、丢响应、超时、DNS/TLS 失败、磁盘满、只读 FS、权限撤销 可脚本化\n\n### 方法\n对骨架进程注入每类故障\n\n### 任务\n- [ ] 网络层：断网 / 半包 / 丢响应 / 超时（可编程 proxy）\n- [ ] 系统层：磁盘满 / 只读 FS / 权限撤销（容器 + 挂载选项）\n- [ ] DNS / TLS 失败注入\n- [ ] 每类故障一个可重复脚本 + 骨架进程不 panic 断言\n\n### 通过标准（验收）\n每类故障有可重复脚本；进程不 panic\n\n### 产出\n`tests/fault/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-A05",
+    "title": "V-A05 · 多目标 CI 矩阵",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "ci"
+    ],
+    "deps": [],
+    "body": "**Track** A · 基础设施与 harness\n**类型** ci\n**排雷对象** Phase 全部\n**v2.1 依据** §20.4 矩阵、§32.1、§34.2\n**依赖** 无\n\n### 验证什么\n**多目标 CI 矩阵**：Redis 7.2/7.4/8.0、Valkey 8.0/8.1、Cluster（6 节点）、Sentinel（3+1）、TLS（自签 CA + client cert）、macOS/Linux/Windows runner、8h soak runner、24h 发布 soak runner\n\n### 方法\n用 hello-world crate 跑满矩阵\n\n### 任务\n- [ ] 为 §20.4 每个 target 拉取并 pin image digest，写入 `compatibility/manifest.toml`\n- [ ] 搭 Cluster（6 节点）与 Sentinel（3+1）compose\n- [ ] 自签 CA 生成 server/client cert，含错名/过期样本\n- [ ] 接入 macOS / Linux / Windows runner\n- [ ] 建 8h soak job 与 24h release-soak job（手动触发）\n- [ ] hello-world crate 跑满矩阵全绿\n\n### 通过标准（验收）\n矩阵全绿；每个 target 的 image digest 已写入 `compatibility/manifest.toml`\n\n### 产出\nCI 配置、`compatibility/manifest.toml`\n\n### 不通过时\n缺哪个 target 就不许声称支持哪个；不允许用 `latest`\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-A06",
+    "title": "V-A06 · 资源测量工具",
+    "labels": [
+      "phase-0",
+      "track-a",
+      "harness"
+    ],
+    "deps": [],
+    "body": "**Track** A · 基础设施与 harness\n**类型** harness\n**排雷对象** Phase 2、4、7 + 所有预算项\n**v2.1 依据** §12.5、§24.7、§16.4、R08、R35\n**依赖** 无\n\n### 验证什么\n**资源测量工具**：allocator 统计 hook、RSS 采样、任务计数暴露、只读 mmap 单独计量\n\n### 方法\n在骨架进程上产出「开/关某模块」的 RSS 差报告\n\n### 任务\n- [ ] allocator 统计 hook（分配次数/字节）\n- [ ] RSS 采样器（跨平台）\n- [ ] 任务计数暴露接口（供 `TaskScope` 与 `:tasks` 使用）\n- [ ] mmap 区域单独计量并在报告中分列\n- [ ] 「开/关模块」差值报告可复现 ±5%\n\n### 通过标准（验收）\n报告可复现（±5%）；mmap 与堆分开\n\n### 产出\n`xtask/measure/`、`benches/baseline/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B01",
+    "title": "V-B01 · SPIKE-002 redis-rs 低层 API",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "spike"
+    ],
+    "deps": [
+      "V-A03"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** spike\n**排雷对象** Phase 1\n**v2.1 依据** §31.2、§37.3\n**依赖** V-A03\n\n### 验证什么\n**SPIKE-002 redis-rs 低层 API**：是否保留 RESP frame 类型、增量读、push 分流、取消后状态、重定向控制\n\n### 方法\n对 V-A03 的全部帧类别用 redis-rs 低层 API 读取，比对保真\n\n### 任务\n- [ ] 枚举 §31.2 验收清单为逐项测试\n- [ ] 用 redis-rs 低层 API 读取 V-A03 全部帧类别，比对保真\n- [ ] 测取消后读取行为、push channel 预算、内部重试\n- [ ] 撰写 `docs/spikes/SPIKE-002.md`：采用 / 拒绝 + 反例；若拒绝则起草 ADR 采纳自研 codec\n\n### 通过标准（验收）\n§31.2 清单全部满足\n\n### 产出\n`docs/spikes/SPIKE-002.md`\n\n### 不通过时\n**ADR 采纳 `pr-protocol` 自研 codec 为唯一 kernel 边界**；redis-rs 降为互操作测试对象\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B02",
+    "title": "V-B02 · 增量 RESP decoder 原型",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-A06"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 1、5\n**v2.1 依据** §19.3、§24.2、R16\n**依赖** V-A03、V-A06\n\n### 验证什么\n**增量 RESP decoder 原型**（无论 B01 结论都要做，§19.3 的 streamed 与有界解码不依赖第三方）\n\n### 方法\n对 V-A03 全部类型解码；1 GiB synthetic blob；半包/畸形 fuzz\n\n### 任务\n- [ ] 实现增量 decoder 状态机，覆盖 §19.3 全部类型含 streamed\n- [ ] 有界解码：最大嵌套 / 声明长度 / aggregate 个数 / 总预算\n- [ ] 1 GiB synthetic blob 流式，记录峰值内存\n- [ ] fuzz 10⁶ 次（畸形长度、截断 CRLF、UTF-8 跨块、压缩炸弹）无 panic\n\n### 通过标准（验收）\n类型全覆盖含 streamed；1 GiB 峰值内存 ≤ 块预算；fuzz 10⁶ 次无 panic/无界分配\n\n### 产出\n`crates/pr-protocol/`、`fixtures/protocol/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B03",
+    "title": "V-B03 · `--pipe` 逐帧路径",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-B02",
+      "V-J02"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 5、3\n**v2.1 依据** §18.5、R01、SEC-09、PIPE-08\n**依赖** V-B02、V-J02\n\n### 验证什么\n**`--pipe` 逐帧路径**：stdin RESP → `CommandRequest` → policy → send → per-frame outcome；背压队列；畸形 fail-closed\n\n### 方法\nprod-deny profile 下喂含写帧的流；喂截断帧\n\n### 任务\n- [ ] stdin RESP 流 → `CommandRequest` 逐帧转换\n- [ ] 非 array-of-bulk 帧 / 截断 / 超长 → fail-closed，报帧序号与偏移\n- [ ] 接入同一 catalog 分类与 policy；prod-deny 下写帧停止（退出码 5）\n- [ ] 有界背压队列（1,000 帧 / 8 MiB）与断线后 `UnknownAfterSend`\n- [ ] SEC-09、PIPE-08 fixture\n\n### 通过标准（验收）\n在第一条写帧停止，退出码 5；截断帧退出码 2 并报帧序号；无静默跳过\n\n### 产出\n`tests/pipe/`、`fixtures/hostile-input/pipe/`\n\n### 不通过时\n无回退；这是 BLOCKER 修复的验证\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B04",
+    "title": "V-B04 · `ExecutionOutcome` 四维度模型 + 退出码映射表",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-J02"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 1、2\n**v2.1 依据** §19.2、§18.6、§22.3、R27、R30、R42\n**依赖** V-A03、V-J02\n\n### 验证什么\n**`ExecutionOutcome` 四维度模型 + 退出码映射表**\n\n### 方法\n用 V-A03 制造每种 delivery×reply×effects 组合\n\n### 任务\n- [ ] 实现四维度 `ExecutionOutcome` 类型\n- [ ] 枚举 delivery×reply×effects 组合，用 V-A03 逐一制造\n- [ ] 编写退出码映射表 fixture（含 §22.3 Ctrl+C 优先级）\n- [ ] typed output `outcome` 字段与退出码同源断言\n\n### 通过标准（验收）\n映射表 fixture 100%；Ctrl+C vs unknown 优先级按 §22.3\n\n### 产出\n`crates/pr-core/src/outcome.rs`、`fixtures/outcome/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B05",
+    "title": "V-B05 · 会话状态机",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 1、3\n**v2.1 依据** §22.4~22.6、STATE-01~08\n**依赖** V-A03\n\n### 验证什么\n**会话状态机**：CLIENT REPLY OFF/SKIP、MULTI/EXEC/WATCH、HELLO/AUTH/SELECT/RESET；断线后不重放\n\n### 方法\nsynthetic server 上跑状态转换与断线\n\n### 任务\n- [ ] 状态机覆盖 protocol / auth identity / DB / reply mode / subscription / transaction / tracking\n- [ ] CLIENT REPLY OFF/SKIP 下辅助请求不占回复位\n- [ ] MULTI/EXEC/WATCH 逐项关联；断线不重建事务\n- [ ] STATE-01~08 在 synthetic server 上全过\n\n### 通过标准（验收）\nSTATE-01~08 全过\n\n### 产出\n`tests/session-state/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B06",
+    "title": "V-B06 · push 帧处理",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-B02"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 2、5\n**v2.1 依据** §18.1、R17、R40\n**依赖** V-A03、V-B02\n\n### 验证什么\n**push 帧处理**：one-shot `--json` 不进 stdout；`--show-pushes`；ndjson 事件；`--output resp` 再编码\n\n### 方法\nsynthetic server 在回复前后插 push\n\n### 任务\n- [ ] one-shot `--json`/`--raw`/`--csv` 下 push 丢弃 + stderr 计数\n- [ ] `--show-pushes` NDJSON 到 stderr；`--output ndjson|typed-json` 作为事件入 stdout\n- [ ] `--output resp` 规范化再编码器 + `--trace-wire` 分离\n- [ ] push 在回复前/后/独立到达三种时序 fixture\n\n### 通过标准（验收）\nstdout 只有回复；stderr 计数；ndjson 顺序正确\n\n### 产出\n`tests/output/push/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-B07",
+    "title": "V-B07 · CLI 参数边界 parser",
+    "labels": [
+      "phase-0",
+      "track-b",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02"
+    ],
+    "body": "**Track** B · 协议与执行内核\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §3.2、§3.3、R26、CMD-01\n**依赖** V-J02\n\n### 验证什么\n**CLI 参数边界 parser**：`prc [opts] [@profile] [opts] [--] CMD …`；profile × flag 允许/冲突矩阵\n\n### 方法\n表驱动测试\n\n### 任务\n- [ ] 表驱动实现 §3.3 profile × flag 允许/冲突矩阵\n- [ ] `--` 终止客户端参数区；`SET k '--raw'` 原样\n- [ ] `-h` 保留 host 含义；帮助走 `--help`\n- [ ] 每格一个用例 + CMD-01\n\n### 通过标准（验收）\n§3.3 矩阵每格一个用例；`SET k '--raw'` 原样\n\n### 产出\n`crates/prc/tests/args.rs`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C01",
+    "title": "V-C01 · SPIKE-001 Reedline 作编辑引擎",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "spike"
+    ],
+    "deps": [
+      "V-A01",
+      "V-J02"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** spike\n**排雷对象** Phase 2、2A、4\n**v2.1 依据** §14.5、§31.1、R03、R28\n**依赖** V-A01、V-J02\n\n### 验证什么\n**SPIKE-001 Reedline 作编辑引擎**：`LineBuffer` 接受外部 `TextEdit` 不丢字节；撤销栈把「接受候选」当单事务；与自绘菜单组合\n\n### 方法\n在 V-A01 上跑 ASSIST-020~028、062~064、087\n\n### 任务\n- [ ] 用 Reedline `LineBuffer`/`Editor` 接受外部 `TextEdit`，验证 UTF-8 边界与字节不丢\n- [ ] 「接受候选」封装为单个可撤销事务\n- [ ] 与自绘菜单组合跑 ASSIST-020~028、062~064、087（PTY）\n- [ ] 撰写 SPIKE-001 报告；不满足则起草 ADR-026 回退自有 LineBuffer 并跑同一套测试\n\n### 通过标准（验收）\n全过\n\n### 产出\n`docs/spikes/SPIKE-001.md`、`tests/editor-state/`\n\n### 不通过时\n**ADR-026 回退：`pr-repl` 自有 LineBuffer**（grapheme-aware，复用 Reedline history 格式），同一套测试必须通过\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C02",
+    "title": "V-C02 · 单一 terminal owner 原型",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01",
+      "V-C01"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** prototype\n**排雷对象** Phase 2、4\n**v2.1 依据** §14.4、ADR-022\n**依赖** V-A01、V-C01\n\n### 验证什么\n**单一 terminal owner 原型**：`pr-terminal` 同时驱动 REPL 编辑、自绘下拉、异步消息排队、TUI alternate screen 切换\n\n### 方法\nPub/Sub 消息涌入 + 打字 + 菜单 + 切 TUI 再回\n\n### 任务\n- [ ] `pr-terminal` 唯一 crossterm event source + painter\n- [ ] REPL 编辑 / 自绘下拉 / 异步消息队列 / TUI alternate screen 切换共用 coordinator\n- [ ] Pub/Sub 涌入 + 打字 + 菜单 + 切 TUI 再回 PTY 场景（ASSIST-062、UX-12、场景 H）\n- [ ] 断言无第二个 stdin 读者、无并发 stdout 写者\n\n### 通过标准（验收）\nASSIST-062、UX-12、场景 H 过；无 stdin/stdout 竞争\n\n### 产出\n`crates/pr-terminal/`、`tests/pty/owner/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C03",
+    "title": "V-C03 · bracketed paste 矩阵",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §14.1、R05、ASSIST-082、UX-11\n**依赖** V-A01\n\n### 验证什么\n**bracketed paste 矩阵**：macOS Terminal、iTerm2、kitty、Alacritty、WezTerm、Windows Terminal、conhost、tmux、SSH 中的 `CSI ?2004` 支持；无支持时 10 ms 时序启发式的漏检/误判\n\n### 方法\n每个终端粘贴 3 行写命令\n\n### 任务\n- [ ] 在 9 种终端启用 `CSI ?2004 h` 并粘贴 3 行写命令，记录是否收到成对标记\n- [ ] 实现 10 ms 时序启发式，在无支持终端上测漏检/误判率\n- [ ] paste-staging 原型（逐行显示、编辑、三种提交选择）\n- [ ] ASSIST-082 fixture + 每终端人工记录\n\n### 通过标准（验收）\n有支持终端 100% 进 staging；无支持终端启发式在 fixture 上 0 漏检；误判率记录\n\n### 产出\n`tests/pty/paste/`、人工记录\n\n### 不通过时\n若某终端两者皆失败 → 该终端标 `plain-only`，在支持矩阵明示\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C04",
+    "title": "V-C04 · Unicode 宽度矩阵",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** prototype\n**排雷对象** Phase 2、4\n**v2.1 依据** §14.6、R33、UX-08、ASSIST-018/067\n**依赖** V-A01\n\n### 验证什么\n**Unicode 宽度矩阵**：ambiguous / ZWJ / 组合字符在上述终端的实测宽度；`CSI 6 n` 探测可行性；「每格重置光标」降级绘制\n\n### 方法\n固定策略 + 仿真终端 + 真实终端人工记录\n\n### 任务\n- [ ] `unicode-width` grapheme 计算 + ZWJ 序列按 2 列 + ambiguous 可配置\n- [ ] `CSI 6 n` 光标探测原型（TTY + 用户触发）\n- [ ] 「每格重置光标」降级绘制原型\n- [ ] 仿真终端 UX-08 / ASSIST-018 / 067；真实终端人工记录\n\n### 通过标准（验收）\n仿真下 UX-08 过；降级绘制在宽度判错时框线仍对齐\n\n### 产出\n`tests/render/width/`、人工记录\n\n### 不通过时\n无回退（策略已是可实现契约）\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C05",
+    "title": "V-C05 · 按键可达性",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §14.2、ASSIST-068\n**依赖** V-A01\n\n### 验证什么\n**按键可达性**：F1–F6、Ctrl+R/P/N、Ctrl+Space 在各终端与 IME（macOS 拼音、Windows IME、fcitx）下是否被拦截；文字入口回退\n\n### 方法\n每终端 + IME 组合逐键记录\n\n### 任务\n- [ ] 每终端 × IME（macOS 拼音、Windows IME、fcitx）逐键记录 F1–F6、Ctrl+R/P/N、Ctrl+Space\n- [ ] 确认每个功能至少一条文字入口（`:help`/`:find`/`:guide`/`:complete`/`:history`）可用\n- [ ] 被拦截键在该平台默认重映射并写入文档\n- [ ] PTY 键位 fixture + 人工记录\n\n### 通过标准（验收）\n每个功能至少一条文字入口在所有组合可用\n\n### 产出\n人工记录 + `tests/pty/keys/`\n\n### 不通过时\n被拦截的键在该平台默认重映射并写入文档\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C06",
+    "title": "V-C06 · 颜色层级与 reset",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §7.1~7.3、R25、UX-04/06、PIPE-01\n**依赖** V-A01\n\n### 验证什么\n**颜色层级与 reset**：24bit→256→16→mono 量化后相邻语义可分辨；表头背景不泄漏；管道无 escape；Light/High-contrast token 对比度\n\n### 方法\ngolden tests × 4 色阶 × 3 主题\n\n### 任务\n- [ ] 实现 24bit→256→16→mono 量化\n- [ ] Penguin Dark / Light / High-contrast 三主题 token 表落地\n- [ ] 相邻语义可分辨测试 + WCAG 对比度自动校验\n- [ ] 表头背景不泄漏、每段 reset、管道无 escape 的 golden tests\n\n### 通过标准（验收）\n全过；WCAG 4.5:1 自动校验过\n\n### 产出\n`fixtures/renderer/colour/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-C07",
+    "title": "V-C07 · SPIKE-003 Windows ConPTY 专项",
+    "labels": [
+      "phase-0",
+      "track-c",
+      "spike"
+    ],
+    "deps": [
+      "V-A01",
+      "V-A05"
+    ],
+    "body": "**Track** C · 终端与编辑器\n**类型** spike\n**排雷对象** Phase 2、7\n**v2.1 依据** §35.1、R20、WIN-01/02\n**依赖** V-A01、V-A05\n\n### 验证什么\n**SPIKE-003 Windows ConPTY 专项**：V-A01 全部场景 + 二进制 stdio + `SetConsoleCtrlHandler` + Ctrl+Break\n\n### 方法\nWindows runner 上跑\n\n### 任务\n- [ ] Windows runner 上跑 V-A01 全部场景（ConPTY）\n- [ ] stdin/stdout 二进制模式：`-x`/`-X`/`--bytes`/`--pipe` 无 CRLF 转换\n- [ ] `SetConsoleCtrlHandler` + Ctrl+Break 等价两次 Ctrl+C\n- [ ] WIN-01、WIN-02 过；legacy conhost 不达则标 `plain-only`；撰写 SPIKE-003\n\n### 通过标准（验收）\nWIN-01、WIN-02 过\n\n### 产出\n`docs/spikes/SPIKE-003.md`\n\n### 不通过时\n若 legacy conhost 不达 → conhost 标 `plain-only`；Windows Terminal 必须过\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D01",
+    "title": "V-D01 · `keyring` 平台矩阵",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §4.3、§31.1、R23\n**依赖** V-A05\n\n### 验证什么\n**`keyring` 平台矩阵**：macOS `apple-native`、Windows `windows-native`、Linux Secret Service + keyutils 回退；headless fail-closed；解锁/授权提示行为\n\n### 方法\n三平台存/取/删 + headless 容器\n\n### 任务\n- [ ] `keyring` 固定版本；macOS `apple-native` / Windows `windows-native` / Linux `sync-secret-service` + `linux-native` 回退\n- [ ] 三平台存 / 取 / 删 + service 命名 `penguin-redis/<uuid>`\n- [ ] headless 容器（无 D-Bus、无 UI）下 fail-closed，无明文落盘\n- [ ] 记录每平台解锁/授权提示行为\n\n### 通过标准（验收）\n三平台通过；headless 无明文落盘且给出明确错误\n\n### 产出\n`tests/credentials/`\n\n### 不通过时\n某平台缺 store → 该平台只允许 askpass/会话内秘密，并在支持矩阵明示\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D02",
+    "title": "V-D02 · 跨资源提交 journal + reconciliation",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-D01",
+      "V-A04"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §4.2、§30.2、R07\n**依赖** V-D01、V-A04\n\n### 验证什么\n**跨资源提交 journal + reconciliation**：在 §4.2 六步的每一步注入崩溃\n\n### 方法\nfault injection 崩溃矩阵\n\n### 任务\n- [ ] 实现 §4.2 六步提交 + journal（追加、fsync、私有权限、大小上限）\n- [ ] 用 V-A04 在每一步之后注入崩溃\n- [ ] 启动 reconciliation：孤儿报告不自动删 / 悬空标 `credential missing` / 重试清理\n- [ ] 崩溃矩阵全部收敛断言\n\n### 通过标准（验收）\n每种崩溃后启动 reconciliation 收敛；孤儿/悬空全部被报告\n\n### 产出\n`tests/credentials/journal/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D03",
+    "title": "V-D03 · `ApprovalToken` 字节哈希",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 3、5、6\n**v2.1 依据** §23.2、R02、SEC-10\n**依赖** V-J02\n\n### 验证什么\n**`ApprovalToken` 字节哈希**：「同摘要不同字节」对照集；epoch/TrustIdentity 变化失效\n\n### 方法\n表驱动\n\n### 任务\n- [ ] 实现 `ApprovalToken`：`blake3(len-prefixed argv)` + `TrustIdentity` 哈希 + epoch + expiry\n- [ ] 构造「同摘要不同字节」对照集（Unicode 规范化、转义、截断、掩码）\n- [ ] epoch / TrustIdentity / DB 变化失效测试\n- [ ] SEC-10\n\n### 通过标准（验收）\nSEC-10 过\n\n### 产出\n`crates/pr-security/tests/approval.rs`\n\n### 不通过时\n无回退；BLOCKER 修复验证\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D04",
+    "title": "V-D04 · `TrustIdentity` 绑定",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-J02"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 3\n**v2.1 依据** §21.3、R14、SEC-05 扩展\n**依赖** V-A05、V-J02\n\n### 验证什么\n**`TrustIdentity` 绑定**：证书轮换过渡窗、failover 到已登记节点不重绑、边界外重定向确认\n\n### 方法\nCluster/Sentinel fixture + 证书轮换脚本\n\n### 任务\n- [ ] 实现 `TrustIdentity` 四元组与凭证绑定（TLS 身份 + 服务身份，不绑 endpoint）\n- [ ] 证书轮换过渡窗脚本；failover 到已登记节点不重绑\n- [ ] Cluster 边界外重定向 → 暂停确认\n- [ ] SEC-05 扩展 fixture\n\n### 通过标准（验收）\nSEC-05 过；边界外重定向必停\n\n### 产出\n`tests/topology/trust/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D05",
+    "title": "V-D05 · SafeText 类型边界",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02",
+      "V-A01"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 2、4\n**v2.1 依据** §23.5、§12.9、R34、R47、SEC-05\n**依赖** V-J02、V-A01\n\n### 验证什么\n**SafeText 类型边界**：renderer/TUI widget 签名只接受 `SafeText`；含 OSC/CSI 的 key/field/channel/`CLIENT LIST` 字段在所有视图不触发副作用；`--bytes`/`--output resp` 直写 TTY 警告\n\n### 方法\n编译期断言 + PTY 注入\n\n### 任务\n- [ ] `SafeText` 类型：转义 C0/C1/ESC/OSC/DCS/APC/孤立 surrogate，保留原始 bytes 引用\n- [ ] renderer / TUI widget 文本参数签名改为只接受 `SafeText`（编译期断言）\n- [ ] PTY 注入含 OSC/CSI 的 key/field/channel/`CLIENT LIST` 字段，断言无副作用\n- [ ] `--bytes`/`--output resp` 直写 TTY 的 stderr 警告与 plain 模式拒绝\n\n### 通过标准（验收）\n类型检查阻止 `&str` 进 renderer；PTY 上无标题/超链接/剪贴板副作用\n\n### 产出\n`crates/pr-render/`、`tests/security/terminal-injection/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D06",
+    "title": "V-D06 · 秘密路径审计",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-A04",
+      "V-D01"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 2、7\n**v2.1 依据** §23.4、§19.5、R24、R41、SEC-01\n**依赖** V-A04、V-D01\n\n### 验证什么\n**秘密路径审计**：URI parse error、TLS error、`Debug` 派生、trace、history、clipboard、crash report、`--trace-wire` 十条路径注入含密码输入\n\n### 方法\n每路径注入已知 token 后全量 grep\n\n### 任务\n- [ ] 十条路径（URI parse error、TLS error、`Debug`、trace、history、clipboard、crash report、`--trace-wire`、diag bundle、telemetry-off 断言）各注入已知 token\n- [ ] 全量 grep 断言 0 泄漏\n- [ ] §19.5 只记字节数不记内容\n- [ ] SEC-01 自动化\n\n### 通过标准（验收）\n0 泄漏\n\n### 产出\n`tests/security/secret-path/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D07",
+    "title": "V-D07 · 本地 policy 权威性",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-F01"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 2A、3\n**v2.1 依据** §11.2、R19、SEC-11、ASSIST-086\n**依赖** V-A03、V-F01\n\n### 验证什么\n**本地 policy 权威性**：伪造 `COMMAND`/`COMMAND DOCS` 把写命令标 readonly\n\n### 方法\nsynthetic server 返回伪造 metadata\n\n### 任务\n- [ ] V-A03 返回伪造 `COMMAND`/`COMMAND DOCS`（写命令标 readonly、危险命令无 flag）\n- [ ] 断言本地 effects / 危险性 / 审批等级不变\n- [ ] UI 标 `server reports` 而非改分类\n- [ ] SEC-11、ASSIST-086\n\n### 通过标准（验收）\n本地 effects/策略不变；UI 标 `server reports`\n\n### 产出\n`tests/catalog/precedence/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D08",
+    "title": "V-D08 · MCP stdio bootstrap + 策略批准边界",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02",
+      "V-D03"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 6\n**v2.1 依据** §29.4、R12、R46\n**依赖** V-J02、V-D03\n\n### 验证什么\n**MCP stdio bootstrap + 策略批准边界**：stdout 只有 JSON-RPC；策略型批准只覆盖只读；`execute_approved_plan` 校验 `plan_hash`\n\n### 方法\nPTY-less 集成测试\n\n### 任务\n- [ ] `--mcp-stdio` bootstrap：不初始化 REPL/TUI/终端协调器，无 banner，缺凭证返回 JSON-RPC 错误\n- [ ] 策略型批准只覆盖 `reads_data` + key 模式 + 次数上限\n- [ ] `redis.execute_approved_plan` 校验人签 `ApprovalToken.plan_hash`\n- [ ] PTY-less 集成测试断言 stdout 只有 JSON-RPC 帧\n\n### 通过标准（验收）\nstdout 无杂字节；写类请求无人签令牌被拒\n\n### 产出\n`crates/pr-mcp/tests/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-D09",
+    "title": "V-D09 · L2 插件外部进程隔离",
+    "labels": [
+      "phase-0",
+      "track-d",
+      "prototype"
+    ],
+    "deps": [
+      "V-A04"
+    ],
+    "body": "**Track** D · 安全与凭证\n**类型** prototype\n**排雷对象** Phase 7\n**v2.1 依据** §30.4、R45\n**依赖** V-A04\n\n### 验证什么\n**L2 插件外部进程隔离**：超时 kill、输出截断、崩溃/OOM 不影响主进程\n\n### 方法\n故意崩溃的插件\n\n### 任务\n- [ ] L2 外部进程插件协议（stdio typed 输入/输出）原型\n- [ ] 超时 kill、输出大小截断、故意崩溃/OOM/死循环样本\n- [ ] 主进程存活并退回 generic view 断言\n- [ ] 确认 L1 声明式解释器的深度/大小/时间上限可精确执行\n\n### 通过标准（验收）\n主进程存活，退回 generic view\n\n### 产出\n`tests/plugins/`\n\n### 不通过时\n无回退（L1 声明式不需验证隔离）\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-E01",
+    "title": "V-E01 · SPIKE-004 `pr-json` occurrence DOM",
+    "labels": [
+      "phase-0",
+      "track-e",
+      "spike"
+    ],
+    "deps": [
+      "V-J02",
+      "V-A06"
+    ],
+    "body": "**Track** E · 数据模型\n**类型** spike\n**排雷对象** Phase 2、4、5\n**v2.1 依据** §8.3、§8.5、R06、DATA-02/03/04、JSON-05\n**依赖** V-J02、V-A06\n\n### 验证什么\n**SPIKE-004 `pr-json` occurrence DOM**：重复成员、大数、词法保留、`$.a#2`、增量重写；16 MiB 单值解析/格式化时间与内存\n\n### 方法\nproperty test + 16 MiB fixture\n\n### 任务\n- [ ] 实现 `JsonNode` occurrence DOM（span、lexeme、保序重复成员）\n- [ ] 路径解析：`$.a#2`；重复成员无 `#n` 拒绝\n- [ ] 增量重写只改目标 span；pretty 视图不回写\n- [ ] property test（DATA-02/03/04、JSON-05）+ 16 MiB fixture 时间/内存；撰写 SPIKE-004\n\n### 通过标准（验收）\n全过；16 MiB 解析 + 格式化在 §24.3 时间预算内、峰值 ≤ 2× 输入\n\n### 产出\n`crates/pr-json/`、`docs/spikes/SPIKE-004.md`\n\n### 不通过时\n无回退（已确认 serde_json 不可用）\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-E02",
+    "title": "V-E02 · TableModel 流式宽度算法",
+    "labels": [
+      "phase-0",
+      "track-e",
+      "prototype"
+    ],
+    "deps": [
+      "V-A01",
+      "V-C06"
+    ],
+    "body": "**Track** E · 数据模型\n**类型** prototype\n**排雷对象** Phase 2、4\n**v2.1 依据** §6.1~6.3、UX-03/04/05/07\n**依赖** V-A01、V-C06\n\n### 验证什么\n**TableModel 流式宽度算法**：采样冻结列宽、后续换行、极窄纵向块、每 field 横线、JSON cell 内不加分隔线\n\n### 方法\ngolden × 5 宽度 × 3 色阶\n\n### 任务\n- [ ] TableModel：有限采样估计 field 宽 + 上下界，value 取剩余\n- [ ] 流式：冻结当前片段列宽，后续换行；极窄 → 纵向块\n- [ ] 每 field 横线、表头双线、JSON cell 内不加分隔线\n- [ ] golden × 5 宽度 × 3 色阶（UX-03/04/05/07）\n\n### 通过标准（验收）\n全过\n\n### 产出\n`fixtures/renderer/table/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-E03",
+    "title": "V-E03 · 有界 result store + spool",
+    "labels": [
+      "phase-0",
+      "track-e",
+      "prototype"
+    ],
+    "deps": [
+      "V-A04",
+      "V-A06",
+      "V-J02"
+    ],
+    "body": "**Track** E · 数据模型\n**类型** prototype\n**排雷对象** Phase 2、4\n**v2.1 依据** §24.3、§24.4、§30.5、R31、UX-10、LIFE-02\n**依赖** V-A04、V-A06、V-J02\n\n### 验证什么\n**有界 result store + spool**：64 MiB/16 MiB 淘汰；显式 spool 私有权限、symlink/路径遍历防护、加密可选；`not retained` 标记；§8.2 阈值顺序\n\n### 方法\n超预算结果 + 崩溃后重启\n\n### 任务\n- [ ] 有界 result store：64 MiB 总量 / 16 MiB 单结果，按结果粒度淘汰并标 `not retained`\n- [ ] 显式 spool：私有权限、不可预测名、symlink/路径遍历防护、可选加密\n- [ ] §8.2 阈值顺序：已知长度首字节前询问；未知长度流式不中途询问；非 TTY 永不询问\n- [ ] 崩溃后重启清理 + UX-10、LIFE-02\n\n### 通过标准（验收）\n淘汰正确；spool 权限正确；已知长度首字节前询问、未知长度不中途询问\n\n### 产出\n`crates/pr-results/tests/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-E04",
+    "title": "V-E04 · JSON projection v1",
+    "labels": [
+      "phase-0",
+      "track-e",
+      "prototype"
+    ],
+    "deps": [
+      "V-A02",
+      "V-B02"
+    ],
+    "body": "**Track** E · 数据模型\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §18.3、R17、PIPE-02\n**依赖** V-A02、V-B02\n\n### 验证什么\n**JSON projection v1** vs `redis-cli --json` 差异\n\n### 方法\n§18.3 表逐行 fixture\n\n### 任务\n- [ ] §18.3 projection 表逐行 fixture\n- [ ] 与 V-A02 baseline `redis-cli --json` 差异测试\n- [ ] 差异写入 `compatibility/manifest.toml`\n- [ ] PIPE-02（`-2`/`-3`）\n\n### 通过标准（验收）\n每行一个用例过；差异写入 manifest\n\n### 产出\n`tests/output/json-projection/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-E05",
+    "title": "V-E05 · renderer generic fallback",
+    "labels": [
+      "phase-0",
+      "track-e",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-B02"
+    ],
+    "body": "**Track** E · 数据模型\n**类型** prototype\n**排雷对象** Phase 2、5\n**v2.1 依据** §9.5、CMD-10/12、SEC-07\n**依赖** V-A03、V-B02\n\n### 验证什么\n**renderer generic fallback**：未知命令/模块结果不 panic 不重发\n\n### 方法\nsynthetic 未知结构\n\n### 任务\n- [ ] V-A03 构造未知命令 / 模块 / 新版本结构结果\n- [ ] 专用 renderer 不识别 → generic RESP tree → 保留原始 → 诊断 ID\n- [ ] 断言无 panic、无空白输出、无重发\n- [ ] CMD-10/12、SEC-07\n\n### 通过标准（验收）\n全过\n\n### 产出\n`fixtures/renderer/generic/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F01",
+    "title": "V-F01 · catalog 编译管线",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-I01",
+      "V-I02",
+      "V-I03"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2、2A\n**v2.1 依据** §11.3、§11.4、R29\n**依赖** V-I01、V-I02、V-I03\n\n### 验证什么\n**catalog 编译管线**：pinned snapshot → `CommandSpec`；Redis/Valkey 双分支；`unsupported grammar node` 标记；签名/校验和\n\n### 方法\n编译全部 baseline 命令\n\n### 任务\n- [ ] pinned upstream snapshot → schema adapter → normalized `CommandSpec`\n- [ ] Redis / Valkey `server_family` 双分支\n- [ ] 无法理解的节点标 `unsupported grammar node`；未知属性保留\n- [ ] 签名 / 校验和；全部 baseline 命令 0 编译错 + 差异 fixture\n\n### 通过标准（验收）\n0 编译错；Redis vs Valkey 差异清单生成\n\n### 产出\n`crates/pr-catalog/`、`fixtures/catalog/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F02",
+    "title": "V-F02 · 双解析器等价性",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-F03"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2、2A\n**v2.1 依据** §11.5、R11、ASSIST-081\n**依赖** V-F03\n\n### 验证什么\n**双解析器等价性** property test\n\n### 方法\n随机字节缓冲区 10⁶ 次\n\n### 任务\n- [ ] property test 生成随机字节缓冲区（转义、空参数、Unicode、NUL 转义、未闭合引号）\n- [ ] 断言 `decode(B[span_i]) == argv_i`；未闭合区间正确\n- [ ] 10⁶ 次无失败\n- [ ] ASSIST-081\n\n### 通过标准（验收）\nspan ↔ argv 一一对应；未闭合引号区间正确\n\n### 产出\n`crates/pr-intelligence/tests/equivalence.rs`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F03",
+    "title": "V-F03 · quoting corpus",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-I01"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §11.5、§3.5、R04、R18\n**依赖** V-I01\n\n### 验证什么\n**quoting corpus** vs 固定 `redis-cli` tag 的 `sdssplitargs`；本地 `:` 命令 tokenizer\n\n### 方法\n从 redis-cli 源码生成对照 corpus\n\n### 任务\n- [ ] 从固定 `redis-cli` tag 的 `sdssplitargs` 生成 quoting 对照 corpus\n- [ ] 权威 tokenizer 100% 一致\n- [ ] 本地 `:` 命令 tokenizer（POSIX-like quoting、`--`、无 shell 展开、尾部自由文本）fixture\n- [ ] `LocalCommandSpec` 登记表与 §3.5 一一对应\n\n### 通过标准（验收）\n100% 一致；`:` 命令 fixture 过\n\n### 产出\n`fixtures/catalog/quoting/`、`tests/local-commands/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F04",
+    "title": "V-F04 · 语法复杂度 §11.7 全表",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-F01"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2A\n**v2.1 依据** §11.7、ASSIST-004~015\n**依赖** V-F01\n\n### 验证什么\n**语法复杂度 §11.7 全表**：SET/ZADD/XADD/EVAL/XREAD/子命令/keyword 同形 key 的 signature 与候选\n\n### 方法\n每行 fixture\n\n### 任务\n- [ ] §11.7 每行一组 fixture：子命令 / 交替重复 / score-member / 互斥 / 嵌套 block / numkeys / 成对列表 / keyword 同形 key / 范围模式\n- [ ] signature 高亮位置与候选集合断言\n- [ ] ASSIST-004~015\n\n### 通过标准（验收）\n全过\n\n### 产出\n`fixtures/assistance/grammar/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F05",
+    "title": "V-F05 · 异步 broker",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2、2A\n**v2.1 依据** §12.8、ASSIST-026~028、072\n**依赖** V-J02\n\n### 验证什么\n**异步 broker**：revision/epoch 隔离、迟到丢弃、`CandidateId` 稳定、粘贴期间暂停\n\n### 方法\n模型测试（乱序事件序列）\n\n### 任务\n- [ ] buffer revision / target·identity·policy epoch 标签\n- [ ] 迟到结果丢弃；`CandidateId` 稳定不被异步追加替换\n- [ ] 粘贴期间暂停每字符分析\n- [ ] 乱序事件序列模型测试（ASSIST-026~028、072）\n\n### 通过标准（验收）\n全过\n\n### 产出\n`tests/assistance-network/async/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F06",
+    "title": "V-F06 · `ObservationScope` 隔离",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-F05",
+      "V-J02"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2A、3\n**v2.1 依据** §12.6、R13、ASSIST-029~033、088\n**依赖** V-F05、V-J02\n\n### 验证什么\n**`ObservationScope` 隔离**含 topology epoch\n\n### 方法\n多 profile/identity/DB/拓扑并发 fixture\n\n### 任务\n- [ ] `ObservationScope` = profile_uuid + service_identity + db + auth_epoch + policy_epoch + topology_epoch\n- [ ] 多 profile / identity / DB / 拓扑并发 fixture\n- [ ] AUTH/HELLO/SELECT/RESET 与拓扑变化触发失效\n- [ ] ASSIST-029~033、088；0 泄漏\n\n### 通过标准（验收）\n0 泄漏\n\n### 产出\n`tests/assistance-network/scope/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F07",
+    "title": "V-F07 · 显式发现在百万 key fixture",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-F06"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2A\n**v2.1 依据** §12.4、§12.5、R09、R32、ASSIST-041~045、084、085\n**依赖** V-A05、V-F06\n\n### 验证什么\n**显式发现在百万 key fixture**：50 SCAN / 10 s 返回非空；prefix vs glob 模式；NOPERM 冷却；空页非零 cursor\n\n### 方法\n隔离 Redis 灌 10⁶ key\n\n### 任务\n- [ ] 隔离 Redis 灌 10⁶ key（稀疏与密集前缀各半）\n- [ ] 显式发现默认预算（50 SCAN / COUNT 1000 / 10 s / 20 rps）返回非空并报告完成度\n- [ ] 字面前缀转义 vs raw glob 两模式字节断言（`player:[`）\n- [ ] NOPERM 冷却、空页非零 cursor（ASSIST-041~045、084、085）；预算不足则调高并记 ADR\n\n### 通过标准（验收）\n稀疏前缀有结果并报告完成度；`player:[` 两模式字节正确\n\n### 产出\n`tests/assistance-network/discovery/`\n\n### 不通过时\n若默认预算在 10⁶ key 上仍空 → 调高默认值（不是删功能）并记 ADR\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F08",
+    "title": "V-F08 · 用途搜索双集合",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-F01"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2A\n**v2.1 依据** §16.4、R10、ASSIST-050/051\n**依赖** V-F01\n\n### 验证什么\n**用途搜索双集合**：canonical ≥95%、held-out ≥80%/90%；集合公开\n\n### 方法\n独立人员撰写 held-out 集\n\n### 任务\n- [ ] canonical 集：每命令 ≥ 3 条中/英规范表述（用于构建词表）\n- [ ] held-out 集：独立人员撰写改写/口语表述，任一进入词表即移除\n- [ ] 本地词法 + 同义词 + 中文 n-gram 检索原型\n- [ ] canonical ≥95% top-3；held-out ≥80% top-3 / ≥90% top-5；集合入仓\n\n### 通过标准（验收）\n两行指标达标\n\n### 产出\n`fixtures/assistance/find/{canonical,heldout}/`\n\n### 不通过时\n未达标 → 扩词表后 held-out 集**换新**（旧集作废，防止泄漏）\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F09",
+    "title": "V-F09 · 12 MiB 堆增量实测",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-A06",
+      "V-F01"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2、7\n**v2.1 依据** §12.5、§16.4、R08、R35\n**依赖** V-A06、V-F01\n\n### 验证什么\n**12 MiB 堆增量实测**：catalog 加载后开/关提示 RSS 差\n\n### 方法\nV-A06 工具\n\n### 任务\n- [ ] catalog 加载后测「开/关提示」RSS 差（V-A06）\n- [ ] 分列子项：key 名 / field 名 / metadata / scratch / parser 状态 / 发现响应\n- [ ] 只读 mmap catalog 单独报告\n- [ ] ≤ 12 MiB；超出先定位，预算调整需证据 + ADR\n\n### 通过标准（验收）\n≤ 12 MiB；mmap 单独报告\n\n### 产出\n`benches/assistance/`\n\n### 不通过时\n超出 → 先定位；预算调整必须带证据与 ADR\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-F10",
+    "title": "V-F10 · 零发送不变量",
+    "labels": [
+      "phase-0",
+      "track-f",
+      "prototype"
+    ],
+    "deps": [
+      "V-F01",
+      "V-A01"
+    ],
+    "body": "**Track** F · 智能输入引擎\n**类型** prototype\n**排雷对象** Phase 2A\n**v2.1 依据** §14.10、ASSIST-020、037、050~056、070\n**依赖** V-F01、V-A01\n\n### 验证什么\n**零发送不变量**：断网下 F1/F2/F3/Guide/`:view`/`:copy`/主题切换/接受候选 全路径\n\n### 方法\ntransport spy\n\n### 任务\n- [ ] transport spy 断言 0 条业务命令\n- [ ] 断网下 F1 / F2 / F3 / Guide / `:view` / `:copy` / 主题切换 / 接受候选全路径\n- [ ] `--learn` / `--demo` 离线\n- [ ] ASSIST-020、037、050~056、070\n\n### 通过标准（验收）\n0 条业务命令\n\n### 产出\n`tests/assistance-network/zero-send/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-G01",
+    "title": "V-G01 · Cluster 路由",
+    "labels": [
+      "phase-0",
+      "track-g",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-A04"
+    ],
+    "body": "**Track** G · 连接拓扑\n**类型** prototype\n**排雷对象** Phase 3\n**v2.1 依据** §21.2、R43、NET-03/04/05\n**依赖** V-A05、V-A04\n\n### 验证什么\n**Cluster 路由**：hash tag、MOVED/ASK 同连接、重定向预算、CROSSSLOT 不拆分、部分节点不可达标 partial\n\n### 方法\n6 节点 Cluster + 重分片脚本\n\n### 任务\n- [ ] hash tag slot 计算 + 带 tag 的 MOVED/ASK fixture\n- [ ] ASKING 与命令同连接；重定向链预算\n- [ ] CROSSSLOT 不拆分；部分节点不可达标 partial\n- [ ] NET-03/04/05 + 重分片脚本\n\n### 通过标准（验收）\nNET-03/04/05 过\n\n### 产出\n`tests/topology/cluster/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-G02",
+    "title": "V-G02 · Sentinel failover",
+    "labels": [
+      "phase-0",
+      "track-g",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-A04"
+    ],
+    "body": "**Track** G · 连接拓扑\n**类型** prototype\n**排雷对象** Phase 3\n**v2.1 依据** §21.4、NET-06\n**依赖** V-A05、V-A04\n\n### 验证什么\n**Sentinel failover**：重新发现、未知写不重放、观察上下文清除\n\n### 方法\n强制 failover\n\n### 任务\n- [ ] 强制 failover 脚本\n- [ ] 重新发现 endpoint、清除观察上下文、可能已发送写标 unknown 不重放\n- [ ] `master_name` 变化视为新服务\n- [ ] NET-06\n\n### 通过标准（验收）\nNET-06 过\n\n### 产出\n`tests/topology/sentinel/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-G03",
+    "title": "V-G03 · SSH per-node 与 SOCKS5",
+    "labels": [
+      "phase-0",
+      "track-g",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-G01"
+    ],
+    "body": "**Track** G · 连接拓扑\n**类型** prototype\n**排雷对象** Phase 3\n**v2.1 依据** §21.5、R15、NET-07\n**依赖** V-A05、V-G01\n\n### 验证什么\n**SSH per-node 与 SOCKS5**：OpenSSH `-L`/`-D` 程序化控制、known-host、退出清理、TLS 校验内部名、Cluster-over-SSH\n\n### 方法\nbastion 容器 + Cluster\n\n### 任务\n- [ ] bastion 容器 + Cluster；OpenSSH `-L`（per-node，惰性、`max_tunnels`）与 `-D`（SOCKS5）程序化控制\n- [ ] known-host 验证；TLS 校验内部真实主机名\n- [ ] 跟随 MOVED 到非 seed 节点；退出只清理自建资源\n- [ ] NET-07 + Cluster-over-SSH fixture；某模式某平台不可用则标 unsupported\n\n### 通过标准（验收）\n两模式都能跟随 MOVED；NET-07 过\n\n### 产出\n`tests/topology/ssh/`\n\n### 不通过时\n某模式在某平台不可用 → 该平台该模式标 unsupported，另一模式必须可用\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-G04",
+    "title": "V-G04 · TLS 矩阵",
+    "labels": [
+      "phase-0",
+      "track-g",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05"
+    ],
+    "body": "**Track** G · 连接拓扑\n**类型** prototype\n**排雷对象** Phase 3\n**v2.1 依据** §21.1、NET-01\n**依赖** V-A05\n\n### 验证什么\n**TLS 矩阵**：错名/过期/未知 CA/client cert/SNI 独立/放松类 flag 拒绝\n\n### 方法\n自签 CA 生成各类证书\n\n### 任务\n- [ ] 自签 CA 生成：正常 / 错名 / 过期 / 未知 CA / client cert / 独立 SNI\n- [ ] 放松类 flag 与 profile 同用报错\n- [ ] 无静默 insecure\n- [ ] NET-01\n\n### 通过标准（验收）\nNET-01 过；无静默 insecure\n\n### 产出\n`tests/topology/tls/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-G05",
+    "title": "V-G05 · Windows 凭证 + `LockFileEx` + ACL",
+    "labels": [
+      "phase-0",
+      "track-g",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-D01"
+    ],
+    "body": "**Track** G · 连接拓扑\n**类型** prototype\n**排雷对象** Phase 2、7\n**v2.1 依据** §30.2、§12.10、R20、R39、WIN-03、LIFE-03\n**依赖** V-A05、V-D01\n\n### 验证什么\n**Windows 凭证 + `LockFileEx` + ACL**；共享文件 advisory lock 三平台\n\n### 方法\n多进程并发写\n\n### 任务\n- [ ] Windows Credential Manager 存取删\n- [ ] `LockFileEx` advisory lock + `MoveFileEx(REPLACE_EXISTING)` 原子替换\n- [ ] 文件 ACL 仅当前用户；POSIX 侧 `flock` + rename 同一套测试\n- [ ] 4 进程并发写 profile（LIFE-03）+ WIN-03\n\n### 通过标准（验收）\nWIN-03、LIFE-03 过\n\n### 产出\n`tests/config/locking/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H01",
+    "title": "V-H01 · 启动与空闲基线",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-A06",
+      "V-A05"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 2、4、7\n**v2.1 依据** §24.6\n**依赖** V-A06、V-A05\n\n### 验证什么\n**启动与空闲基线**：全部依赖链接后的骨架进程 `--help` p95、REPL 空闲 RSS、TUI 空闲 RSS\n\n### 方法\nV-A06 工具，固定机器\n\n### 任务\n- [ ] 链接全部计划依赖的骨架进程（不实现功能）\n- [ ] 固定机器测 `--help` p95、REPL 空闲 RSS、TUI 空闲 RSS\n- [ ] 超出则按 feature 裁依赖并重测；预算不变\n- [ ] `benches/baseline/` 报告含硬件 / OS / commit / 依赖锁\n\n### 通过标准（验收）\n`--help` ≤100 ms；REPL ≤30 MiB；TUI ≤60 MiB —— **确认依赖本身没吃掉预算**\n\n### 产出\n`benches/baseline/`\n\n### 不通过时\n超出 → 换/裁依赖 feature；预算不变\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H02",
+    "title": "V-H02 · 1 GiB synthetic blob 流式 + 真 Redis 512 MB 样本",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-B02",
+      "V-A05"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 1、5\n**v2.1 依据** §24.7、PERF-01\n**依赖** V-A03、V-B02、V-A05\n\n### 验证什么\n**1 GiB synthetic blob 流式 + 真 Redis 512 MB 样本**\n\n### 方法\nV-A03 + 真 Redis\n\n### 任务\n- [ ] V-A03 1 GiB blob 流式，记录峰值 RSS 与块预算\n- [ ] 真 Redis 512 MB 上限样本（`proto-max-bulk-len` 默认）\n- [ ] 两类来源分开报告\n- [ ] PERF-01\n\n### 通过标准（验收）\n峰值 RSS 与块预算相符；两类来源分开报告\n\n### 产出\n`benches/protocol/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H03",
+    "title": "V-H03 · 订阅风暴 ring buffer",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-A03",
+      "V-B02"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 5\n**v2.1 依据** §24.3、PERF-02\n**依赖** V-A03、V-B02\n\n### 验证什么\n**订阅风暴 ring buffer**\n\n### 方法\n每秒 10⁵ 消息\n\n### 任务\n- [ ] 每秒 10⁵ 消息订阅风暴\n- [ ] ring buffer 10,000 条 / 16 MiB 先到者为准\n- [ ] 淘汰计数与实际一致\n- [ ] PERF-02\n\n### 通过标准（验收）\n有界；淘汰计数真实\n\n### 产出\n`benches/pubsub/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H04",
+    "title": "V-H04 · 任务监督 leak detection",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-J02",
+      "V-A06"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 4\n**v2.1 依据** §31.1、§31.4、R21、PERF-03\n**依赖** V-J02、V-A06\n\n### 验证什么\n**任务监督 leak detection**：`TaskScope` drop 后任务计数回零；TUI 开关 1000 次\n\n### 方法\nV-A06 任务计数\n\n### 任务\n- [ ] `TaskScope`：`JoinSet` + `CancellationToken` + Drop 中 cancel → 有界等待 → `abort_all`\n- [ ] V-A06 任务计数在 scope drop 后回零\n- [ ] TUI 开关 1,000 次无增长\n- [ ] PERF-03\n\n### 通过标准（验收）\n回零；无增长\n\n### 产出\n`tests/soak/tasks/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H05",
+    "title": "V-H05 · 8h soak runner 跑通",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05",
+      "V-A06"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 7\n**v2.1 依据** §32.1 Soak、PERF-04\n**依赖** V-A05、V-A06\n\n### 验证什么\n**8h soak runner 跑通**（骨架功能）\n\n### 方法\nrunner 上跑 8h\n\n### 任务\n- [ ] 8h soak job 用骨架功能跑通\n- [ ] 指标采集（RSS / 任务数 / 分配 / 请求数）完整\n- [ ] 无线性增长断言\n- [ ] 为 24h release-soak 准备同一脚本\n\n### 通过标准（验收）\n指标采集完整；无线性增长\n\n### 产出\nCI soak job\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-H06",
+    "title": "V-H06 · rusqlite WAL 多进程并发写 + 0600 + `user_version` 迁移",
+    "labels": [
+      "phase-0",
+      "track-h",
+      "prototype"
+    ],
+    "deps": [
+      "V-A05"
+    ],
+    "body": "**Track** H · 资源预算与性能基线\n**类型** prototype\n**排雷对象** Phase 2\n**v2.1 依据** §31.1、R22、R24\n**依赖** V-A05\n\n### 验证什么\n**rusqlite WAL 多进程并发写 + 0600 + `user_version` 迁移**\n\n### 方法\n4 进程并发写 history\n\n### 任务\n- [ ] `rusqlite` `bundled` 固定版本 + WAL + `user_version`\n- [ ] 4 进程并发写 history 无丢更新\n- [ ] 文件 0600（Windows ACL）\n- [ ] 前向迁移脚本测试\n\n### 通过标准（验收）\n无丢更新；权限正确；迁移前向\n\n### 产出\n`tests/history/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-I01",
+    "title": "V-I01 · `compatibility/manifest.toml` 冻结",
+    "labels": [
+      "phase-0",
+      "track-i",
+      "freeze"
+    ],
+    "deps": [],
+    "body": "**Track** I · 兼容矩阵、catalog 与许可\n**类型** freeze\n**排雷对象** Phase 全部\n**v2.1 依据** §20.4、R29\n**依赖** 无\n\n### 验证什么\n**`compatibility/manifest.toml` 冻结**：§20.4 初始矩阵每项 image digest / tag 填入\n\n### 方法\n拉取并 pin\n\n### 任务\n- [ ] §20.4 初始矩阵每项 image digest / `redis-cli` tag / 模块版本填入 `compatibility/manifest.toml`\n- [ ] 禁止 `latest`；每项可复现拉取\n- [ ] manifest schema 校验进 CI\n\n### 通过标准（验收）\n无 `latest`；每项可复现拉取\n\n### 产出\n`compatibility/manifest.toml`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-I02",
+    "title": "V-I02 · Valkey vs Redis `COMMAND DOCS` 差异清单",
+    "labels": [
+      "phase-0",
+      "track-i",
+      "fixture"
+    ],
+    "deps": [
+      "V-I01",
+      "V-A05"
+    ],
+    "body": "**Track** I · 兼容矩阵、catalog 与许可\n**类型** fixture\n**排雷对象** Phase 2、2A\n**v2.1 依据** §20.3、R29\n**依赖** V-I01、V-A05\n\n### 验证什么\n**Valkey vs Redis `COMMAND DOCS` 差异清单**\n\n### 方法\n双分支 introspection diff\n\n### 任务\n- [ ] Redis 与 Valkey 各 target 抓 `COMMAND` / `COMMAND DOCS`\n- [ ] 生成差异清单（新增 / 缺失 / 参数差异 / 版本引入差异）\n- [ ] 入 `fixtures/catalog/valkey-diff/`\n\n### 通过标准（验收）\n清单生成并进入 catalog fixture\n\n### 产出\n`fixtures/catalog/valkey-diff/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-I03",
+    "title": "V-I03 · catalog 再分发许可结论",
+    "labels": [
+      "phase-0",
+      "track-i",
+      "audit"
+    ],
+    "deps": [],
+    "body": "**Track** I · 兼容矩阵、catalog 与许可\n**类型** audit\n**排雷对象** Phase 2、7\n**v2.1 依据** §35.5、R29\n**依赖** 无\n\n### 验证什么\n**catalog 再分发许可结论**（CAT-001 / ADR-023）：每个 snapshot 三选一（可打包 / 用户运行时下载 / 本仓独立撰写）\n\n### 方法\n逐来源审查\n\n### 任务\n- [ ] 逐 upstream 来源（Redis commands JSON、文档站、Valkey）审查许可\n- [ ] 每 snapshot 三选一结论：可打包 / 用户运行时下载 / 本仓独立撰写\n- [ ] `prc` 自身许可决定 → ADR-023\n- [ ] `pr-catalog/LICENSES.md` + notices；不可再分发部分的独立撰写计划\n\n### 通过标准（验收）\n无空结论；`prc` 自身许可已定\n\n### 产出\n`docs/adr/ADR-023.md`、`pr-catalog/LICENSES.md`\n\n### 不通过时\n不可再分发的部分 → 本仓独立撰写并以 fixture 对照真实服务器\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-I04",
+    "title": "V-I04 · `redis-cli` baseline 特殊模式 inventory",
+    "labels": [
+      "phase-0",
+      "track-i",
+      "freeze"
+    ],
+    "deps": [
+      "V-I01"
+    ],
+    "body": "**Track** I · 兼容矩阵、catalog 与许可\n**类型** freeze\n**排雷对象** Phase 5\n**v2.1 依据** §28.4、R36\n**依赖** V-I01\n\n### 验证什么\n**`redis-cli` baseline 特殊模式 inventory**：从 help/source 生成 §28.4 的命令/flag/退出码清单\n\n### 方法\n解析固定 tag 源码\n\n### 任务\n- [ ] 解析固定 `redis-cli` tag 的 help/source，生成特殊模式 inventory（命令 / flag / 退出码）\n- [ ] 与 v2.1 §28.4 契约表逐项对应\n- [ ] 入 `compatibility/redis-cli-modes.toml`\n\n### 通过标准（验收）\n清单与 §28.4 契约表逐项对应\n\n### 产出\n`compatibility/redis-cli-modes.toml`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-J01",
+    "title": "V-J01 · ADR-001~030 全部写入并评审",
+    "labels": [
+      "phase-0",
+      "track-j",
+      "freeze"
+    ],
+    "deps": [],
+    "body": "**Track** J · 契约冻结与 ADR\n**类型** freeze\n**排雷对象** Phase 全部\n**v2.1 依据** §37.1\n**依赖** 无\n\n### 验证什么\n**ADR-001~030 全部写入并评审**\n\n### 方法\n逐条评审\n\n### 任务\n- [ ] ADR-001~030 逐条撰写（context / decision / consequences / 关联 V 项）\n- [ ] 评审并标 `accepted`\n- [ ] 有争议者在 Phase 0 内决出\n\n### 通过标准（验收）\n30 条状态 `accepted`\n\n### 产出\n`docs/adr/`\n\n### 不通过时\n有争议 → 在 Phase 0 内决出，不带入 Phase 1\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-J02",
+    "title": "V-J02 · 冻结接口骨架",
+    "labels": [
+      "phase-0",
+      "track-j",
+      "freeze"
+    ],
+    "deps": [
+      "V-J01"
+    ],
+    "body": "**Track** J · 契约冻结与 ADR\n**类型** freeze\n**排雷对象** Phase 全部\n**v2.1 依据** §11.11、§19.2、§21.3、§23.2、§3.5、§8.3、§12.9、§31.4\n**依赖** V-J01\n\n### 验证什么\n**冻结接口骨架**：`CommandRequest`、`ExecutionOutcome`、`ResultRecord`、`CompletionRequest`、`CompletionCandidate`、`AssistanceSnapshot`、`TrustIdentity`、`ApprovalToken`、`LocalCommandSpec`、`JsonNode`、`SafeText`、`TaskScope`\n\n### 方法\nRust 类型 + doc test + schema 版本号\n\n### 任务\n- [ ] `CommandRequest`、`ExecutionOutcome`、`ResultRecord`、`CompletionRequest`、`CompletionCandidate`、`AssistanceSnapshot`、`TrustIdentity`、`ApprovalToken`、`LocalCommandSpec`、`JsonNode`、`SafeText`、`TaskScope` 的 Rust 类型骨架\n- [ ] 每类型 doc test + schema 版本号\n- [ ] `docs/contracts/` 与代码同步\n\n### 通过标准（验收）\n编译通过；每个类型有 doc test\n\n### 产出\n`crates/*/src/contract.rs`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-J03",
+    "title": "V-J03 · 威胁模型",
+    "labels": [
+      "phase-0",
+      "track-j",
+      "freeze"
+    ],
+    "deps": [
+      "V-J01"
+    ],
+    "body": "**Track** J · 契约冻结与 ADR\n**类型** freeze\n**排雷对象** Phase 3、7\n**v2.1 依据** §23、§32.1 Security\n**依赖** V-J01\n\n### 验证什么\n**威胁模型**：每条信任边界对应至少一个 SEC 用例\n\n### 方法\n边界 → 用例映射表\n\n### 任务\n- [ ] 列出全部信任边界（输入 / parser / 配置 / 连接 / 错误 / trace / history / clipboard / export / crash / suggestion / metadata / plugin / MCP）\n- [ ] 每条边界 → 至少一个 SEC 用例映射表\n- [ ] 无未覆盖边界断言\n\n### 通过标准（验收）\n无未覆盖边界\n\n### 产出\n`docs/threat-model/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "V-J04",
+    "title": "V-J04 · Phase 0 新增 ADR",
+    "labels": [
+      "phase-0",
+      "track-j",
+      "freeze"
+    ],
+    "deps": [
+      "V-B01",
+      "V-C01",
+      "V-C07",
+      "V-E01",
+      "V-C03",
+      "V-C04",
+      "V-C05"
+    ],
+    "body": "**Track** J · 契约冻结与 ADR\n**类型** freeze\n**排雷对象** Phase 全部\n**v2.1 依据** §37.3\n**依赖** V-B01、V-C01、V-C07、V-E01、V-C03、V-C04、V-C05\n\n### 验证什么\n**Phase 0 新增 ADR**：每个 spike 一条结论（SPIKE-001~004 + V-C03/C04/C05 的平台结论）\n\n### 方法\n—\n\n### 任务\n- [ ] SPIKE-001~004 各一条 ADR（采用 / 拒绝 / 回退）\n- [ ] V-C03 / C04 / C05 平台结论各一条 ADR\n- [ ] 全部标 `accepted`\n\n### 通过标准（验收）\n每个 spike 有 ADR\n\n### 产出\n`docs/adr/`\n\n### 不通过时\n无回退\n\n### 状态\n`IN-PROGRESS` → 结束时必须为 `PASS` 或 `FALLBACK-ADOPTED(ADR-xxx)`；不存在 DEFERRED / SKIPPED。\n\n### 完成定义\n- [ ] 产出已进仓库并在 CI 运行（无法自动化的部分有人工记录编号）\n- [ ] 通过标准逐条有证据链接\n- [ ] 若 FALLBACK：对应 ADR 已 `accepted`，回退方案跑同一套测试\n- [ ] 在 Phase 0 报告中登记一行\n"
+  },
+  {
+    "id": "P0-META-01",
+    "title": "P0-META-01 · Phase 0 追踪看板与报告",
+    "labels": [
+      "phase-0",
+      "meta"
+    ],
+    "deps": [],
+    "body": "**类型** meta\n\n### 目标\n维护 Phase 0 全部 63 个 V 项的状态与证据链接；产出 Phase 0 报告。\n\n### 任务\n- [ ] 建立看板：列 = `IN-PROGRESS` / `PASS` / `FALLBACK-ADOPTED`；不设 DEFERRED 列\n- [ ] 每个 V 项一张卡，链接 issue、产出路径、ADR\n- [ ] `docs/phase-0-report.md`：每 V 项一行 = 状态 + 证据链接\n- [ ] 每周同步依赖阻塞（按 issue 中的「依赖」字段）\n\n### 通过标准\n63 行全部为 PASS / FALLBACK-ADOPTED 且每行有证据链接。\n"
+  },
+  {
+    "id": "P0-META-02",
+    "title": "P0-META-02 · Phase 0 出口门禁 checklist",
+    "labels": [
+      "phase-0",
+      "meta",
+      "gate"
+    ],
+    "deps": [
+      "P0-META-01",
+      "P0-META-03",
+      "V-A01",
+      "V-A02",
+      "V-A03",
+      "V-A04",
+      "V-A05",
+      "V-A06",
+      "V-B01",
+      "V-B02",
+      "V-B03",
+      "V-B04",
+      "V-B05",
+      "V-B06",
+      "V-B07",
+      "V-C01",
+      "V-C02",
+      "V-C03",
+      "V-C04",
+      "V-C05",
+      "V-C06",
+      "V-C07",
+      "V-D01",
+      "V-D02",
+      "V-D03",
+      "V-D04",
+      "V-D05",
+      "V-D06",
+      "V-D07",
+      "V-D08",
+      "V-D09",
+      "V-E01",
+      "V-E02",
+      "V-E03",
+      "V-E04",
+      "V-E05",
+      "V-F01",
+      "V-F02",
+      "V-F03",
+      "V-F04",
+      "V-F05",
+      "V-F06",
+      "V-F07",
+      "V-F08",
+      "V-F09",
+      "V-F10",
+      "V-G01",
+      "V-G02",
+      "V-G03",
+      "V-G04",
+      "V-G05",
+      "V-H01",
+      "V-H02",
+      "V-H03",
+      "V-H04",
+      "V-H05",
+      "V-H06",
+      "V-I01",
+      "V-I02",
+      "V-I03",
+      "V-I04",
+      "V-J01",
+      "V-J02",
+      "V-J03",
+      "V-J04"
+    ],
+    "body": "**类型** meta / gate\n\n### 目标\n执行 phase-plan §2.4 的 8 项出口门禁；全部勾选后才允许 Phase 1 合入 `main`。\n\n### Checklist（来自 phase-plan §2.4）\n- [ ] §2.3 全部 V 项状态 ∈ {PASS, FALLBACK-ADOPTED(ADR-xxx)}；无 IN-PROGRESS / DEFERRED / SKIPPED\n- [ ] V-A05 CI 矩阵在 macOS / Linux / Windows 三 runner 全绿，含 Cluster、Sentinel、TLS\n- [ ] 每个 harness（PTY、differential、synthetic server、fault）至少跑通 v2.1 §33 中属于自己类别的一条验收案例\n- [ ] `benches/baseline/` 基线报告存档，含硬件 / OS / commit / 依赖锁\n- [ ] 人工记录模板建立，V-C03 / C04 / C05 有首批真实终端记录\n- [ ] `compatibility/manifest.toml` 无 `latest`\n- [ ] ADR-001~030 + spike ADR 全部 `accepted`\n- [ ] Phase 0 报告完成（P0-META-01）\n\n### 通过标准\n8 项全部勾选；由至少一名非执行者复核签字。\n"
+  },
+  {
+    "id": "P0-META-03",
+    "title": "P0-META-03 · 人工验证记录模板",
+    "labels": [
+      "phase-0",
+      "meta",
+      "manual-verification"
+    ],
+    "deps": [],
+    "body": "**类型** meta\n\n### 目标\n为无法自动化的验证（系统 IME、屏幕阅读器、真实终端字体宽度、bracketed paste 实测）建立正式记录模板，作为发布门禁的一部分（v2.1 §32.6）。\n\n### 任务\n- [ ] `docs/manual-verification/TEMPLATE.md`：平台 / 终端 / 版本 / 字体 / IME、操作步骤、预期、实际、录屏链接、结论、记录人、日期\n- [ ] 为 V-C03 / V-C04 / V-C05 各建一个记录目录\n- [ ] 记录编号规则（`MV-<V项>-<平台>-<序号>`），可被 ASSIST / UX 案例引用\n- [ ] 复核流程：第二人复现或审阅录屏\n\n### 通过标准\n模板落地；三个 V 项各有 ≥ 1 条完整记录。\n"
+  }
+]
