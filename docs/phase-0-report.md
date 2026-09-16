@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 17 |
+| PASS | 18 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 45 |
+| IN-PROGRESS | 44 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -79,7 +79,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-E01 | PASS | `crates/pr-json/` · 17 tests · `docs/spikes/SPIKE-004.md` | occurrence DOM；重复成员保留+`#n` 寻址；数字词法逐字节保留；歧义路径拒绝；span 局部重写 |
-| V-E02 | IN-PROGRESS | — | |
+| V-E02 | PASS | `crates/pr-render/src/{table,width}.rs` · 43 tests | 每 field 横线、表头双线、JSON 在 cell 内不加内部横线；宽度采样后冻结；窄屏改纵向块不隐藏列；宽字符/ZWJ/组合字符帧对齐；SEC-05 控制字节不外泄 |
 | V-E03 | IN-PROGRESS | — | |
 | V-E04 | IN-PROGRESS | — | |
 | V-E05 | IN-PROGRESS | — | |
@@ -163,3 +163,4 @@
 | 2026-09-16 | V-B05 / V-D01 → PASS（会话状态机、三平台凭证存储）；244 tests 全绿 |
 | 2026-09-16 | V-D02 → PASS（凭证 journal 与崩溃 reconciliation）；256 tests 全绿 |
 | 2026-09-16 | V-C06 → PASS（三主题 token + 量化降级）；测试暴露 mono/plain 语义混淆并分离；270 tests 全绿 |
+| 2026-09-16 | V-E02 → PASS（TableModel + 显示宽度策略）；299 tests 全绿 |
