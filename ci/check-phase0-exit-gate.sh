@@ -180,6 +180,12 @@ else
   ./ci/check-plan-cases-are-claimed.sh 2>&1 | sed 's/^/        /' || true
   bad "the plan names acceptance cases that appear nowhere else"
 fi
+if ./ci/check-plan-outputs.sh >/dev/null 2>&1; then
+  pass "every path the plan promises exists or is mapped to where it went"
+else
+  ./ci/check-plan-outputs.sh 2>&1 | sed 's/^/        /' | tail -5 || true
+  bad "the plan promises output paths that do not exist and are not mapped"
+fi
 
 echo
 if [ "$fail" -eq 0 ]; then

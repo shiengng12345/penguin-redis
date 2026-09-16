@@ -408,6 +408,10 @@ jobs:
       # item still goes green on the tests that were written.
       - name: every acceptance case the plan names is claimed somewhere
         run: ./ci/check-plan-cases-are-claimed.sh
+      # The 产出 column is what a reviewer follows to find the evidence. 39 of its 70 paths
+      # pointed at directories that were never created.
+      - name: every promised output path exists or is mapped
+        run: ./ci/check-plan-outputs.sh
       # V-F08 / ADR-034: §16.4's held-out gate turns itself on when an independently written
       # corpus appears. Printed here so the waiting state is visible in every run rather than
       # only in a document.
