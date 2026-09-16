@@ -229,17 +229,25 @@ pub fn run_probe(probe: Probe) -> Result<String, String> {
             let scope = pr_intelligence::ObservationScope::new("probe", "service", 0);
             let mut ws = pr_intelligence::WorkingSet::new();
             ws.saturate(&scope);
+            // The purpose-search index belongs on this side of the difference too, and for a
+            // while it was not here: `prc` has no code path that calls `Finder::new()` yet, so
+            // the linker dropped the whole phrase table and the "assistance heap" number was
+            // measured without the largest thing in it. The probe is what decides what counts
+            // as assistance, so it has to build everything that will be built.
+            let finder = pr_intelligence::find::Finder::new();
             let rss = pr_core::mem::rss_bytes();
             let detail = format!(
-                "commands={} assistance=on keys={} fields={}B accounted={}B",
+                "commands={} assistance=on keys={} fields={}B accounted={}B find_commands={}",
                 catalog.commands.len(),
                 ws.keys.len(),
                 ws.fields.bytes(),
-                ws.accounted_bytes()
+                ws.accounted_bytes(),
+                finder.len()
             );
             // Kept alive across the sample: a probe that lets the thing being measured drop
             // before sampling measures nothing at all.
             drop(ws);
+            drop(finder);
             format_probe(probe, rss, &detail)
         }
         Probe::Catalog => {

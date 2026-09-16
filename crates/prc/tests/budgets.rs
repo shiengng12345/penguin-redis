@@ -348,4 +348,23 @@ fn f09_the_assistance_probe_really_holds_a_saturated_working_set() {
         "the probe accounted for only {accounted} B, so it is not saturated"
     );
     assert!(out.contains("assistance=on"));
+
+    // And the purpose-search index, which is the other half of "assistance" and the half that
+    // went unmeasured: nothing in `prc` calls `Finder::new()` yet, so the linker dropped the
+    // phrase table entirely and the increment was measured without it. A count here is the
+    // cheapest way to notice that again.
+    let find_commands: usize = out
+        .split("find_commands=")
+        .nth(1)
+        .unwrap_or_else(|| panic!("the probe did not report a purpose-search index: {out:?}"))
+        .split_whitespace()
+        .next()
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
+    assert!(
+        find_commands >= 190,
+        "the probe built a purpose-search index of only {find_commands} commands"
+    );
 }
