@@ -106,6 +106,49 @@ pub fn plan_hash(reqs: &[CommandRequest]) -> String {
     h.finalize().to_hex().to_string()
 }
 
+/// The exact-bytes view an approver can ask for (§23.2, `:approval show --bytes`).
+///
+/// §23.2 requires that "审批者看到的预览必须能展开为完整 argv 的转义视图……保证「看到的」与
+/// 「哈希的」是同一份数据". A summary is for reading; this is for deciding. It shows every
+/// argument with its byte length and every byte that is not printable ASCII, so two commands
+/// that look identical in a summary cannot look identical here.
+///
+/// The length is shown as well as the escaped text because escaping is lossy in one direction
+/// a reader would not notice: `\x41` and `A` render differently but a reader skimming might
+/// not register that one argument is three bytes longer than the other.
+#[must_use]
+pub fn preview(req: &CommandRequest) -> String {
+    use std::fmt::Write as _;
+    let mut out = format!("argc={}\n", req.args.len());
+    for (i, a) in req.args.iter().enumerate() {
+        let _ = writeln!(out, "argv[{i}] len={} \"{}\"", a.len(), escape_bytes(a));
+    }
+    out
+}
+
+/// Escape bytes so that distinct byte strings produce distinct text.
+///
+/// Anything outside printable ASCII becomes `\xNN`, including the characters a terminal would
+/// act on and the ones a font renders identically to something else. A preview that hid a
+/// zero-width space would let two different commands look the same to the person approving
+/// them, which is the whole failure SEC-10 describes.
+#[must_use]
+pub fn escape_bytes(b: &[u8]) -> String {
+    let mut out = String::with_capacity(b.len());
+    for &c in b {
+        match c {
+            b'"' => out.push_str("\\\""),
+            b'\\' => out.push_str("\\\\"),
+            0x20..=0x7e => out.push(char::from(c)),
+            other => {
+                use std::fmt::Write as _;
+                let _ = write!(out, "\\x{other:02x}");
+            }
+        }
+    }
+    out
+}
+
 /// The context the kernel is about to execute in.
 #[derive(Clone, Debug)]
 pub struct ExecutionContext<'a> {

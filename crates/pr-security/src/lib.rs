@@ -8,7 +8,8 @@ pub mod approval;
 pub mod trust;
 
 pub use approval::{
-    ApprovalRefusal, ApprovalToken, Epochs, ExecutionContext, Issuer, plan_hash, request_hash,
+    ApprovalRefusal, ApprovalToken, Epochs, ExecutionContext, Issuer, escape_bytes, plan_hash,
+    preview, request_hash,
 };
 pub use trust::{
     AuthIdentity, DiscoveryBounds, Endpoint, RebindVerdict, ServerIdentity, TlsIdentity,
