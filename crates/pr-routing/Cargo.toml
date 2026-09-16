@@ -6,9 +6,12 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-routing"
+description = "Penguin Redis — pr-routing: cluster slots, hash tags, MOVED/ASK, target trust"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+pr-security = { path = "../pr-security" }
+thiserror = { workspace = true }

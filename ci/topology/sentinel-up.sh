@@ -15,7 +15,7 @@ done
 for i in 0 1 2; do
   port=$((26379 + i))
   docker run -d --name "pr-sn-$i" --network "$NET" -p "$port:26379" --entrypoint sh "$IMAGE" -c \
-    "printf 'port 26379\nsentinel monitor mymaster pr-sn-primary 6379 2\nsentinel down-after-milliseconds mymaster 2000\nsentinel failover-timeout mymaster 10000\n' > /tmp/s.conf && redis-sentinel /tmp/s.conf" >/dev/null
+    "printf 'port 26379\nsentinel resolve-hostnames yes\nsentinel announce-hostnames yes\nsentinel monitor mymaster pr-sn-primary 6379 2\nsentinel down-after-milliseconds mymaster 2000\nsentinel failover-timeout mymaster 10000\n' > /tmp/s.conf && exec redis-sentinel /tmp/s.conf" >/dev/null
 done
 for _ in $(seq 1 60); do
   if docker exec pr-sn-0 redis-cli -p 26379 SENTINEL master mymaster 2>/dev/null | grep -q mymaster; then
@@ -24,4 +24,9 @@ for _ in $(seq 1 60); do
   sleep 1
 done
 echo "::error::sentinel did not come up" >&2
+for i in 0 1 2; do
+  echo "--- pr-sn-$i ---" >&2
+  docker logs "pr-sn-$i" 2>&1 | tail -20 >&2 || true
+done
+docker ps -a --filter name=pr-sn --format '{{.Names}} {{.Status}}' >&2 || true
 exit 1
