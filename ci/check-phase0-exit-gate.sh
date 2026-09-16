@@ -43,12 +43,19 @@ for job in topology shared-files ssh-tunnels differential; do
 done
 # The soak has its own workflow: it runs for hours and ci.yml cancels superseded runs.
 [ -f .github/workflows/soak.yml ] || bad ".github/workflows/soak.yml is missing"
+# §2.4 names TLS alongside Cluster and Sentinel, but TLS has no job of its own: its matrix
+# needs no Docker, generates its certificates at run time, and therefore rides in the ordinary
+# three-platform `test` job. A job-name check cannot see that, so run the matrix instead of
+# looking for a name. `run_case` is defined under item 3 and used here after it.
 if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1; then
-  # The latest *completed* run. `.[0]` alone picks up a queued run, whose conclusion is null,
-  # and the check then reported "no run" while several were in flight.
-  concl="$(gh run list --workflow=ci.yml --branch=main --limit=20 \
-            --json conclusion,status \
-            --jq '[.[] | select(.status == "completed")][0].conclusion' 2>/dev/null || true)"
+  # The latest run that actually reached a verdict. `.[0]` alone picks up a queued run (whose
+  # conclusion is null, so the check reported "no run" while four were in flight) or a
+  # cancelled one — and `ci.yml` cancels superseded runs on purpose, so cancelled is the
+  # normal state of every run but the newest. Neither is a verdict about the code.
+  concl="$(gh run list --workflow=ci.yml --branch=main --limit=30 \
+            --json conclusion \
+            --jq '[.[] | select(.conclusion == "success" or .conclusion == "failure")][0].conclusion' \
+            2>/dev/null || true)"
   case "$concl" in
     success) pass "the latest CI run on main concluded success" ;;
     "")      warn "gh returned no run for ci.yml on main" ;;
@@ -72,6 +79,8 @@ run_case() {  # run_case <label> <cargo args...>
   if cargo test -q "$@" >/dev/null 2>&1; then pass "$label"; else bad "$label"; fi
 }
 run_case "ASSIST-082 (PTY harness)" -p pr-terminal --test pty_owner -- assist_082
+# Item 2's TLS half, run here because `run_case` lives here.
+run_case "NET-01 (TLS matrix, part of item 2)" -p pr-transport --test tls_matrix
 run_case "STATE-01 (fault injection)" -p xtask -- cut_after_client_bytes
 if [ "${PHASE0_FULL:-0}" = "1" ]; then
   run_case "PERF-01 (synthetic RESP server, 1 GiB)" -p pr-protocol --test large_values -- \
