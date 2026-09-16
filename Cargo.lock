@@ -525,6 +525,13 @@ dependencies = [
 [[package]]
 name = "pr-intelligence"
 version = "0.0.0"
+dependencies = [
+ "pr-catalog",
+ "pr-core",
+ "pr-repl",
+ "proptest",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-json"

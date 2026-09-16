@@ -6,9 +6,16 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-intelligence"
+description = "Penguin Redis — pr-intelligence: lenient analyser, suggestions, signature help"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+pr-catalog = { path = "../pr-catalog" }
+pr-repl = { path = "../pr-repl" }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

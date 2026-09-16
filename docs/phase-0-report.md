@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 25 |
+| PASS | 26 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 37 |
+| IN-PROGRESS | 36 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -89,7 +89,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-F01 | IN-PROGRESS | — | |
-| V-F02 | IN-PROGRESS | — | |
+| V-F02 | PASS | `crates/pr-intelligence/src/analyser.rs` · 11 tests（含 3 个 proptest） | 宽容分析器与权威 tokenizer 的 argv 等价性 property；span 恒在范围内且 analyse 不 panic；按 span 替换后参数个数不变、替换落在正确位置（ASSIST-081） |
 | V-F03 | PASS | `crates/pr-repl/` · 26 tests | 权威 tokenizer 对齐 `sdssplitargs`；全 256 字节 quote 往返；`:` 本地命令独立 grammar（重复选项报错、零 shell 展开） |
 | V-F04 | IN-PROGRESS | — | |
 | V-F05 | IN-PROGRESS | — | |
@@ -168,3 +168,4 @@
 | 2026-09-16 | V-H06 / V-D06 → PASS（history 存储与按环境脱敏）；346 tests 全绿 |
 | 2026-09-16 | V-E03 / V-D07 → PASS（有界 result store、catalog 权威性）；370 tests 全绿 |
 | 2026-09-16 | V-B03 → PASS（`--pipe` 逐帧策略，BLOCKER #1 验证完成）；384 tests 全绿 |
+| 2026-09-16 | V-F02 → PASS（双解析器等价性 property）；395 tests 全绿 |
