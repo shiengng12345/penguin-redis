@@ -78,7 +78,15 @@ def walk_docs(name, doc, container=None):
     rec = {"name": full}
     if container:
         rec["container"] = container.upper()
-    for k in ("summary", "since", "group", "complexity"):
+    # `summary` and `complexity` are deliberately NOT captured (V-I03, ADR-023).
+    #
+    # They are the only upstream-authored *prose* in the reply; everything else is interface
+    # structure — names, arity, flags, the argument tree. Redistributing the structure of a
+    # published wire protocol is a different question from redistributing somebody's English,
+    # and the honest way to keep them different is to not carry the English at all. Penguin
+    # writes its own descriptions (§13), which it needs to anyway: an upstream one-liner is
+    # written for a reference page, not for somebody stuck at a prompt.
+    for k in ("since", "group"):
         if k in doc:
             rec[k] = doc[k]
     if "arguments" in doc:

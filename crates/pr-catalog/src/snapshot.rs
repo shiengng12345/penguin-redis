@@ -17,6 +17,12 @@
 //! how a snapshot and the compiler drift apart without anyone noticing — this crate found
 //! exactly that during V-F01, when a leftover integrity field survived a schema change and
 //! was read by nothing.
+//!
+//! It also does a second job here. `summary` and `complexity` — the only upstream-authored
+//! prose in a `COMMAND DOCS` reply — are deliberately absent from this schema (V-I03,
+//! ADR-023). Because unknown fields are refused rather than ignored, a future capture that
+//! started including them again would fail to load instead of quietly redistributing text
+//! nobody reviewed the licence of.
 
 use serde::{Deserialize, Serialize};
 
@@ -86,18 +92,12 @@ pub struct RawCommand {
     /// Uppercase container name for a subcommand.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub container: Option<String>,
-    /// One-line summary.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub summary: Option<String>,
     /// First version.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub since: Option<String>,
     /// Documentation group, e.g. `string`, `stream`, `bf`.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
-    /// Complexity note.
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub complexity: Option<String>,
     /// Arity as reported by `COMMAND`; negative means "at least".
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub arity: Option<i64>,

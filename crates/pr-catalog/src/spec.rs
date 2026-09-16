@@ -258,7 +258,11 @@ pub struct ExclusiveGroup {
 pub struct CommandSpec {
     /// Canonical uppercase name.
     pub name: String,
-    /// One-line summary.
+    /// Penguin's own one-line description.
+    ///
+    /// Not taken from the server: a `COMMAND DOCS` summary is upstream-authored prose, and
+    /// V-I03 concluded that the catalog carries interface structure rather than somebody
+    /// else's English. Empty until the description table is written (§13).
     pub summary: String,
     /// Locally assigned effects — the policy input (ADR-030).
     pub effects: Effects,

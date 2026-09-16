@@ -6,7 +6,9 @@ members = ["crates/*", "xtask", "xtask/resp-server", "xtask/pty-harness"]
 version = "0.0.0"
 edition = "2024"
 rust-version = "1.97"
-license = "TBD-ADR-023"
+# ADR-023. One place, deliberately: changing the project's licence should be one edit, not a
+# hunt through twenty crates.
+license = "MIT OR Apache-2.0"
 repository = "https://github.com/shiengng12345/penguin-redis"
 
 [workspace.dependencies]

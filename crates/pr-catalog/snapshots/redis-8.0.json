@@ -5,15 +5,13 @@
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "ACL",
-   "since": "6.0.0",
-   "summary": "A container for Access List Control commands."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -28,7 +26,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) since the categories and commands are a fixed set.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -40,8 +37,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|CAT",
-   "since": "6.0.0",
-   "summary": "Lists the ACL categories, or the commands inside a category."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -58,7 +54,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) amortized time considering the typical user.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -71,8 +66,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|DELUSER",
-   "since": "6.0.0",
-   "summary": "Deletes ACL users, and terminates their connections."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -100,7 +94,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1).",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -113,8 +106,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|DRYRUN",
-   "since": "7.0.0",
-   "summary": "Simulates the execution of a command by a user, without executing the command."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -129,7 +121,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1)",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -141,8 +132,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|GENPASS",
-   "since": "6.0.0",
-   "summary": "Generates a pseudorandom, secure password that can be used to identify ACL users."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -158,7 +148,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N). Where N is the number of password, command and pattern rules that the user has.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -171,15 +160,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|GETUSER",
-   "since": "6.0.0",
-   "summary": "Lists the ACL rules of a user."
+   "since": "6.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -190,8 +177,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|HELP",
-   "since": "6.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -200,7 +186,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N). Where N is the number of configured users.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -213,8 +198,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|LIST",
-   "since": "6.0.0",
-   "summary": "Dumps the effective rules in ACL file format."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -223,7 +207,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N). Where N is the number of configured users.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -236,8 +219,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|LOAD",
-   "since": "6.0.0",
-   "summary": "Reloads the rules from the configured ACL file."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -266,7 +248,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) with N being the number of entries shown.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -279,8 +260,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|LOG",
-   "since": "6.0.0",
-   "summary": "Lists recent security events generated due to ACL rules."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -289,7 +269,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N). Where N is the number of configured users.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -302,8 +281,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|SAVE",
-   "since": "6.0.0",
-   "summary": "Saves the effective ACL rules in the configured ACL file."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -326,7 +304,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N). Where N is the number of rules provided.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -339,8 +316,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|SETUSER",
-   "since": "6.0.0",
-   "summary": "Creates and modifies an ACL user and its rules."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -349,7 +325,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N). Where N is the number of configured users.",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -362,15 +337,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|USERS",
-   "since": "6.0.0",
-   "summary": "Lists all ACL users."
+   "since": "6.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "ACL",
    "first_key": 0,
    "flags": [
@@ -382,8 +355,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ACL|WHOAMI",
-   "since": "6.0.0",
-   "summary": "Returns the authenticated username of the current connection."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -405,7 +377,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1). The amortized time complexity is O(1) assuming the appended value is small and the already present value is of any size, since the dynamic string library used by Redis will double the free space available on every reallocation.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -416,8 +387,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "APPEND",
-   "since": "2.0.0",
-   "summary": "Appends a string to the value of a key. Creates the key if it doesn't exist."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -425,7 +395,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast"
@@ -434,8 +403,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ASKING",
-   "since": "3.0.0",
-   "summary": "Signals that a cluster client is following an -ASK redirect."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -457,7 +425,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of passwords defined for the user",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -471,8 +438,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "AUTH",
-   "since": "1.0.0",
-   "summary": "Authenticates the connection."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -671,7 +637,6 @@
     "@slow"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -682,8 +647,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "BGREWRITEAOF",
-   "since": "1.0.0",
-   "summary": "Asynchronously rewrites the append-only file to disk."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -702,7 +666,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -713,8 +676,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "BGSAVE",
-   "since": "1.0.0",
-   "summary": "Asynchronously saves the database(s) to disk."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -768,7 +730,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N)",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -777,8 +738,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "BITCOUNT",
-   "since": "2.6.0",
-   "summary": "Counts the number of set bits (population counting) in a string."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -902,7 +862,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for each subcommand specified",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -912,8 +871,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "BITFIELD",
-   "since": "3.2.0",
-   "summary": "Performs arbitrary bitfield integer operations on strings."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -950,7 +908,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for each subcommand specified",
    "first_key": 1,
    "flags": [
     "fast",
@@ -960,8 +917,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "BITFIELD_RO",
-   "since": "6.0.0",
-   "summary": "Performs arbitrary read-only bitfield integer operations on strings."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -1015,7 +971,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N)",
    "first_key": 2,
    "flags": [
     "denyoom",
@@ -1025,8 +980,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "BITOP",
-   "since": "2.6.0",
-   "summary": "Performs bitwise operations on multiple strings, and stores the result."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -1092,7 +1046,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N)",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -1101,8 +1054,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "BITPOS",
-   "since": "2.8.7",
-   "summary": "Finds the first set (1) or clear (0) bit in a string."
+   "since": "2.8.7"
   },
   {
    "acl": [
@@ -1167,7 +1119,6 @@
     }
    ],
    "arity": 6,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1178,8 +1129,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "BLMOVE",
-   "since": "6.2.0",
-   "summary": "Pops an element from a list, pushes it to another list and returns it. Blocks until an element is available otherwise. Deletes the list if the last element was moved."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -1233,7 +1183,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N+M) where N is the number of provided keys and M is the number of elements returned.",
    "first_key": 0,
    "flags": [
     "blocking",
@@ -1244,8 +1193,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "BLMPOP",
-   "since": "7.0.0",
-   "summary": "Pops the first element from one of multiple lists. Blocks until an element is available otherwise. Deletes the list if the last element was popped."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -1269,7 +1217,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of provided keys.",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1279,8 +1226,7 @@
    "key_step": 1,
    "last_key": -2,
    "name": "BLPOP",
-   "since": "2.0.0",
-   "summary": "Removes and returns the first element in a list. Blocks until an element is available otherwise. Deletes the list if the last element was popped."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -1304,7 +1250,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of provided keys.",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1314,8 +1259,7 @@
    "key_step": 1,
    "last_key": -2,
    "name": "BRPOP",
-   "since": "2.0.0",
-   "summary": "Removes and returns the last element in a list. Blocks until an element is available otherwise. Deletes the list if the last element was popped."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -1344,7 +1288,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1355,8 +1298,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "BRPOPLPUSH",
-   "since": "2.2.0",
-   "summary": "Pops an element from a list, pushes it to another list and returns it. Block until an element is available otherwise. Deletes the list if the last element was popped."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -1410,7 +1352,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(K) + O(M*log(N)) where K is the number of provided keys, N being the number of elements in the sorted set, and M being the number of elements popped.",
    "first_key": 0,
    "flags": [
     "blocking",
@@ -1421,8 +1362,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "BZMPOP",
-   "since": "7.0.0",
-   "summary": "Removes and returns a member by score from one or more sorted sets. Blocks until a member is available otherwise. Deletes the sorted set if the last element was popped."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -1446,7 +1386,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(log(N)) with N being the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1457,8 +1396,7 @@
    "key_step": 1,
    "last_key": -2,
    "name": "BZPOPMAX",
-   "since": "5.0.0",
-   "summary": "Removes and returns the member with the highest score from one or more sorted sets. Blocks until a member available otherwise.  Deletes the sorted set if the last element was popped."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -1482,7 +1420,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(log(N)) with N being the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "blocking",
@@ -1493,8 +1430,7 @@
    "key_step": 1,
    "last_key": -2,
    "name": "BZPOPMIN",
-   "since": "5.0.0",
-   "summary": "Removes and returns the member with the lowest score from one or more sorted sets. Blocks until a member is available otherwise. Deletes the sorted set if the last element was popped."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -1741,15 +1677,13 @@
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "connection",
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT",
-   "since": "2.4.0",
-   "summary": "A container for client connection commands."
+   "since": "2.4.0"
   },
   {
    "acl": [
@@ -1777,7 +1711,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1789,8 +1722,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|CACHING",
-   "since": "6.0.0",
-   "summary": "Instructs the server whether to track the keys in the next request."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -1798,7 +1730,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1810,8 +1741,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|GETNAME",
-   "since": "2.6.9",
-   "summary": "Returns the name of the connection."
+   "since": "2.6.9"
   },
   {
    "acl": [
@@ -1819,7 +1749,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1831,8 +1760,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|GETREDIR",
-   "since": "6.0.0",
-   "summary": "Returns the client ID to which the connection's tracking notifications are redirected."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -1840,7 +1768,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1851,8 +1778,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -1860,7 +1786,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1872,8 +1797,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|ID",
-   "since": "5.0.0",
-   "summary": "Returns the unique client ID of the connection."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -1881,7 +1805,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -1893,8 +1816,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|INFO",
-   "since": "6.2.0",
-   "summary": "Returns information about the connection."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -2023,7 +1945,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of client connections",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2036,8 +1957,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|KILL",
-   "since": "2.4.0",
-   "summary": "Terminates open connections."
+   "since": "2.4.0"
   },
   {
    "acl": [
@@ -2091,7 +2011,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of client connections",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2104,8 +2023,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|LIST",
-   "since": "2.4.0",
-   "summary": "Lists open connections."
+   "since": "2.4.0"
   },
   {
    "acl": [
@@ -2135,7 +2053,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2148,8 +2065,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|NO-EVICT",
-   "since": "7.0.0",
-   "summary": "Sets the client eviction mode of the connection."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -2177,7 +2093,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2189,8 +2104,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|NO-TOUCH",
-   "since": "7.2.0",
-   "summary": "Controls whether commands sent by the client affect the LRU/LFU of accessed keys."
+   "since": "7.2.0"
   },
   {
    "acl": [
@@ -2227,7 +2141,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2240,8 +2153,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|PAUSE",
-   "since": "3.0.0",
-   "summary": "Suspends commands processing."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2275,7 +2187,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2287,8 +2198,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|REPLY",
-   "since": "3.2.0",
-   "summary": "Instructs the server whether to reply to commands."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -2316,7 +2226,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2328,8 +2237,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|SETINFO",
-   "since": "7.2.0",
-   "summary": "Sets information specific to the client or connection."
+   "since": "7.2.0"
   },
   {
    "acl": [
@@ -2344,7 +2252,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2356,8 +2263,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|SETNAME",
-   "since": "2.6.9",
-   "summary": "Sets the connection name."
+   "since": "2.6.9"
   },
   {
    "acl": [
@@ -2429,7 +2335,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1). Some options may introduce additional complexity.",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2441,8 +2346,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|TRACKING",
-   "since": "6.0.0",
-   "summary": "Controls server-assisted client-side caching for the connection."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -2450,7 +2354,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2462,8 +2365,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|TRACKINGINFO",
-   "since": "6.2.0",
-   "summary": "Returns information about server-assisted client-side caching for the connection."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -2499,7 +2401,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(log N) where N is the number of client connections",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2512,8 +2413,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|UNBLOCK",
-   "since": "5.0.0",
-   "summary": "Unblocks a client blocked by a blocking command from a different connection."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -2523,7 +2423,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) Where N is the number of paused clients",
    "container": "CLIENT",
    "first_key": 0,
    "flags": [
@@ -2536,23 +2435,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLIENT|UNPAUSE",
-   "since": "6.2.0",
-   "summary": "Resumes processing commands from paused clients."
+   "since": "6.2.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "cluster",
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER",
-   "since": "3.0.0",
-   "summary": "A container for Redis Cluster commands."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2569,7 +2465,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the total number of hash slot arguments",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2581,8 +2476,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|ADDSLOTS",
-   "since": "3.0.0",
-   "summary": "Assigns new hash slots to a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2610,7 +2504,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) where N is the total number of the slots between the start slot and end slot arguments.",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2622,8 +2515,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|ADDSLOTSRANGE",
-   "since": "7.0.0",
-   "summary": "Assigns new hash slot ranges to a node."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -2632,7 +2524,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2644,8 +2535,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|BUMPEPOCH",
-   "since": "3.0.0",
-   "summary": "Advances the cluster config epoch."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2661,7 +2551,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of failure reports",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2672,8 +2561,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|COUNT-FAILURE-REPORTS",
-   "since": "3.0.0",
-   "summary": "Returns the number of active failure reports active for a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2687,7 +2575,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2697,8 +2584,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|COUNTKEYSINSLOT",
-   "since": "3.0.0",
-   "summary": "Returns the number of keys in a hash slot."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2715,7 +2601,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the total number of hash slot arguments",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2727,8 +2612,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|DELSLOTS",
-   "since": "3.0.0",
-   "summary": "Sets hash slots as unbound for a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2756,7 +2640,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) where N is the total number of the slots between the start slot and end slot arguments.",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2768,8 +2651,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|DELSLOTSRANGE",
-   "since": "7.0.0",
-   "summary": "Sets hash slot ranges as unbound for a node."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -2799,7 +2681,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2811,8 +2692,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|FAILOVER",
-   "since": "3.0.0",
-   "summary": "Forces a replica to perform a manual failover of its master."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2821,7 +2701,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2833,8 +2712,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|FLUSHSLOTS",
-   "since": "3.0.0",
-   "summary": "Deletes all slots information from a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2850,7 +2728,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2862,8 +2739,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|FORGET",
-   "since": "3.0.0",
-   "summary": "Removes a node from the nodes table."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2882,7 +2758,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the number of requested keys",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2892,15 +2767,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|GETKEYSINSLOT",
-   "since": "3.0.0",
-   "summary": "Returns the key names in a hash slot."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2911,15 +2784,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2929,8 +2800,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|INFO",
-   "since": "3.0.0",
-   "summary": "Returns information about the state of a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -2944,7 +2814,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of bytes in the key",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2954,15 +2823,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|KEYSLOT",
-   "since": "3.0.0",
-   "summary": "Returns the hash slot for a key."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the total number of Cluster nodes",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -2972,8 +2839,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|LINKS",
-   "since": "7.0.0",
-   "summary": "Returns a list of all TCP links to and from peer nodes."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -3001,7 +2867,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3013,15 +2878,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|MEET",
-   "since": "3.0.0",
-   "summary": "Forces a node to handshake with another node."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3031,15 +2894,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|MYID",
-   "since": "3.0.0",
-   "summary": "Returns the ID of a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3049,15 +2910,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|MYSHARDID",
-   "since": "7.2.0",
-   "summary": "Returns the shard ID of a node."
+   "since": "7.2.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the total number of Cluster nodes",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3067,8 +2926,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|NODES",
-   "since": "3.0.0",
-   "summary": "Returns the cluster configuration for a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3084,7 +2942,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of replicas.",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3095,8 +2952,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|REPLICAS",
-   "since": "5.0.0",
-   "summary": "Lists the replica nodes of a master node."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -3112,7 +2968,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3124,8 +2979,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|REPLICATE",
-   "since": "3.0.0",
-   "summary": "Configure a node as replica of a master node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3155,7 +3009,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of known nodes. The command may execute a FLUSHALL as a side effect.",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3167,8 +3020,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|RESET",
-   "since": "3.0.0",
-   "summary": "Resets a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3177,7 +3029,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3189,8 +3040,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SAVECONFIG",
-   "since": "3.0.0",
-   "summary": "Forces a node to save the cluster configuration to disk."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3206,7 +3056,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3218,8 +3067,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SET-CONFIG-EPOCH",
-   "since": "3.0.0",
-   "summary": "Sets the configuration epoch for a new node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3265,7 +3113,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1)",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3277,15 +3124,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SETSLOT",
-   "since": "3.0.0",
-   "summary": "Binds a hash slot to a node."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the total number of cluster nodes",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3296,8 +3141,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SHARDS",
-   "since": "7.0.0",
-   "summary": "Returns the mapping of cluster slots to shards."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -3313,7 +3157,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of replicas.",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3324,15 +3167,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SLAVES",
-   "since": "3.0.0",
-   "summary": "Lists the replica nodes of a master node."
+   "since": "3.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the total number of Cluster nodes",
    "container": "CLUSTER",
    "first_key": 0,
    "flags": [
@@ -3343,8 +3184,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CLUSTER|SLOTS",
-   "since": "3.0.0",
-   "summary": "Returns the mapping of cluster slots to nodes."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -3455,7 +3295,6 @@
     "@slow"
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the total number of Redis commands",
    "first_key": 0,
    "flags": [
     "loading",
@@ -3465,8 +3304,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND",
-   "since": "2.8.13",
-   "summary": "Returns detailed information about all commands."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -3474,7 +3312,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3485,8 +3322,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|COUNT",
-   "since": "2.8.13",
-   "summary": "Returns a count of commands."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -3503,7 +3339,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of commands to look up",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3514,8 +3349,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|DOCS",
-   "since": "7.0.0",
-   "summary": "Returns documentary information about one, multiple or all commands."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -3537,7 +3371,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of arguments to the command",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3548,8 +3381,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|GETKEYS",
-   "since": "2.8.13",
-   "summary": "Extracts the key names from an arbitrary command."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -3571,7 +3403,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of arguments to the command",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3582,8 +3413,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|GETKEYSANDFLAGS",
-   "since": "7.0.0",
-   "summary": "Extracts the key names and access flags for an arbitrary command."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -3591,7 +3421,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3602,8 +3431,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -3620,7 +3448,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of commands to look up",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3631,8 +3458,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|INFO",
-   "since": "2.8.13",
-   "summary": "Returns information about one, multiple or all commands."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -3668,7 +3494,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the total number of Redis commands",
    "container": "COMMAND",
    "first_key": 0,
    "flags": [
@@ -3679,23 +3504,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "COMMAND|LIST",
-   "since": "7.0.0",
-   "summary": "Returns a list of command names."
+   "since": "7.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG",
-   "since": "2.0.0",
-   "summary": "A container for server configuration commands."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -3712,7 +3534,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) when N is the number of configuration parameters provided",
    "container": "CONFIG",
    "first_key": 0,
    "flags": [
@@ -3725,15 +3546,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG|GET",
-   "since": "2.0.0",
-   "summary": "Returns the effective values of configuration parameters."
+   "since": "2.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CONFIG",
    "first_key": 0,
    "flags": [
@@ -3744,8 +3563,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -3754,7 +3572,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CONFIG",
    "first_key": 0,
    "flags": [
@@ -3767,8 +3584,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG|RESETSTAT",
-   "since": "2.0.0",
-   "summary": "Resets the server's statistics."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -3777,7 +3593,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "CONFIG",
    "first_key": 0,
    "flags": [
@@ -3790,8 +3605,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG|REWRITE",
-   "since": "2.8.0",
-   "summary": "Persists the effective configuration to file."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -3819,7 +3633,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) when N is the number of configuration parameters provided",
    "container": "CONFIG",
    "first_key": 0,
    "flags": [
@@ -3832,8 +3645,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "CONFIG|SET",
-   "since": "2.0.0",
-   "summary": "Sets configuration parameters in-flight."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -3870,7 +3682,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) worst case for collections, where N is the number of nested items. O(1) for string values.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -3880,8 +3691,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "COPY",
-   "since": "6.2.0",
-   "summary": "Copies the value of a key to a new key."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -3890,7 +3700,6 @@
     "@read"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -3900,8 +3709,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "DBSIZE",
-   "since": "1.0.0",
-   "summary": "Returns the number of keys in the database."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -3910,7 +3718,6 @@
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [
     "admin",
@@ -3922,8 +3729,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "DEBUG",
-   "since": "1.0.0",
-   "summary": "A container for debugging commands."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -3940,7 +3746,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -3951,8 +3756,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "DECR",
-   "since": "1.0.0",
-   "summary": "Decrements the integer value of a key by one. Uses 0 as initial value if the key doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -3974,7 +3778,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -3985,8 +3788,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "DECRBY",
-   "since": "1.0.0",
-   "summary": "Decrements a number from the integer value of a key. Uses 0 as initial value if the key doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4004,7 +3806,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of keys that will be removed. When a key to remove holds a value other than a string, the individual complexity for this key is O(M) where M is the number of elements in the list, set, sorted set or hash. Removing a single key that holds a string value is O(1).",
    "first_key": 1,
    "flags": [
     "write"
@@ -4013,8 +3814,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "DEL",
-   "since": "1.0.0",
-   "summary": "Deletes one or more keys."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4022,7 +3822,6 @@
     "@transaction"
    ],
    "arity": 1,
-   "complexity": "O(N), when N is the number of queued commands",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -4035,8 +3834,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "DISCARD",
-   "since": "2.0.0",
-   "summary": "Discards a transaction."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -4053,7 +3851,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1) to access the key and additional O(N*M) to serialize it, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -4062,8 +3859,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "DUMP",
-   "since": "2.6.0",
-   "summary": "Returns a serialized representation of the value stored at a key."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -4078,7 +3874,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -4089,8 +3884,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ECHO",
-   "since": "1.0.0",
-   "summary": "Returns the given string."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4125,7 +3919,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the script that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4138,8 +3931,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "EVAL",
-   "since": "2.6.0",
-   "summary": "Executes a server-side Lua script."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -4174,7 +3966,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the script that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4187,8 +3978,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "EVALSHA",
-   "since": "2.6.0",
-   "summary": "Executes a server-side Lua script by SHA1 digest."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -4223,7 +4013,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the script that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4237,8 +4026,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "EVALSHA_RO",
-   "since": "7.0.0",
-   "summary": "Executes a read-only server-side Lua script by SHA1 digest."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -4273,7 +4061,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the script that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4287,8 +4074,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "EVAL_RO",
-   "since": "7.0.0",
-   "summary": "Executes a read-only server-side Lua script."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -4296,7 +4082,6 @@
     "@transaction"
    ],
    "arity": 1,
-   "complexity": "Depends on commands in the transaction",
    "first_key": 0,
    "flags": [
     "loading",
@@ -4308,8 +4093,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "EXEC",
-   "since": "1.2.0",
-   "summary": "Executes all commands in a transaction."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -4327,7 +4111,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of keys to check.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -4337,8 +4120,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "EXISTS",
-   "since": "1.0.0",
-   "summary": "Determines whether one or more keys exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4392,7 +4174,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -4402,8 +4183,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "EXPIRE",
-   "since": "1.0.0",
-   "summary": "Sets the expiration time of a key in seconds."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4457,7 +4237,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -4467,8 +4246,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "EXPIREAT",
-   "since": "1.2.0",
-   "summary": "Sets the expiration time of a key to a Unix timestamp."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -4485,7 +4263,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -4495,8 +4272,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "EXPIRETIME",
-   "since": "7.0.0",
-   "summary": "Returns the expiration time of a key as a Unix timestamp."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -4546,7 +4322,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -4557,8 +4332,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FAILOVER",
-   "since": "6.2.0",
-   "summary": "Starts a coordinated failover from a server to one of its replicas."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -4593,7 +4367,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the function that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4606,8 +4379,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FCALL",
-   "since": "7.0.0",
-   "summary": "Invokes a function."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -4642,7 +4414,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "Depends on the function that is executed.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -4656,8 +4427,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FCALL_RO",
-   "since": "7.0.0",
-   "summary": "Invokes a read-only function."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -4690,7 +4460,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the total number of keys in all databases",
    "first_key": 0,
    "flags": [
     "write"
@@ -4699,8 +4468,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FLUSHALL",
-   "since": "1.0.0",
-   "summary": "Removes all keys from all databases."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -4733,7 +4501,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the number of keys in the selected database",
    "first_key": 0,
    "flags": [
     "write"
@@ -4742,8 +4509,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FLUSHDB",
-   "since": "1.0.0",
-   "summary": "Remove all keys from the current database."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -5360,15 +5126,13 @@
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "scripting",
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION",
-   "since": "7.0.0",
-   "summary": "A container for function commands."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5384,7 +5148,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5395,8 +5158,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|DELETE",
-   "since": "7.0.0",
-   "summary": "Deletes a library and its functions."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5404,7 +5166,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the number of functions",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5414,8 +5175,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|DUMP",
-   "since": "7.0.0",
-   "summary": "Dumps all libraries into a serialized binary payload."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5445,7 +5205,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of functions deleted",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5456,8 +5215,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|FLUSH",
-   "since": "7.0.0",
-   "summary": "Deletes all libraries and functions."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5465,7 +5223,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5476,8 +5233,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|HELP",
-   "since": "7.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5485,7 +5241,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5496,8 +5251,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|KILL",
-   "since": "7.0.0",
-   "summary": "Terminates a function during execution."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5521,7 +5275,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of functions",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5531,8 +5284,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|LIST",
-   "since": "7.0.0",
-   "summary": "Returns information about all libraries."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5555,7 +5307,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) (considering compilation time is redundant)",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5567,8 +5318,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|LOAD",
-   "since": "7.0.0",
-   "summary": "Creates a library."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5609,7 +5359,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of functions on the payload",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5621,8 +5370,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|RESTORE",
-   "since": "7.0.0",
-   "summary": "Restores all libraries from a payload."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5630,7 +5378,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "FUNCTION",
    "first_key": 0,
    "flags": [
@@ -5641,8 +5388,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "FUNCTION|STATS",
-   "since": "7.0.0",
-   "summary": "Returns information about a function during execution."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -5709,7 +5455,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(log(N)) for each item added, where N is the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -5719,8 +5464,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEOADD",
-   "since": "3.2.0",
-   "summary": "Adds one or more members to a geospatial index. The key is created if it doesn't exist."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -5778,7 +5522,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -5787,8 +5530,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEODIST",
-   "since": "3.2.0",
-   "summary": "Returns the distance between two members of a geospatial index."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -5812,7 +5554,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for each member requested.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -5821,8 +5562,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEOHASH",
-   "since": "3.2.0",
-   "summary": "Returns members from a geospatial index as geohash strings."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -5846,7 +5586,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for each member requested.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -5855,8 +5594,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEOPOS",
-   "since": "3.2.0",
-   "summary": "Returns the longitude and latitude of members from a geospatial index."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -6000,7 +5738,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N+log(M)) where N is the number of elements inside the bounding box of the circular area delimited by center and radius and M is the number of items inside the index.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -6011,8 +5748,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEORADIUS",
-   "since": "3.2.0",
-   "summary": "Queries a geospatial index for members within a distance from a coordinate, optionally stores the result."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -6150,7 +5886,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N+log(M)) where N is the number of elements inside the bounding box of the circular area delimited by center and radius and M is the number of items inside the index.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -6161,8 +5896,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEORADIUSBYMEMBER",
-   "since": "3.2.0",
-   "summary": "Queries a geospatial index for members within a distance from a member, optionally stores the result."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -6279,7 +6013,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N+log(M)) where N is the number of elements inside the bounding box of the circular area delimited by center and radius and M is the number of items inside the index.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -6288,8 +6021,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEORADIUSBYMEMBER_RO",
-   "since": "3.2.10",
-   "summary": "Returns members from a geospatial index that are within a distance from a member."
+   "since": "3.2.10"
   },
   {
    "acl": [
@@ -6412,7 +6144,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N+log(M)) where N is the number of elements inside the bounding box of the circular area delimited by center and radius and M is the number of items inside the index.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -6421,8 +6152,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEORADIUS_RO",
-   "since": "3.2.10",
-   "summary": "Returns members from a geospatial index that are within a distance from a coordinate."
+   "since": "3.2.10"
   },
   {
    "acl": [
@@ -6623,7 +6353,6 @@
     }
    ],
    "arity": -7,
-   "complexity": "O(N+log(M)) where N is the number of elements in the grid-aligned bounding box area around the shape provided as the filter and M is the number of items inside the shape",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -6632,8 +6361,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GEOSEARCH",
-   "since": "6.2.0",
-   "summary": "Queries a geospatial index for members inside an area of a box or a circle."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -6826,7 +6554,6 @@
     }
    ],
    "arity": -8,
-   "complexity": "O(N+log(M)) where N is the number of elements in the grid-aligned bounding box area around the shape provided as the filter and M is the number of items inside the shape",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -6836,8 +6563,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "GEOSEARCHSTORE",
-   "since": "6.2.0",
-   "summary": "Queries a geospatial index for members inside an area of a box or a circle, optionally stores the result."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -6854,7 +6580,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -6864,8 +6589,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GET",
-   "since": "1.0.0",
-   "summary": "Returns the string value of a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -6887,7 +6611,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -6897,8 +6620,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GETBIT",
-   "since": "2.2.0",
-   "summary": "Returns a bit value by offset."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -6915,7 +6637,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -6925,8 +6646,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GETDEL",
-   "since": "6.2.0",
-   "summary": "Returns the string value of a key after deleting the key."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -6980,7 +6700,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -6990,8 +6709,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GETEX",
-   "since": "6.2.0",
-   "summary": "Returns the string value of a key after setting its expiration time."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -7018,7 +6736,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the length of the returned string. The complexity is ultimately determined by the returned length, but because creating a substring from an existing string is very cheap, it can be considered O(1) for small strings.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -7027,8 +6744,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GETRANGE",
-   "since": "2.4.0",
-   "summary": "Returns a substring of the string stored at a key."
+   "since": "2.4.0"
   },
   {
    "acl": [
@@ -7050,7 +6766,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -7061,8 +6776,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "GETSET",
-   "since": "1.0.0",
-   "summary": "Returns the previous string value of a key after setting it to a new value."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -7085,7 +6799,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of fields to be removed.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7095,8 +6808,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HDEL",
-   "since": "2.0.0",
-   "summary": "Deletes one or more fields and their values from a hash. Deletes the hash if no fields remain."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7143,7 +6855,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -7157,8 +6868,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "HELLO",
-   "since": "6.0.0",
-   "summary": "Handshakes with the Redis server."
+   "since": "6.0.0"
   },
   {
    "acl": [
@@ -7180,7 +6890,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7190,8 +6899,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HEXISTS",
-   "since": "2.0.0",
-   "summary": "Determines whether a field exists in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7262,7 +6970,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7272,8 +6979,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HEXPIRE",
-   "since": "7.4.0",
-   "summary": "Set expiry for hash field using relative time to expire (seconds)"
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -7344,7 +7050,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7354,8 +7059,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HEXPIREAT",
-   "since": "7.4.0",
-   "summary": "Set expiry for hash field using an absolute Unix timestamp (seconds)"
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -7390,7 +7094,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7400,8 +7103,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HEXPIRETIME",
-   "since": "7.4.0",
-   "summary": "Returns the expiration time of a hash field as a Unix timestamp, in seconds."
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -7423,7 +7125,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7433,8 +7134,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HGET",
-   "since": "2.0.0",
-   "summary": "Returns the value of a field in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7451,7 +7151,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the size of the hash.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -7460,8 +7159,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HGETALL",
-   "since": "2.0.0",
-   "summary": "Returns all fields and values in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7496,7 +7194,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7506,8 +7203,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HGETDEL",
-   "since": "8.0.0",
-   "summary": "Returns the value of a field and deletes it from the hash."
+   "since": "8.0.0"
   },
   {
    "acl": [
@@ -7579,7 +7275,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7589,8 +7284,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HGETEX",
-   "since": "8.0.0",
-   "summary": "Get the value of one or more fields of a given hash key, and optionally set their expiration."
+   "since": "8.0.0"
   },
   {
    "acl": [
@@ -7617,7 +7311,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -7628,8 +7321,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HINCRBY",
-   "since": "2.0.0",
-   "summary": "Increments the integer value of a field in a hash by a number. Uses 0 as initial value if the field doesn't exist."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7656,7 +7348,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -7667,8 +7358,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HINCRBYFLOAT",
-   "since": "2.6.0",
-   "summary": "Increments the floating point value of a field by a number. Uses 0 as initial value if the field doesn't exist."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -7685,7 +7375,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the size of the hash.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -7694,8 +7383,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HKEYS",
-   "since": "2.0.0",
-   "summary": "Returns all fields in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7712,7 +7400,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7722,8 +7409,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HLEN",
-   "since": "2.0.0",
-   "summary": "Returns the number of fields in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7746,7 +7432,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of fields being requested.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7756,8 +7441,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HMGET",
-   "since": "2.0.0",
-   "summary": "Returns the values of all fields in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7791,7 +7475,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) where N is the number of fields being set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -7802,8 +7485,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HMSET",
-   "since": "2.0.0",
-   "summary": "Sets the values of multiple fields."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -7838,7 +7520,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7848,8 +7529,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HPERSIST",
-   "since": "7.4.0",
-   "summary": "Removes the expiration time for each specified field"
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -7920,7 +7600,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -7930,8 +7609,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HPEXPIRE",
-   "since": "7.4.0",
-   "summary": "Set expiry for hash field using relative time to expire (milliseconds)"
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -8002,7 +7680,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -8012,8 +7689,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HPEXPIREAT",
-   "since": "7.4.0",
-   "summary": "Set expiry for hash field using an absolute Unix timestamp (milliseconds)"
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -8048,7 +7724,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -8058,8 +7733,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HPEXPIRETIME",
-   "since": "7.4.0",
-   "summary": "Returns the expiration time of a hash field as a Unix timestamp, in msec."
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -8094,7 +7768,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -8104,8 +7777,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HPTTL",
-   "since": "7.4.0",
-   "summary": "Returns the TTL in milliseconds of a hash field."
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -8141,7 +7813,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of fields returned",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -8150,8 +7821,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HRANDFIELD",
-   "since": "6.2.0",
-   "summary": "Returns one or more random fields from a hash."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -8194,7 +7864,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for every call. O(N) for a complete iteration, including enough command calls for the cursor to return back to 0. N is the number of elements inside the collection.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -8203,8 +7872,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HSCAN",
-   "since": "2.8.0",
-   "summary": "Iterates over fields and values of a hash."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -8238,7 +7906,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1) for each field/value pair added, so O(N) to add N field/value pairs when the command is called with multiple field/value pairs.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8249,8 +7916,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HSET",
-   "since": "2.0.0",
-   "summary": "Creates or modifies the value of a field in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -8352,7 +8018,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(N) where N is the number of fields being set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8363,8 +8028,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HSETEX",
-   "since": "8.0.0",
-   "summary": "Set the value of one or more fields of a given hash key, and optionally set their expiration."
+   "since": "8.0.0"
   },
   {
    "acl": [
@@ -8391,7 +8055,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8402,8 +8065,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HSETNX",
-   "since": "2.0.0",
-   "summary": "Sets the value of a field in a hash only when the field doesn't exist."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -8425,7 +8087,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -8435,8 +8096,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HSTRLEN",
-   "since": "3.2.0",
-   "summary": "Returns the length of the value of a field."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -8471,7 +8131,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(N) where N is the number of specified fields",
    "first_key": 1,
    "flags": [
     "fast",
@@ -8481,8 +8140,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HTTL",
-   "since": "7.4.0",
-   "summary": "Returns the TTL in seconds of a hash field."
+   "since": "7.4.0"
   },
   {
    "acl": [
@@ -8499,7 +8157,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the size of the hash.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -8508,8 +8165,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "HVALS",
-   "since": "2.0.0",
-   "summary": "Returns all values in a hash."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -8526,7 +8182,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8537,8 +8192,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "INCR",
-   "since": "1.0.0",
-   "summary": "Increments the integer value of a key by one. Uses 0 as initial value if the key doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -8560,7 +8214,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8571,8 +8224,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "INCRBY",
-   "since": "1.0.0",
-   "summary": "Increments the integer value of a key by a number. Uses 0 as initial value if the key doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -8594,7 +8246,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -8605,8 +8256,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "INCRBYFLOAT",
-   "since": "2.6.0",
-   "summary": "Increment the floating point value of a key by a number. Uses 0 as initial value if the key doesn't exist."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -8623,7 +8273,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "loading",
@@ -8633,8 +8282,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "INFO",
-   "since": "1.0.0",
-   "summary": "Returns information and statistics about the server."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9058,7 +8706,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(N) with N being the number of keys in the database, under the assumption that the key names in the database and the given pattern have limited length.",
    "first_key": 0,
    "flags": [
     "readonly"
@@ -9067,8 +8714,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "KEYS",
-   "since": "1.0.0",
-   "summary": "Returns all key names that match a pattern."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9077,7 +8723,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -9088,23 +8733,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LASTSAVE",
-   "since": "1.0.0",
-   "summary": "Returns the Unix timestamp of the last successful save to disk."
+   "since": "1.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY",
-   "since": "2.8.13",
-   "summary": "A container for latency diagnostics commands."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9113,7 +8755,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9126,8 +8767,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|DOCTOR",
-   "since": "2.8.13",
-   "summary": "Returns a human-readable latency analysis report."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9143,7 +8783,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9156,15 +8795,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|GRAPH",
-   "since": "2.8.13",
-   "summary": "Returns a latency graph for an event."
+   "since": "2.8.13"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9175,8 +8812,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|HELP",
-   "since": "2.8.13",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9194,7 +8830,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of commands with latency information being retrieved.",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9207,8 +8842,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|HISTOGRAM",
-   "since": "7.0.0",
-   "summary": "Returns the cumulative distribution of latencies of a subset or all commands."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -9224,7 +8858,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9237,8 +8870,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|HISTORY",
-   "since": "2.8.13",
-   "summary": "Returns timestamp-latency samples for an event."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9247,7 +8879,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9260,8 +8891,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|LATEST",
-   "since": "2.8.13",
-   "summary": "Returns the latest latency samples for all events."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9279,7 +8909,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1)",
    "container": "LATENCY",
    "first_key": 0,
    "flags": [
@@ -9292,8 +8921,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LATENCY|RESET",
-   "since": "2.8.13",
-   "summary": "Resets the latency data for one or more events."
+   "since": "2.8.13"
   },
   {
    "acl": [
@@ -9344,7 +8972,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N*M) where N and M are the lengths of s1 and s2, respectively",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -9353,8 +8980,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "LCS",
-   "since": "7.0.0",
-   "summary": "Finds the longest common substring."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -9376,7 +9002,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of elements to traverse to get to the element at index. This makes asking for the first or the last element of the list O(1).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -9385,8 +9010,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LINDEX",
-   "since": "1.0.0",
-   "summary": "Returns an element from a list by its index."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9431,7 +9055,6 @@
     }
    ],
    "arity": 5,
-   "complexity": "O(N) where N is the number of elements to traverse before seeing the value pivot. This means that inserting somewhere on the left end on the list (head) can be considered O(1) and inserting somewhere on the right end (tail) is O(N).",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -9441,8 +9064,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LINSERT",
-   "since": "2.2.0",
-   "summary": "Inserts an element before or after another element in a list."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -9459,7 +9081,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -9469,8 +9090,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LLEN",
-   "since": "1.0.0",
-   "summary": "Returns the length of a list."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9529,7 +9149,6 @@
     }
    ],
    "arity": 5,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -9539,8 +9158,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "LMOVE",
-   "since": "6.2.0",
-   "summary": "Returns an element after popping it from one list and pushing it to another. Deletes the list if the last element was moved."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -9588,7 +9206,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N+M) where N is the number of provided keys and M is the number of elements returned.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -9598,8 +9215,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LMPOP",
-   "since": "7.0.0",
-   "summary": "Returns multiple elements from a list after removing them. Deletes the list if the last element was popped."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -9625,8 +9241,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "LOLWUT",
-   "since": "5.0.0",
-   "summary": "Displays computer art and the Redis version"
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -9650,7 +9265,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of elements returned",
    "first_key": 1,
    "flags": [
     "fast",
@@ -9660,8 +9274,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LPOP",
-   "since": "1.0.0",
-   "summary": "Returns the first elements in a list after removing it. Deletes the list if the last element was popped."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9704,7 +9317,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of elements in the list, for the average case. When searching for elements near the head or the tail of the list, or when the MAXLEN option is provided, the command may run in constant time.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -9713,8 +9325,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LPOS",
-   "since": "6.0.6",
-   "summary": "Returns the index of matching elements in a list."
+   "since": "6.0.6"
   },
   {
    "acl": [
@@ -9737,7 +9348,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each element added, so O(N) to add N elements when the command is called with multiple arguments.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -9748,8 +9358,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LPUSH",
-   "since": "1.0.0",
-   "summary": "Prepends one or more elements to a list. Creates the key if it doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9772,7 +9381,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each element added, so O(N) to add N elements when the command is called with multiple arguments.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -9783,8 +9391,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LPUSHX",
-   "since": "2.2.0",
-   "summary": "Prepends one or more elements to a list only when the list exists."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -9811,7 +9418,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(S+N) where S is the distance of start offset from HEAD for small lists, from nearest end (HEAD or TAIL) for large lists; and N is the number of elements in the specified range.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -9820,8 +9426,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LRANGE",
-   "since": "1.0.0",
-   "summary": "Returns a range of elements from a list."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9848,7 +9453,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N+M) where N is the length of the list and M is the number of elements removed.",
    "first_key": 1,
    "flags": [
     "write"
@@ -9857,8 +9461,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LREM",
-   "since": "1.0.0",
-   "summary": "Removes elements from a list. Deletes the list if the last element was removed."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9885,7 +9488,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the length of the list. Setting either the first or the last element of the list is O(1).",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -9895,8 +9497,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LSET",
-   "since": "1.0.0",
-   "summary": "Sets the value of an element in a list by its index."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -9923,7 +9524,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the number of elements to be removed by the operation.",
    "first_key": 1,
    "flags": [
     "write"
@@ -9932,30 +9532,26 @@
    "key_step": 1,
    "last_key": 1,
    "name": "LTRIM",
-   "since": "1.0.0",
-   "summary": "Removes elements from both ends a list. Deletes the list if all elements were trimmed."
+   "since": "1.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY",
-   "since": "4.0.0",
-   "summary": "A container for memory diagnostics commands."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "MEMORY",
    "first_key": 0,
    "flags": [],
@@ -9963,15 +9559,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY|DOCTOR",
-   "since": "4.0.0",
-   "summary": "Outputs a memory problems report."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "MEMORY",
    "first_key": 0,
    "flags": [
@@ -9982,15 +9576,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY|HELP",
-   "since": "4.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "Depends on how much memory is allocated, could be slow",
    "container": "MEMORY",
    "first_key": 0,
    "flags": [],
@@ -9998,15 +9590,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY|MALLOC-STATS",
-   "since": "4.0.0",
-   "summary": "Returns the allocator statistics."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "Depends on how much memory is allocated, could be slow",
    "container": "MEMORY",
    "first_key": 0,
    "flags": [],
@@ -10014,15 +9604,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY|PURGE",
-   "since": "4.0.0",
-   "summary": "Asks the allocator to release memory."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "MEMORY",
    "first_key": 0,
    "flags": [],
@@ -10030,8 +9618,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MEMORY|STATS",
-   "since": "4.0.0",
-   "summary": "Returns details about memory usage."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10054,7 +9641,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of samples.",
    "container": "MEMORY",
    "first_key": 2,
    "flags": [
@@ -10064,8 +9650,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "MEMORY|USAGE",
-   "since": "4.0.0",
-   "summary": "Estimates the memory usage of a key."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10083,7 +9668,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of keys to retrieve.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10093,8 +9677,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "MGET",
-   "since": "1.0.0",
-   "summary": "Atomically returns the string values of one or more keys."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -10202,7 +9785,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "This command actually executes a DUMP+DEL in the source instance, and a RESTORE in the target instance. See the pages of these commands for time complexity. Also an O(N) data transfer between the two instances is performed.",
    "first_key": 3,
    "flags": [
     "movablekeys",
@@ -10212,30 +9794,26 @@
    "key_step": 1,
    "last_key": 3,
    "name": "MIGRATE",
-   "since": "2.6.0",
-   "summary": "Atomically transfers a key from one Redis instance to another."
+   "since": "2.6.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE",
-   "since": "4.0.0",
-   "summary": "A container for module commands."
+   "since": "4.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "MODULE",
    "first_key": 0,
    "flags": [
@@ -10246,8 +9824,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -10256,7 +9833,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the number of loaded modules.",
    "container": "MODULE",
    "first_key": 0,
    "flags": [
@@ -10267,8 +9843,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE|LIST",
-   "since": "4.0.0",
-   "summary": "Returns all loaded modules."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10291,7 +9866,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "container": "MODULE",
    "first_key": 0,
    "flags": [
@@ -10303,8 +9877,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE|LOAD",
-   "since": "4.0.0",
-   "summary": "Loads a module."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10348,7 +9921,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "container": "MODULE",
    "first_key": 0,
    "flags": [
@@ -10360,8 +9932,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE|LOADEX",
-   "since": "7.0.0",
-   "summary": "Loads a module using extended parameters."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -10377,7 +9948,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "MODULE",
    "first_key": 0,
    "flags": [
@@ -10389,8 +9959,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MODULE|UNLOAD",
-   "since": "4.0.0",
-   "summary": "Unloads a module."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10410,8 +9979,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MONITOR",
-   "since": "1.0.0",
-   "summary": "Listens for all requests received by the server in real-time."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -10433,7 +10001,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10443,8 +10010,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "MOVE",
-   "since": "1.0.0",
-   "summary": "Moves a key to another database."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -10473,7 +10039,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of keys to set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -10483,8 +10048,7 @@
    "key_step": 2,
    "last_key": -1,
    "name": "MSET",
-   "since": "1.0.1",
-   "summary": "Atomically creates or modifies the string values of one or more keys."
+   "since": "1.0.1"
   },
   {
    "acl": [
@@ -10513,7 +10077,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of keys to set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -10523,8 +10086,7 @@
    "key_step": 2,
    "last_key": -1,
    "name": "MSETNX",
-   "since": "1.0.1",
-   "summary": "Atomically modifies the string values of one or more keys only when all keys don't exist."
+   "since": "1.0.1"
   },
   {
    "acl": [
@@ -10532,7 +10094,6 @@
     "@transaction"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -10545,23 +10106,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "MULTI",
-   "since": "1.2.0",
-   "summary": "Starts a transaction."
+   "since": "1.2.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "generic",
    "key_step": 0,
    "last_key": 0,
    "name": "OBJECT",
-   "since": "2.2.3",
-   "summary": "A container for object introspection commands."
+   "since": "2.2.3"
   },
   {
    "acl": [
@@ -10578,7 +10136,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "OBJECT",
    "first_key": 2,
    "flags": [
@@ -10588,8 +10145,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "OBJECT|ENCODING",
-   "since": "2.2.3",
-   "summary": "Returns the internal encoding of a Redis object."
+   "since": "2.2.3"
   },
   {
    "acl": [
@@ -10606,7 +10162,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "OBJECT",
    "first_key": 2,
    "flags": [
@@ -10616,8 +10171,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "OBJECT|FREQ",
-   "since": "4.0.0",
-   "summary": "Returns the logarithmic access frequency counter of a Redis object."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -10625,7 +10179,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "OBJECT",
    "first_key": 0,
    "flags": [
@@ -10636,8 +10189,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "OBJECT|HELP",
-   "since": "6.2.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -10654,7 +10206,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "OBJECT",
    "first_key": 2,
    "flags": [
@@ -10664,8 +10215,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "OBJECT|IDLETIME",
-   "since": "2.2.3",
-   "summary": "Returns the time since the last access to a Redis object."
+   "since": "2.2.3"
   },
   {
    "acl": [
@@ -10682,7 +10232,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "OBJECT",
    "first_key": 2,
    "flags": [
@@ -10692,8 +10241,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "OBJECT|REFCOUNT",
-   "since": "2.2.3",
-   "summary": "Returns the reference count of a value of a key."
+   "since": "2.2.3"
   },
   {
    "acl": [
@@ -10710,7 +10258,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10720,8 +10267,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PERSIST",
-   "since": "2.2.0",
-   "summary": "Removes the expiration time of a key."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -10775,7 +10321,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10785,8 +10330,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PEXPIRE",
-   "since": "2.6.0",
-   "summary": "Sets the expiration time of a key in milliseconds."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -10840,7 +10384,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10850,8 +10393,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PEXPIREAT",
-   "since": "2.6.0",
-   "summary": "Sets the expiration time of a key to a Unix milliseconds timestamp."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -10868,7 +10410,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -10878,8 +10419,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PEXPIRETIME",
-   "since": "7.0.0",
-   "summary": "Returns the expiration time of a key as a Unix milliseconds timestamp."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -10903,7 +10443,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) to add every element.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -10914,8 +10453,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PFADD",
-   "since": "2.8.9",
-   "summary": "Adds elements to a HyperLogLog key. Creates the key if it doesn't exist."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -10933,7 +10471,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) with a very small average constant time when called with a single key. O(N) with N being the number of keys, and much bigger constant times, when called with multiple keys.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -10942,8 +10479,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "PFCOUNT",
-   "since": "2.8.9",
-   "summary": "Returns the approximated cardinality of the set(s) observed by the HyperLogLog key(s)."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -10967,7 +10503,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "N/A",
    "first_key": 2,
    "flags": [
     "admin",
@@ -10978,8 +10513,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "PFDEBUG",
-   "since": "2.8.9",
-   "summary": "Internal commands for debugging HyperLogLog values."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -11004,7 +10538,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) to merge N HyperLogLogs, but with high constant times.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11014,8 +10547,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "PFMERGE",
-   "since": "2.8.9",
-   "summary": "Merges one or more HyperLogLog values into a single key."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -11025,7 +10557,6 @@
     "@slow"
    ],
    "arity": 1,
-   "complexity": "N/A",
    "first_key": 0,
    "flags": [
     "admin"
@@ -11034,8 +10565,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PFSELFTEST",
-   "since": "2.8.9",
-   "summary": "An internal command for testing HyperLogLog values."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -11051,7 +10581,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast"
@@ -11060,8 +10589,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PING",
-   "since": "1.0.0",
-   "summary": "Returns the server's liveliness response."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11088,7 +10616,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11098,8 +10625,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PSETEX",
-   "since": "2.6.0",
-   "summary": "Sets both string value and expiration time in milliseconds of a key. The key is created if it doesn't exist."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -11115,7 +10641,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of patterns to subscribe to.",
    "first_key": 0,
    "flags": [
     "loading",
@@ -11127,8 +10652,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PSUBSCRIBE",
-   "since": "2.0.0",
-   "summary": "Listens for messages published to channels that match one or more patterns."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -11160,8 +10684,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PSYNC",
-   "since": "2.8.0",
-   "summary": "An internal command used in replication."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -11178,7 +10701,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -11188,8 +10710,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "PTTL",
-   "since": "2.6.0",
-   "summary": "Returns the expiration time in milliseconds of a key."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -11209,7 +10730,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N+M) where N is the number of clients subscribed to the receiving channel and M is the total number of subscribed patterns (by any client).",
    "first_key": 0,
    "flags": [
     "fast",
@@ -11221,23 +10741,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBLISH",
-   "since": "2.0.0",
-   "summary": "Posts a message to a channel."
+   "since": "2.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "pubsub",
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB",
-   "since": "2.8.0",
-   "summary": "A container for Pub/Sub commands."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -11253,7 +10770,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of active channels, and assuming constant time pattern matching (relatively short channels and patterns)",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11265,15 +10781,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|CHANNELS",
-   "since": "2.8.0",
-   "summary": "Returns the active channels."
+   "since": "2.8.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11284,8 +10798,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|HELP",
-   "since": "6.2.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -11293,7 +10806,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11305,8 +10817,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|NUMPAT",
-   "since": "2.8.0",
-   "summary": "Returns a count of unique pattern subscriptions."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -11323,7 +10834,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) for the NUMSUB subcommand, where N is the number of requested channels",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11335,8 +10845,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|NUMSUB",
-   "since": "2.8.0",
-   "summary": "Returns a count of subscribers to channels."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -11352,7 +10861,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of active shard channels, and assuming constant time pattern matching (relatively short shard channels).",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11364,8 +10872,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|SHARDCHANNELS",
-   "since": "7.0.0",
-   "summary": "Returns the active shard channels."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -11382,7 +10889,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) for the SHARDNUMSUB subcommand, where N is the number of requested shard channels",
    "container": "PUBSUB",
    "first_key": 0,
    "flags": [
@@ -11394,8 +10900,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUBSUB|SHARDNUMSUB",
-   "since": "7.0.0",
-   "summary": "Returns the count of subscribers of shard channels."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -11412,7 +10917,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the number of patterns to unsubscribe.",
    "first_key": 0,
    "flags": [
     "loading",
@@ -11424,8 +10928,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "PUNSUBSCRIBE",
-   "since": "2.0.0",
-   "summary": "Stops listening to messages published to channels that match one or more patterns."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -11433,7 +10936,6 @@
     "@fast"
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -11447,8 +10949,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "QUIT",
-   "since": "1.0.0",
-   "summary": "Closes the connection."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11457,7 +10958,6 @@
     "@slow"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "readonly"
@@ -11466,8 +10966,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "RANDOMKEY",
-   "since": "1.0.0",
-   "summary": "Returns a random key name from the database."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11475,7 +10974,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -11486,8 +10984,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "READONLY",
-   "since": "3.0.0",
-   "summary": "Enables read-only queries for a connection to a Redis Cluster replica node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -11495,7 +10992,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -11506,8 +11002,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "READWRITE",
-   "since": "3.0.0",
-   "summary": "Enables read-write queries for a connection to a Reids Cluster replica node."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -11530,7 +11025,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "write"
@@ -11539,8 +11033,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "RENAME",
-   "since": "1.0.0",
-   "summary": "Renames a key and overwrites the destination."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11563,7 +11056,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -11573,8 +11065,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "RENAMENX",
-   "since": "1.0.0",
-   "summary": "Renames a key only when the target key name doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11583,7 +11074,6 @@
     "@slow"
    ],
    "arity": -1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -11596,8 +11086,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "REPLCONF",
-   "since": "3.0.0",
-   "summary": "An internal command for configuring the replication stream."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -11648,7 +11137,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -11660,8 +11148,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "REPLICAOF",
-   "since": "5.0.0",
-   "summary": "Configures a server as replica of another, or promotes it to a master."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -11669,7 +11156,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -11683,8 +11169,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "RESET",
-   "since": "6.2.0",
-   "summary": "Resets the connection."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -11744,7 +11229,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1) to create the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11754,8 +11238,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "RESTORE",
-   "since": "2.6.0",
-   "summary": "Creates a key from the serialized representation of a value."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -11815,7 +11298,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1) to create the new key and additional O(N*M) to reconstruct the serialized value, where N is the number of Redis objects composing the value and M their average size. For small string values the time complexity is thus O(1)+O(1*M) where M is small, so simply O(1). However for sorted set values the complexity is O(N*M*log(N)) because inserting values into sorted sets is O(log(N)).",
    "first_key": 1,
    "flags": [
     "asking",
@@ -11826,8 +11308,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "RESTORE-ASKING",
-   "since": "3.0.0",
-   "summary": "An internal command for migrating keys in a cluster."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -11836,7 +11317,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -11848,8 +11328,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ROLE",
-   "since": "2.8.12",
-   "summary": "Returns the replication role."
+   "since": "2.8.12"
   },
   {
    "acl": [
@@ -11873,7 +11352,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of elements returned",
    "first_key": 1,
    "flags": [
     "fast",
@@ -11883,8 +11361,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "RPOP",
-   "since": "1.0.0",
-   "summary": "Returns and removes the last elements of a list. Deletes the list if the last element was popped."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11907,7 +11384,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11917,8 +11393,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "RPOPLPUSH",
-   "since": "1.2.0",
-   "summary": "Returns the last element of a list after removing and pushing it to another list. Deletes the list if the last element was popped."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -11941,7 +11416,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each element added, so O(N) to add N elements when the command is called with multiple arguments.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11952,8 +11426,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "RPUSH",
-   "since": "1.0.0",
-   "summary": "Appends one or more elements to a list. Creates the key if it doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -11976,7 +11449,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each element added, so O(N) to add N elements when the command is called with multiple arguments.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -11987,8 +11459,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "RPUSHX",
-   "since": "2.2.0",
-   "summary": "Appends an element to a list only when the list exists."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -12011,7 +11482,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each element added, so O(N) to add N elements when the command is called with multiple arguments.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12022,8 +11492,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SADD",
-   "since": "1.0.0",
-   "summary": "Adds one or more members to a set. Creates the key if it doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12032,7 +11501,6 @@
     "@slow"
    ],
    "arity": 1,
-   "complexity": "O(N) where N is the total number of keys in all databases",
    "first_key": 0,
    "flags": [
     "admin",
@@ -12044,8 +11512,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SAVE",
-   "since": "1.0.0",
-   "summary": "Synchronously saves the database(s) to disk."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12083,7 +11550,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for every call. O(N) for a complete iteration, including enough command calls for the cursor to return back to 0. N is the number of elements inside the collection.",
    "first_key": 0,
    "flags": [
     "readonly"
@@ -12092,8 +11558,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCAN",
-   "since": "2.8.0",
-   "summary": "Iterates over the key names in the database."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -12110,7 +11575,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -12120,23 +11584,20 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SCARD",
-   "since": "1.0.0",
-   "summary": "Returns the number of members in a set."
+   "since": "1.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "scripting",
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT",
-   "since": "2.6.0",
-   "summary": "A container for Lua scripts management commands."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -12170,7 +11631,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12180,8 +11640,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|DEBUG",
-   "since": "3.2.0",
-   "summary": "Sets the debug mode of server-side Lua scripts."
+   "since": "3.2.0"
   },
   {
    "acl": [
@@ -12197,7 +11656,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) with N being the number of scripts to check (so checking a single script is an O(1) operation).",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12207,8 +11665,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|EXISTS",
-   "since": "2.6.0",
-   "summary": "Determines whether server-side Lua scripts exist in the script cache."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -12238,7 +11695,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) with N being the number of scripts in cache",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12248,8 +11704,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|FLUSH",
-   "since": "2.6.0",
-   "summary": "Removes all server-side Lua scripts from the script cache."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -12257,7 +11712,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12268,8 +11722,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -12277,7 +11730,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12288,8 +11740,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|KILL",
-   "since": "2.6.0",
-   "summary": "Terminates a server-side Lua script during execution."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -12304,7 +11755,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) with N being the length in bytes of the script body.",
    "container": "SCRIPT",
    "first_key": 0,
    "flags": [
@@ -12315,8 +11765,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SCRIPT|LOAD",
-   "since": "2.6.0",
-   "summary": "Loads a server-side Lua script to the script cache."
+   "since": "2.6.0"
   },
   {
    "acl": [
@@ -12334,7 +11783,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the total number of elements in all given sets.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -12343,8 +11791,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SDIFF",
-   "since": "1.0.0",
-   "summary": "Returns the difference of multiple sets."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12368,7 +11815,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the total number of elements in all given sets.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12378,8 +11824,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SDIFFSTORE",
-   "since": "1.0.0",
-   "summary": "Stores the difference of multiple sets in a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12444,7 +11889,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -12455,8 +11899,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SELECT",
-   "since": "1.0.0",
-   "summary": "Changes the selected database."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12548,7 +11991,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12558,8 +12000,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SET",
-   "since": "1.0.0",
-   "summary": "Sets the string value of a key, ignoring its type. The key is created if it doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12586,7 +12027,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12596,8 +12036,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SETBIT",
-   "since": "2.2.0",
-   "summary": "Sets or clears the bit at offset of the string value. Creates the key if it doesn't exist."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -12624,7 +12063,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12634,8 +12072,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SETEX",
-   "since": "2.0.0",
-   "summary": "Sets the string value and expiration time of a key. Creates the key if it doesn't exist."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -12657,7 +12094,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12668,8 +12104,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SETNX",
-   "since": "1.0.0",
-   "summary": "Set the string value of a key only when the key doesn't exist."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12696,7 +12131,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1), not counting the time taken to copy the new string in place. Usually, this string is very small so the amortized complexity is O(1). Otherwise, complexity is O(M) with M being the length of the value argument.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12706,8 +12140,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SETRANGE",
-   "since": "2.2.0",
-   "summary": "Overwrites a part of a string value with another by an offset. Creates the key if it doesn't exist."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -12761,7 +12194,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) when saving, where N is the total number of keys in all databases when saving data, otherwise O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -12775,8 +12207,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SHUTDOWN",
-   "since": "1.0.0",
-   "summary": "Synchronously saves the database(s) to disk and shuts down the Redis server."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12794,7 +12225,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N*M) worst case where N is the cardinality of the smallest set and M is the number of sets.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -12803,8 +12233,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SINTER",
-   "since": "1.0.0",
-   "summary": "Returns the intersect of multiple sets."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12834,7 +12263,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N*M) worst case where N is the cardinality of the smallest set and M is the number of sets.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -12844,8 +12272,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SINTERCARD",
-   "since": "7.0.0",
-   "summary": "Returns the number of members of the intersect of multiple sets."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -12869,7 +12296,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N*M) worst case where N is the cardinality of the smallest set and M is the number of sets.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -12879,8 +12305,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SINTERSTORE",
-   "since": "1.0.0",
-   "summary": "Stores the intersect of multiple sets in a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12902,7 +12327,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -12912,8 +12336,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SISMEMBER",
-   "since": "1.0.0",
-   "summary": "Determines whether a member belongs to a set."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -12964,7 +12387,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "admin",
@@ -12976,23 +12398,20 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SLAVEOF",
-   "since": "1.0.0",
-   "summary": "Sets a Redis server as a replica of another, or promotes it to being a master."
+   "since": "1.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "server",
    "key_step": 0,
    "last_key": 0,
    "name": "SLOWLOG",
-   "since": "2.2.12",
-   "summary": "A container for slow log commands."
+   "since": "2.2.12"
   },
   {
    "acl": [
@@ -13009,7 +12428,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of entries returned",
    "container": "SLOWLOG",
    "first_key": 0,
    "flags": [
@@ -13021,15 +12439,13 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SLOWLOG|GET",
-   "since": "2.2.12",
-   "summary": "Returns the slow log's entries."
+   "since": "2.2.12"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "SLOWLOG",
    "first_key": 0,
    "flags": [
@@ -13040,8 +12456,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SLOWLOG|HELP",
-   "since": "6.2.0",
-   "summary": "Show helpful text about the different subcommands"
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -13050,7 +12465,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "SLOWLOG",
    "first_key": 0,
    "flags": [
@@ -13062,8 +12476,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SLOWLOG|LEN",
-   "since": "2.2.12",
-   "summary": "Returns the number of entries in the slow log."
+   "since": "2.2.12"
   },
   {
    "acl": [
@@ -13072,7 +12485,6 @@
     "@slow"
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the number of entries in the slowlog",
    "container": "SLOWLOG",
    "first_key": 0,
    "flags": [
@@ -13084,8 +12496,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SLOWLOG|RESET",
-   "since": "2.2.12",
-   "summary": "Clears all entries from the slow log."
+   "since": "2.2.12"
   },
   {
    "acl": [
@@ -13102,7 +12513,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(N) where N is the set cardinality.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -13111,8 +12521,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SMEMBERS",
-   "since": "1.0.0",
-   "summary": "Returns all members of a set."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13135,7 +12544,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of elements being checked for membership",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13145,8 +12553,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SMISMEMBER",
-   "since": "6.2.0",
-   "summary": "Determines whether multiple members belong to a set."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -13174,7 +12581,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13184,8 +12590,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "SMOVE",
-   "since": "1.0.0",
-   "summary": "Moves a member from one set to another."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13275,7 +12680,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N+M*log(M)) where N is the number of elements in the list or set to sort, and M the number of returned elements. When the elements are not sorted, complexity is O(N).",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -13286,8 +12690,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SORT",
-   "since": "1.0.0",
-   "summary": "Sorts the elements in a list, a set, or a sorted set, optionally storing the result."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13369,7 +12772,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N+M*log(M)) where N is the number of elements in the list or set to sort, and M the number of returned elements. When the elements are not sorted, complexity is O(N).",
    "first_key": 1,
    "flags": [
     "movablekeys",
@@ -13379,8 +12781,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SORT_RO",
-   "since": "7.0.0",
-   "summary": "Returns the sorted elements of a list, a set, or a sorted set."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -13404,7 +12805,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "Without the count argument O(1), otherwise O(N) where N is the value of the passed count.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13414,8 +12814,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SPOP",
-   "since": "1.0.0",
-   "summary": "Returns one or more random members from a set after removing them. Deletes the set if the last member was popped."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13435,7 +12834,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the number of clients subscribed to the receiving shard channel.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13447,8 +12845,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SPUBLISH",
-   "since": "7.0.0",
-   "summary": "Post a message to a shard channel"
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -13472,7 +12869,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "Without the count argument O(1), otherwise O(N) where N is the absolute value of the passed count.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -13481,8 +12877,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SRANDMEMBER",
-   "since": "1.0.0",
-   "summary": "Get one or multiple random members from a set"
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13505,7 +12900,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of members to be removed.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13515,8 +12909,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SREM",
-   "since": "1.0.0",
-   "summary": "Removes one or more members from a set. Deletes the set if the last member was removed."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13552,7 +12945,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for every call. O(N) for a complete iteration, including enough command calls for the cursor to return back to 0. N is the number of elements inside the collection.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -13561,8 +12953,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SSCAN",
-   "since": "2.8.0",
-   "summary": "Iterates over members of a set."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -13578,7 +12969,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of shard channels to subscribe to.",
    "first_key": 1,
    "flags": [
     "loading",
@@ -13590,8 +12980,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SSUBSCRIBE",
-   "since": "7.0.0",
-   "summary": "Listens for messages published to shard channels."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -13608,7 +12997,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -13618,8 +13006,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "STRLEN",
-   "since": "2.2.0",
-   "summary": "Returns the length of a string value."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -13635,7 +13022,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of channels to subscribe to.",
    "first_key": 0,
    "flags": [
     "loading",
@@ -13647,8 +13033,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SUBSCRIBE",
-   "since": "2.0.0",
-   "summary": "Listens for messages published to channels."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -13675,7 +13060,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the length of the returned string. The complexity is ultimately determined by the returned length, but because creating a substring from an existing string is very cheap, it can be considered O(1) for small strings.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -13684,8 +13068,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "SUBSTR",
-   "since": "1.0.0",
-   "summary": "Returns a substring from a string value."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13703,7 +13086,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the total number of elements in all given sets.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -13712,8 +13094,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SUNION",
-   "since": "1.0.0",
-   "summary": "Returns the union of multiple sets."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13737,7 +13118,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the total number of elements in all given sets.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -13747,8 +13127,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SUNIONSTORE",
-   "since": "1.0.0",
-   "summary": "Stores the union of multiple sets in a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -13765,7 +13144,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the number of shard channels to unsubscribe.",
    "first_key": 1,
    "flags": [
     "loading",
@@ -13777,8 +13155,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "SUNSUBSCRIBE",
-   "since": "7.0.0",
-   "summary": "Stops listening to messages posted to shard channels."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -13800,7 +13177,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(N) where N is the count of clients watching or blocking on keys from both databases.",
    "first_key": 0,
    "flags": [
     "fast",
@@ -13810,8 +13186,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SWAPDB",
-   "since": "4.0.0",
-   "summary": "Swaps two Redis databases."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -13831,8 +13206,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "SYNC",
-   "since": "1.0.0",
-   "summary": "An internal command used in replication."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -14078,7 +13452,6 @@
     "@fast"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "fast",
@@ -14089,8 +13462,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "TIME",
-   "since": "2.6.0",
-   "summary": "Returns the server time."
+   "since": "2.6.0"
   },
   {
    "acl": [],
@@ -14239,7 +13611,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of keys that will be touched.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -14249,8 +13620,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "TOUCH",
-   "since": "3.2.1",
-   "summary": "Returns the number of existing keys out of those specified after updating the time they were last accessed."
+   "since": "3.2.1"
   },
   {
    "acl": [
@@ -14550,7 +13920,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -14560,8 +13929,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "TTL",
-   "since": "1.0.0",
-   "summary": "Returns the expiration time in seconds of a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -14578,7 +13946,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -14588,8 +13955,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "TYPE",
-   "since": "1.0.0",
-   "summary": "Determines the type of value stored at a key."
+   "since": "1.0.0"
   },
   {
    "acl": [
@@ -14607,7 +13973,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for each key removed regardless of its size. Then the command does O(N) work in a different thread in order to reclaim memory, where N is the number of allocations the deleted objects where composed of.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -14617,8 +13982,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "UNLINK",
-   "since": "4.0.0",
-   "summary": "Asynchronously deletes one or more keys."
+   "since": "4.0.0"
   },
   {
    "acl": [
@@ -14635,7 +13999,6 @@
     }
    ],
    "arity": -1,
-   "complexity": "O(N) where N is the number of channels to unsubscribe.",
    "first_key": 0,
    "flags": [
     "loading",
@@ -14647,8 +14010,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "UNSUBSCRIBE",
-   "since": "2.0.0",
-   "summary": "Stops listening to messages posted to channels."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -14656,7 +14018,6 @@
     "@transaction"
    ],
    "arity": 1,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "allow_busy",
@@ -14669,8 +14030,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "UNWATCH",
-   "since": "2.2.0",
-   "summary": "Forgets about watched keys of a transaction."
+   "since": "2.2.0"
   },
   {
    "acl": [],
@@ -14855,7 +14215,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "blocking"
@@ -14864,8 +14223,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "WAIT",
-   "since": "3.0.0",
-   "summary": "Blocks until the asynchronous replication of all preceding write commands sent by the connection is completed."
+   "since": "3.0.0"
   },
   {
    "acl": [
@@ -14891,7 +14249,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "first_key": 0,
    "flags": [
     "blocking"
@@ -14900,8 +14257,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "WAITAOF",
-   "since": "7.2.0",
-   "summary": "Blocks until all of the preceding write commands sent by the connection are written to the append-only file of the master and/or replicas."
+   "since": "7.2.0"
   },
   {
    "acl": [
@@ -14918,7 +14274,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(1) for every key.",
    "first_key": 1,
    "flags": [
     "allow_busy",
@@ -14931,8 +14286,7 @@
    "key_step": 1,
    "last_key": -1,
    "name": "WATCH",
-   "since": "2.2.0",
-   "summary": "Monitors changes to keys to determine the execution of a transaction."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -14960,7 +14314,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(1) for each message ID processed.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -14970,8 +14323,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XACK",
-   "since": "5.0.0",
-   "summary": "Returns the number of messages that were successfully acknowledged by the consumer group member of a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15088,7 +14440,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(1) when adding a new entry, O(N) when trimming where N being the number of entries evicted.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -15099,8 +14450,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XADD",
-   "since": "5.0.0",
-   "summary": "Appends a new message to a stream. Creates the key if it doesn't exist."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15151,7 +14501,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(1) if COUNT is small.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -15161,8 +14510,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XAUTOCLAIM",
-   "since": "6.2.0",
-   "summary": "Changes, or acquires, ownership of messages in a consumer group, as if the messages were delivered to as consumer group member."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -15242,7 +14590,6 @@
     }
    ],
    "arity": -6,
-   "complexity": "O(log N) with N being the number of messages in the PEL of the consumer group.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -15252,8 +14599,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XCLAIM",
-   "since": "5.0.0",
-   "summary": "Changes, or acquires, ownership of a message in a consumer group, as if the message was delivered a consumer group member."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15276,7 +14622,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for each single item to delete in the stream, regardless of the stream size.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -15286,23 +14631,20 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XDEL",
-   "since": "5.0.0",
-   "summary": "Returns the number of messages after removing them from a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "stream",
    "key_step": 0,
    "last_key": 0,
    "name": "XGROUP",
-   "since": "5.0.0",
-   "summary": "A container for consumer groups commands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15355,7 +14697,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(1)",
    "container": "XGROUP",
    "first_key": 2,
    "flags": [
@@ -15366,8 +14707,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XGROUP|CREATE",
-   "since": "5.0.0",
-   "summary": "Creates a consumer group."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15394,7 +14734,6 @@
     }
    ],
    "arity": 5,
-   "complexity": "O(1)",
    "container": "XGROUP",
    "first_key": 2,
    "flags": [
@@ -15405,8 +14744,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XGROUP|CREATECONSUMER",
-   "since": "6.2.0",
-   "summary": "Creates a consumer in a consumer group."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -15433,7 +14771,6 @@
     }
    ],
    "arity": 5,
-   "complexity": "O(1)",
    "container": "XGROUP",
    "first_key": 2,
    "flags": [
@@ -15443,8 +14780,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XGROUP|DELCONSUMER",
-   "since": "5.0.0",
-   "summary": "Deletes a consumer from a consumer group."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15466,7 +14802,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(N) where N is the number of entries in the group's pending entries list (PEL).",
    "container": "XGROUP",
    "first_key": 2,
    "flags": [
@@ -15476,8 +14811,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XGROUP|DESTROY",
-   "since": "5.0.0",
-   "summary": "Destroys a consumer group."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15485,7 +14819,6 @@
     "@stream"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "XGROUP",
    "first_key": 0,
    "flags": [
@@ -15496,8 +14829,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "XGROUP|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15543,7 +14875,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(1)",
    "container": "XGROUP",
    "first_key": 2,
    "flags": [
@@ -15553,23 +14884,20 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XGROUP|SETID",
-   "since": "5.0.0",
-   "summary": "Sets the last-delivered ID of a consumer group."
+   "since": "5.0.0"
   },
   {
    "acl": [
     "@slow"
    ],
    "arity": -2,
-   "complexity": "Depends on subcommand.",
    "first_key": 0,
    "flags": [],
    "group": "stream",
    "key_step": 0,
    "last_key": 0,
    "name": "XINFO",
-   "since": "5.0.0",
-   "summary": "A container for stream introspection commands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15591,7 +14919,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(1)",
    "container": "XINFO",
    "first_key": 2,
    "flags": [
@@ -15601,8 +14928,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XINFO|CONSUMERS",
-   "since": "5.0.0",
-   "summary": "Returns a list of the consumers in a consumer group."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15619,7 +14945,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "container": "XINFO",
    "first_key": 2,
    "flags": [
@@ -15629,8 +14954,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XINFO|GROUPS",
-   "since": "5.0.0",
-   "summary": "Returns a list of the consumer groups of a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15638,7 +14962,6 @@
     "@stream"
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "container": "XINFO",
    "first_key": 0,
    "flags": [
@@ -15649,8 +14972,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "XINFO|HELP",
-   "since": "5.0.0",
-   "summary": "Returns helpful text about the different subcommands."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15687,7 +15009,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "container": "XINFO",
    "first_key": 2,
    "flags": [
@@ -15697,8 +15018,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "XINFO|STREAM",
-   "since": "5.0.0",
-   "summary": "Returns information about a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15715,7 +15035,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -15725,8 +15044,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XLEN",
-   "since": "5.0.0",
-   "summary": "Return the number of messages in a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15784,7 +15102,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) with N being the number of elements returned, so asking for a small fixed number of entries per call is O(1). O(M), where M is the total number of entries scanned when used with the IDLE filter. When the command returns just the summary and the list of consumers is small, it runs in O(1) time; otherwise, an additional O(N) time for iterating every consumer.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -15793,8 +15110,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XPENDING",
-   "since": "5.0.0",
-   "summary": "Returns the information and entries from a stream consumer group's pending entries list."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15828,7 +15144,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) with N being the number of elements being returned. If N is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -15837,8 +15152,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XRANGE",
-   "since": "5.0.0",
-   "summary": "Returns the messages from a stream within a range of IDs."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15894,8 +15208,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "XREAD",
-   "since": "5.0.0",
-   "summary": "Returns messages from multiple streams with IDs greater than the ones requested. Blocks until a message is available otherwise."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -15965,7 +15278,6 @@
     }
    ],
    "arity": -7,
-   "complexity": "For each stream mentioned: O(M) with M being the number of elements returned. If M is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1). On the other side when XREADGROUP blocks, XADD will pay the O(N) time in order to serve the N clients blocked on the stream getting new data.",
    "first_key": 0,
    "flags": [
     "blocking",
@@ -15976,8 +15288,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "XREADGROUP",
-   "since": "5.0.0",
-   "summary": "Returns new or historical messages from a stream for a consumer in a group. Blocks until a message is available otherwise."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16011,7 +15322,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N) with N being the number of elements returned. If N is constant (e.g. always asking for the first 10 elements with COUNT), you can consider it O(1).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -16020,8 +15330,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XREVRANGE",
-   "since": "5.0.0",
-   "summary": "Returns the messages from a stream within a range of IDs in reverse order."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16059,7 +15368,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -16070,8 +15378,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XSETID",
-   "since": "5.0.0",
-   "summary": "An internal command for replicating stream values."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16145,7 +15452,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N), with N being the number of evicted entries. Constant times are very small however, since entries are organized in macro nodes containing multiple entries that can be released with a single deallocation.",
    "first_key": 1,
    "flags": [
     "write"
@@ -16154,8 +15460,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "XTRIM",
-   "since": "5.0.0",
-   "summary": "Deletes messages from the beginning of a stream."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16245,7 +15550,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)) for each item added, where N is the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -16256,8 +15560,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZADD",
-   "since": "1.2.0",
-   "summary": "Adds one or more members to a sorted set, or updates their scores. Creates the key if it doesn't exist."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -16274,7 +15577,6 @@
     }
    ],
    "arity": 2,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16284,8 +15586,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZCARD",
-   "since": "1.2.0",
-   "summary": "Returns the number of members in a sorted set."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -16312,7 +15613,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)) with N being the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16322,8 +15622,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZCOUNT",
-   "since": "2.0.0",
-   "summary": "Returns the count of members in a sorted set that have scores within a range."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -16353,7 +15652,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(L + (N-K)log(N)) worst case where L is the total number of elements in all the sets, N is the size of the first set, and K is the size of the result set.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -16363,8 +15661,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ZDIFF",
-   "since": "6.2.0",
-   "summary": "Returns the difference between multiple sorted sets."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -16393,7 +15690,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(L + (N-K)log(N)) worst case where L is the total number of elements in all the sets, N is the size of the first set, and K is the size of the result set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -16404,8 +15700,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZDIFFSTORE",
-   "since": "6.2.0",
-   "summary": "Stores the difference of multiple sorted sets in a key."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -16432,7 +15727,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)) where N is the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -16443,8 +15737,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZINCRBY",
-   "since": "1.2.0",
-   "summary": "Increments the score of a member in a sorted set."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -16508,7 +15801,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N*K)+O(M*log(M)) worst case with N being the smallest input sorted set, K being the number of input sorted sets and M being the number of elements in the resulting sorted set.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -16518,8 +15810,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ZINTER",
-   "since": "6.2.0",
-   "summary": "Returns the intersect of multiple sorted sets."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -16549,7 +15840,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N*K) worst case with N being the smallest input sorted set, K being the number of input sorted sets.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -16559,8 +15849,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ZINTERCARD",
-   "since": "7.0.0",
-   "summary": "Returns the number of members of the intersect of multiple sorted sets."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -16623,7 +15912,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N*K)+O(M*log(M)) worst case with N being the smallest input sorted set, K being the number of input sorted sets and M being the number of elements in the resulting sorted set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -16634,8 +15922,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZINTERSTORE",
-   "since": "2.0.0",
-   "summary": "Stores the intersect of multiple sorted sets in a key."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -16662,7 +15949,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)) with N being the number of elements in the sorted set.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16672,8 +15958,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZLEXCOUNT",
-   "since": "2.8.9",
-   "summary": "Returns the number of members in a sorted set within a lexicographical range."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -16721,7 +16006,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(K) + O(M*log(N)) where K is the number of provided keys, N being the number of elements in the sorted set, and M being the number of elements popped.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -16731,8 +16015,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ZMPOP",
-   "since": "7.0.0",
-   "summary": "Returns the highest- or lowest-scoring members from one or more sorted sets after removing them. Deletes the sorted set if the last member was popped."
+   "since": "7.0.0"
   },
   {
    "acl": [
@@ -16755,7 +16038,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N) where N is the number of members being requested.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16765,8 +16047,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZMSCORE",
-   "since": "6.2.0",
-   "summary": "Returns the score of one or more members in a sorted set."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -16789,7 +16070,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(log(N)*M) with N being the number of elements in the sorted set, and M being the number of elements popped.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16799,8 +16079,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZPOPMAX",
-   "since": "5.0.0",
-   "summary": "Returns the highest-scoring members from a sorted set after removing them. Deletes the sorted set if the last member was popped."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16823,7 +16102,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(log(N)*M) with N being the number of elements in the sorted set, and M being the number of elements popped.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -16833,8 +16111,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZPOPMIN",
-   "since": "5.0.0",
-   "summary": "Returns the lowest-scoring members from a sorted set after removing them. Deletes the sorted set if the last member was popped."
+   "since": "5.0.0"
   },
   {
    "acl": [
@@ -16870,7 +16147,6 @@
     }
    ],
    "arity": -2,
-   "complexity": "O(N) where N is the number of members returned",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -16879,8 +16155,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZRANDMEMBER",
-   "since": "6.2.0",
-   "summary": "Returns one or more random members from a sorted set."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -16961,7 +16236,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -16970,8 +16244,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZRANGE",
-   "since": "1.2.0",
-   "summary": "Returns members in a sorted set within a range of indexes."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -17016,7 +16289,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17025,8 +16297,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZRANGEBYLEX",
-   "since": "2.8.9",
-   "summary": "Returns members in a sorted set within a lexicographical range."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -17079,7 +16350,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17088,8 +16358,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZRANGEBYSCORE",
-   "since": "1.0.5",
-   "summary": "Returns members in a sorted set within a range of scores."
+   "since": "1.0.5"
   },
   {
    "acl": [
@@ -17166,7 +16435,6 @@
     }
    ],
    "arity": -5,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements stored into the destination key.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -17176,8 +16444,7 @@
    "key_step": 1,
    "last_key": 2,
    "name": "ZRANGESTORE",
-   "since": "6.2.0",
-   "summary": "Stores a range of members from sorted set in a key."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -17206,7 +16473,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(log(N))",
    "first_key": 1,
    "flags": [
     "fast",
@@ -17216,8 +16482,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZRANK",
-   "since": "2.0.0",
-   "summary": "Returns the index of a member in a sorted set ordered by ascending scores."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -17240,7 +16505,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(M*log(N)) with N being the number of elements in the sorted set and M the number of elements to be removed.",
    "first_key": 1,
    "flags": [
     "fast",
@@ -17250,8 +16514,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREM",
-   "since": "1.2.0",
-   "summary": "Removes one or more members from a sorted set. Deletes the sorted set if all members were removed."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -17278,7 +16541,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements removed by the operation.",
    "first_key": 1,
    "flags": [
     "write"
@@ -17287,8 +16549,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREMRANGEBYLEX",
-   "since": "2.8.9",
-   "summary": "Removes members in a sorted set within a lexicographical range. Deletes the sorted set if all members were removed."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -17315,7 +16576,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements removed by the operation.",
    "first_key": 1,
    "flags": [
     "write"
@@ -17324,8 +16584,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREMRANGEBYRANK",
-   "since": "2.0.0",
-   "summary": "Removes members in a sorted set within a range of indexes. Deletes the sorted set if all members were removed."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -17352,7 +16611,6 @@
     }
    ],
    "arity": 4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements removed by the operation.",
    "first_key": 1,
    "flags": [
     "write"
@@ -17361,8 +16619,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREMRANGEBYSCORE",
-   "since": "1.2.0",
-   "summary": "Removes members in a sorted set within a range of scores. Deletes the sorted set if all members were removed."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -17396,7 +16653,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements returned.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17405,8 +16661,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREVRANGE",
-   "since": "1.2.0",
-   "summary": "Returns members in a sorted set within a range of indexes in reverse order."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -17451,7 +16706,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17460,8 +16714,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREVRANGEBYLEX",
-   "since": "2.8.9",
-   "summary": "Returns members in a sorted set within a lexicographical range in reverse order."
+   "since": "2.8.9"
   },
   {
    "acl": [
@@ -17513,7 +16766,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(log(N)+M) with N being the number of elements in the sorted set and M the number of elements being returned. If M is constant (e.g. always asking for the first 10 elements with LIMIT), you can consider it O(log(N)).",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17522,8 +16774,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREVRANGEBYSCORE",
-   "since": "2.2.0",
-   "summary": "Returns members in a sorted set within a range of scores in reverse order."
+   "since": "2.2.0"
   },
   {
    "acl": [
@@ -17552,7 +16803,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(log(N))",
    "first_key": 1,
    "flags": [
     "fast",
@@ -17562,8 +16812,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZREVRANK",
-   "since": "2.0.0",
-   "summary": "Returns the index of a member in a sorted set ordered by descending scores."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -17599,7 +16848,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(1) for every call. O(N) for a complete iteration, including enough command calls for the cursor to return back to 0. N is the number of elements inside the collection.",
    "first_key": 1,
    "flags": [
     "readonly"
@@ -17608,8 +16856,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZSCAN",
-   "since": "2.8.0",
-   "summary": "Iterates over members and scores of a sorted set."
+   "since": "2.8.0"
   },
   {
    "acl": [
@@ -17631,7 +16878,6 @@
     }
    ],
    "arity": 3,
-   "complexity": "O(1)",
    "first_key": 1,
    "flags": [
     "fast",
@@ -17641,8 +16887,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZSCORE",
-   "since": "1.2.0",
-   "summary": "Returns the score of a member in a sorted set."
+   "since": "1.2.0"
   },
   {
    "acl": [
@@ -17706,7 +16951,6 @@
     }
    ],
    "arity": -3,
-   "complexity": "O(N)+O(M*log(M)) with N being the sum of the sizes of the input sorted sets, and M being the number of elements in the resulting sorted set.",
    "first_key": 0,
    "flags": [
     "movablekeys",
@@ -17716,8 +16960,7 @@
    "key_step": 0,
    "last_key": 0,
    "name": "ZUNION",
-   "since": "6.2.0",
-   "summary": "Returns the union of multiple sorted sets."
+   "since": "6.2.0"
   },
   {
    "acl": [
@@ -17780,7 +17023,6 @@
     }
    ],
    "arity": -4,
-   "complexity": "O(N)+O(M log(M)) with N being the sum of the sizes of the input sorted sets, and M being the number of elements in the resulting sorted set.",
    "first_key": 1,
    "flags": [
     "denyoom",
@@ -17791,8 +17033,7 @@
    "key_step": 1,
    "last_key": 1,
    "name": "ZUNIONSTORE",
-   "since": "2.0.0",
-   "summary": "Stores the union of multiple sorted sets in a key."
+   "since": "2.0.0"
   },
   {
    "acl": [
@@ -18461,7 +17702,7 @@
   }
  ],
  "provenance": {
-  "captured_utc": "2026-09-16T04:59:04Z",
+  "captured_utc": "2026-09-16T07:09:14Z",
   "family": "redis",
   "image": "redis@sha256:ae471bdc20de180beed36e347d170ec0bdf8faa327959ea1f24692f22b05b955",
   "line": "8.0",

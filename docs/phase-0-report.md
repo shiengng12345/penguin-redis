@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 44 |
+| PASS | 45 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 17 |
+| IN-PROGRESS | 16 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -126,7 +126,7 @@
 |---|---|---|---|
 | V-I01 | PASS | `compatibility/manifest.toml` · CI job `manifest-pinned` | 5 服务器 target 全部 digest 固定；无 `latest`；gate 脚本强制 |
 | V-I02 | PASS | `fixtures/catalog/valkey-diff/`（`diff.md` + `summary.txt`）· `crates/pr-catalog/src/diff.rs` 10 tests · `tests/grammar_table.rs` 2 tests · `xtask catalog-diff` · `ci/check-catalog-snapshots.sh` 门禁 | 分歧是**记录**下来的，不是抹平的：呈现并集等于告诉 Valkey 用户 `HEXPIRE` 存在，呈现交集等于对 Redis 用户隐藏它——两者都在回答用户没问的问题。四类差异按「忽略了会坏什么」分节：缺失命令（建议会被服务器拒绝）、参数差异（建议形状不对）、`since` 差异（把选项推给太老的服务器）、**效果差异（在错误的分类上做策略判断）**——最后一类是这项属于 Phase 0 而非文档任务的原因。实测 577 vs 379，362 条完全一致，Redis-only 207（含 183 个捆绑模块 + HEXPIRE 族 + 向量集），Valkey-only 9，参数差异 8 条（`SET IFEQ`、`BGSAVE CANCEL`、`CLIENT KILL PRIMARY`、`CLIENT LIST` 多出 6 个过滤器、`CLUSTER SETSLOT TIMEOUT`…），**效果差异 0**。fixture 由 CI 重新生成并 diff，改手写的内容会被拦下 |
-| V-I03 | IN-PROGRESS | — | |
+| V-I03 | PASS | `crates/pr-catalog/LICENSES.md`（逐来源结论表）· `docs/adr/ADR-023.md` · `LICENSE-MIT` + `LICENSE-APACHE` · `crates/prc/tests/licence.rs` 6 tests · `crates/pr-catalog/tests/grammar_table.rs` 2 tests | 审查先回答了一个更基本的问题：**二进制里嵌的到底是什么**。`COMMAND DOCS` 的回复里有两类性质完全不同的东西——接口结构（命令名、arity、flags、ACL 分类、key spec、参数树、`since`、`group`）与上游撰写的散文（`summary`、`complexity`，占 16%）。前者取自 digest-pinned 服务器的**运行时回复**而非上游源文件，任何人跑一次服务器都能复现（CI 每次都在逐字节复现）；后者是别人写的英文。**结论：散文从快照里整体移除**——`ci/catalog-normalise.py` 归一化阶段丢弃，`snapshot.rs` 的 schema 里没有这两个字段，而因为那些 struct 是 `deny_unknown_fields`，将来某次抓取若重新带上它们会**加载失败**而不是悄悄分发没人审过许可的文本。快照体积 343 KB → 286 KB。Redis `src/commands/*.json` 与文档站（CC-BY-SA-4.0）**从未取用**，避开后者是刻意的——它的 copyleft 会传染到我们自己写的说明。命令说明改由本仓独立撰写（§13 要的本来就是给卡在提示符前的人看的文字，不是参考手册的一句话），落点 `descriptions.rs`（Phase 2）；在它存在之前 `CommandSpec::summary` 为空字符串，**明显缺失而非悄悄借用**。`prc` 自身许可定为 **`MIT OR Apache-2.0`**：Rust 生态事实标准，企业法务例行放行，而 AGPL 常被明确禁止——一个开发者 CLI 被法务禁用等于没人用。**代价明说**：这不给 Penguin Studio 任何商业保护，任何人可闭源分发。决定**可逆且刻意做成一处改动**（workspace `license` 字段 + 两个 LICENSE 文件），项目未发布任何二进制、未上 crates.io，Phase 7 之前更换无需任何外部同意。**未做而记下的**：「接口结构 vs 散文」的划分是工程判断不是法律意见，发布前需人工法务确认，已列入发布门禁，不阻塞 Phase 1 |
 | V-I04 | PASS | `compatibility/redis-cli-modes.toml`（20 modes）· `compatibility/redis-cli-8.0.6-help.txt` · `crates/pr-application/tests/cli_modes.rs` 12 tests | §28.4 明说理由：「名称与详细 flags 由该 baseline 的 help/source 生成登记」——凭记忆写的清单会悄悄漏掉没人想到的那个模式，而漏掉只在用户真去跑它、发现没有时才暴露。inventory 从 digest-pinned 的 redis-cli 8.0.6 help 生成，help 原文一并入库，**双向**校验：清单里有而 baseline 没有的 flag 是「为不存在的东西定契约」；baseline 有而清单没有的是「没人决定过的兼容缺口」。`NOT_A_MODE` 显式列出而非用规则过滤——新 flag 会同时落在两边之外并让测试失败，而不是被某条恰好匹配的规则悄悄归类；**测试第一次跑就抓到 `-2`/`-3` 未分类**。发现两个 §28.4 未命名的模式：`--hotkeys`（属同一行，但多一个前提——只在 `maxmemory-policy` 为 LFU 时有效，必须说明而非返回空结果让人以为「没有热 key」）与 `--intrinsic-latency`（**不连服务器**，测本机调度延迟，§28.4 的 latency 行假设的是 INFO/PING 循环）。安全列逐条断言：`--rdb` / `--functions-rdb` / `--replica` / `--lru-test` prod+agent 双 deny；`--pipe` / `--eval` / `--ldb` / `--cluster` agent deny；`--ldb-sync-mode` 的策略必须与 `--ldb` 不同（它阻塞服务器，代价由其他客户端承担）；`-r` 的策略是乘法而非继承一次 |
 
 ## Track J · 契约冻结与 ADR
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | V-I03 → PASS（catalog 再分发结论 + `prc` 许可）；快照移除上游散文（343 KB → 286 KB），`license` 由占位符改为 `MIT OR Apache-2.0`；795 tests |
 | 2026-09-16 | V-I04 → PASS（`redis-cli` 特殊模式 inventory）；双向校验抓到未分类 flag 与两个 §28.4 未覆盖的模式；`ci/mark-phase0.py` 改为从文件读证据与备注（反引号曾被 shell 命令替换吃掉） |
 | 2026-09-16 | V-I04 → PASS（redis-cli 特殊模式 inventory）；双向校验抓到未分类 flag 与两个 §28.4 未覆盖的模式 |
 | 2026-09-16 | V-D04 → PASS（TrustIdentity 绑定 / 证书轮换窗口 / 边界外重定向）；补上 §21.3 要求但实现缺失的 sentinel 集合变更警告 |

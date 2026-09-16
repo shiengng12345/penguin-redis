@@ -552,7 +552,11 @@ pub fn compile_command(cmd: &RawCommand, family: Family) -> CommandSpec {
 
     CommandSpec {
         name: cmd.name.clone(),
-        summary: cmd.summary.clone().unwrap_or_default(),
+        // Empty on purpose: the snapshot carries no upstream prose (V-I03, ADR-023), and
+        // Penguin's own descriptions are written against the audience §13 describes rather
+        // than copied from a reference page. Until that table exists, a command has no
+        // summary — which is visibly missing rather than quietly borrowed.
+        summary: String::new(),
         effects,
         grammar,
         exclusive,

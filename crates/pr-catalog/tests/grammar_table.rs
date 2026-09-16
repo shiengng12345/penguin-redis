@@ -937,3 +937,59 @@ fn the_divergence_list_names_the_differences_that_actually_matter() {
         d.effects
     );
 }
+
+// ============================================================ V-I03: what the snapshot carries
+#[test]
+fn the_snapshot_carries_interface_structure_and_no_upstream_prose() {
+    // V-I03 / ADR-023. `COMMAND DOCS` replies with two kinds of thing: the interface — names,
+    // arity, flags, the argument tree — and English somebody wrote. Redistributing the
+    // structure of a published wire protocol is a different question from redistributing
+    // somebody's prose, and the way to keep them different is not to carry the prose.
+    let raw = std::str::from_utf8(REDIS_JSON).expect("utf-8");
+    assert!(
+        !raw.contains("\"summary\""),
+        "a summary field survived the capture"
+    );
+    assert!(
+        !raw.contains("\"complexity\""),
+        "a complexity note survived the capture"
+    );
+
+    // Sentences from the upstream documentation, which is what a summary is.
+    for phrase in [
+        "Sets the string value of a key",
+        "Returns the value of a key",
+        "Removes the specified keys",
+    ] {
+        assert!(
+            !raw.contains(phrase),
+            "upstream prose is still in the snapshot: {phrase}"
+        );
+    }
+
+    // And the structure that *is* carried is intact, so this is a removal rather than a loss.
+    let r = redis();
+    let set = spec(&r, "SET");
+    assert!(!set.grammar.keywords().is_empty());
+    assert_eq!(
+        set.since.as_deref(),
+        Some("1.0.0"),
+        "version data is structure"
+    );
+    assert_eq!(set.group, "string");
+    assert!(set.effects.writes_data);
+}
+
+#[test]
+fn a_compiled_command_has_no_borrowed_description() {
+    // The slot exists; it is Penguin's to fill (§13). Empty is the honest state — visibly
+    // missing rather than quietly borrowed.
+    for c in redis().iter().take(50) {
+        assert!(
+            c.summary.is_empty(),
+            "{} has a summary from somewhere: {:?}",
+            c.name,
+            c.summary
+        );
+    }
+}
