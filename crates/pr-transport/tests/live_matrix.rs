@@ -20,6 +20,7 @@
 //! | `tested = ["RESP2", "RESP3"]` | `live_resp3_is_available` |
 //! | redis 7.2 is "pre-Hash-field-TTL; no HSCAN NOVALUES" | `live_hash_field_ttl_matches_the_line` |
 //! | 7.4 "introduces HSCAN NOVALUES and Hash field TTL" | the same test, from the other side |
+//! | valkey 8.x has NOVALUES but **not** hash-field TTL | both tests, which is how that was found |
 //! | the family is redis or valkey | `live_the_family_is_what_the_matrix_says` |
 //!
 //! ## Skipping
@@ -170,9 +171,15 @@ fn live_hash_field_ttl_matches_the_line() {
     let Some(t) = target() else {
         return skipped("live_hash_field_ttl_matches_the_line");
     };
-    // The manifest says 7.2 is "pre-Hash-field-TTL" and 7.4 "introduces … Hash field TTL".
-    // Those are the sentences under test.
-    let expected = !t.line.starts_with("7.2");
+    // The manifest says redis 7.2 is "pre-Hash-field-TTL" and 7.4 "introduces … Hash field
+    // TTL". Those are the sentences under test — **for redis**.
+    //
+    // valkey 8.0 and 8.1 do not have it. They are forked from redis 7.2.4 and have not taken
+    // the 7.4 hash-TTL family, so a version-number rule ("anything after 7.2") is wrong for
+    // them and this test said so on its first real run against valkey. That is the matrix
+    // earning its keep: the fact is now in `compatibility/manifest.toml` and in the Valkey
+    // diff rather than in somebody's head.
+    let expected = t.family == "redis" && !t.line.starts_with("7.2");
     let mut c = connect();
     let key = format!("live:hfttl:{}", std::process::id());
     c.call(&argv(&["DEL", &key])).expect("DEL");
@@ -204,6 +211,10 @@ fn live_hscan_novalues_matches_the_line() {
     // ADR-019 turns this into a behaviour difference the product has to handle: without
     // NOVALUES, field discovery either drags every value across the network or stops. Which
     // side of the line a target is on is therefore a compatibility claim, not trivia.
+    //
+    // valkey **does** have this one, on both 8.0 and 8.1 — measured, not assumed, and worth
+    // stating next to the hash-TTL case above: the two features arrived together in redis 7.4
+    // and valkey took one of them. A rule that groups them would be wrong.
     let expected = !t.line.starts_with("7.2");
     let mut c = connect();
     let key = format!("live:novalues:{}", std::process::id());

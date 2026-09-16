@@ -376,8 +376,12 @@ pub mod delivery {
         //! It does exactly one thing — an atomic add — and returns. Anything else (locking,
         //! allocating, printing) can deadlock against a thread the console has just suspended.
 
-        use windows_sys::Win32::Foundation::{BOOL, FALSE, TRUE};
+        // `BOOL` is `windows_sys::core::BOOL`, not `Win32::Foundation::BOOL` — `TRUE` and
+        // `FALSE` live under `Foundation` but the type they are does not, and importing it
+        // from the obvious place compiles nowhere but fails only on Windows.
+        use windows_sys::Win32::Foundation::{FALSE, TRUE};
         use windows_sys::Win32::System::Console::SetConsoleCtrlHandler;
+        use windows_sys::core::BOOL;
 
         /// SAFETY: called by the console on its own thread. The body touches one `AtomicU32`
         /// and nothing else, so it is safe to run at any point in any other thread's execution.
