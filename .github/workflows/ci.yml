@@ -130,12 +130,16 @@ jobs:
             if docker exec target valkey-cli PING 2>/dev/null | grep -q PONG; then break; fi
             sleep 1
           done
+      # No `--no-tests=pass`. Until `crates/pr-transport/tests/live_matrix.rs` existed, this
+      # filter matched nothing and that flag turned "nothing ran" into a pass: seven targets,
+      # seven green badges, seven containers started and thrown away. An empty selection here
+      # means the matrix has stopped testing the thing it exists for, and must be a failure.
       - name: integration tests against live server
         env:
           PENGUIN_TEST_REDIS: redis://127.0.0.1:6379
           PENGUIN_TEST_FAMILY: ${{ matrix.family }}
           PENGUIN_TEST_LINE: ${{ matrix.line }}
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/live_/)' --no-tests=pass
+        run: cargo nextest run --workspace --no-fail-fast -E 'test(/live_/)'
       - name: server log on failure
         if: failure()
         run: docker logs target
@@ -166,7 +170,9 @@ jobs:
       - name: topology tests
         env:
           PENGUIN_TEST_TOPOLOGY: ${{ matrix.topology }}
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/topology_/)' --no-tests=pass
+        # No `--no-tests=pass` here either: this filter matches eight tests today, and the
+        # flag's only remaining effect would be to turn their deletion into a pass.
+        run: cargo nextest run --workspace --no-fail-fast -E 'test(/topology_/)'
       - name: tear down
         if: always()
         run: ./ci/topology/${{ matrix.topology }}-down.sh || true
@@ -256,8 +262,21 @@ jobs:
       # dependency fails here rather than in a release.
       - name: redis-rs stays a dev-dependency (ADR-031)
         run: ./ci/check-redis-rs-is-dev-only.sh
-      - name: security test suite
-        run: cargo nextest run --workspace --no-fail-fast -E 'test(/security_|secret_|injection_|approval_/)' --no-tests=pass
+      # Named test targets, not a name filter. The filter this replaces --
+      # `test(/security_|secret_|injection_|approval_/)` with `--no-tests=pass` -- matched
+      # exactly one test in the whole workspace, and it was a parser test for the shape of a
+      # secret reference. Every actual security suite is in a file whose *functions* are named
+      # after what they assert, which is right, and which made the filter select almost nothing
+      # while the job stayed green and said "safety".
+      #
+      # A missing target is an error here, so a suite that gets renamed or deleted fails the
+      # job instead of quietly leaving it.
+      - name: security test suites
+        run: |
+          cargo test -p pr-security --test approval --test trust_binding --test threat_model
+          cargo test -p pr-render --test safetext_boundary
+          cargo test -p pr-mcp --test approval_boundary
+          cargo test -p prc --test secret_paths
 
   # ---------------------------------------------------------------- Differential gate
   differential:
