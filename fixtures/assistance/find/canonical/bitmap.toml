@@ -12,6 +12,7 @@ phrases = [
   "数一数位图里有多少个 1",
   "count the set bits in a string",
   "统计置位的数量",
+  "数一数这个位图里有多少个 1 被置上了",
 ]
 
 [[case]]
@@ -20,6 +21,7 @@ phrases = [
   "在字符串里按位操作多个整数",
   "treat a string as an array of packed integers",
   "位域方式读写紧凑的数字",
+  "several counters of custom width packed into a single string",
 ]
 
 [[case]]
@@ -28,6 +30,8 @@ phrases = [
   "只读地按位读取整数",
   "read packed integers without writing",
   "位域只读访问",
+  "位域的只读版本，从库上也可以执行",
+  "位域的只读版，从库上也可以跑",
 ]
 
 [[case]]

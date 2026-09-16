@@ -44,6 +44,7 @@ phrases = [
   "查哈希字段什么时候过期",
   "when a hash field will expire, as a timestamp",
   "看字段的过期时间点",
+  "what wall clock second will this field expire at",
 ]
 
 [[case]]
@@ -132,6 +133,7 @@ phrases = [
   "去掉哈希字段的过期时间",
   "remove the expiry from a hash field",
   "让 hash 字段不再自动过期",
+  "cancel the expiry so the field stays forever",
 ]
 
 [[case]]
@@ -220,6 +222,7 @@ phrases = [
   "查哈希字段还剩多久过期",
   "remaining seconds before a hash field expires",
   "hash 字段的剩余存活时间",
+  "how many seconds are remaining before that field expires",
 ]
 
 [[case]]
@@ -228,4 +231,5 @@ phrases = [
   "列出哈希的所有字段值",
   "list every value in a hash",
   "只要 hash 的值不要字段名",
+  "pull every value out and skip the names",
 ]

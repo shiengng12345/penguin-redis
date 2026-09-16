@@ -12,6 +12,7 @@ phrases = [
   "记录一个地点的经纬度",
   "add a location with its coordinates",
   "把坐标存进去",
+  "record a location point so proximity lookups can find it later",
 ]
 
 [[case]]
@@ -20,6 +21,7 @@ phrases = [
   "算两个地点之间的距离",
   "how far apart two stored locations are",
   "这两个点相隔多远",
+  "how far apart are these two members",
 ]
 
 [[case]]
@@ -28,6 +30,7 @@ phrases = [
   "取地点的 geohash 字符串",
   "geohash string for a stored location",
   "把坐标编码成短字符串",
+  "turn a stored point into a compact location string",
 ]
 
 [[case]]
@@ -36,6 +39,7 @@ phrases = [
   "取出某个地点的经纬度",
   "read the coordinates of a member",
   "查这个点在哪",
+  "give me back the latitude and longitude of a member",
 ]
 
 [[case]]
@@ -44,6 +48,7 @@ phrases = [
   "按半径搜索附近的地点",
   "find members within a radius of a point",
   "以某个坐标为中心找附近",
+  "which stored points sit within five km of here",
 ]
 
 [[case]]
@@ -52,6 +57,7 @@ phrases = [
   "以某个成员为中心搜附近",
   "find members near an existing member",
   "以已存的点为圆心找周边",
+  "the older neighbour lookup anchored on an existing member",
 ]
 
 [[case]]
@@ -60,6 +66,8 @@ phrases = [
   "只读地以成员为中心搜附近",
   "read-only radius search around a member",
   "以成员为中心搜索且不写入",
+  "replica safe neighbour lookup anchored on an existing member",
+  "从库上查某成员周边，绝对不带写操作",
 ]
 
 [[case]]
@@ -76,6 +84,8 @@ phrases = [
   "搜索某个范围内的地点",
   "find members within a radius or box",
   "附近有哪些点",
+  "find the points inside a box or a circle around here",
+  "an area lookup by box or by circle, with sorting",
 ]
 
 [[case]]
@@ -84,4 +94,7 @@ phrases = [
   "把范围搜索结果存起来",
   "store the result of a geo search",
   "搜附近并把结果写到新 key",
+  "run that proximity query and save the result somewhere",
+  "persist the result of an area query into another key",
+  "范围查询出来的结果直接落成新 key 存着",
 ]

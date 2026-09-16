@@ -12,6 +12,7 @@ phrases = [
   "往基数估计器里加元素",
   "add elements to a HyperLogLog",
   "用很小的空间记下见过哪些值",
+  "feed values into a cheap unique counter that only approximates",
 ]
 
 [[case]]
@@ -20,6 +21,7 @@ phrases = [
   "估算有多少个不重复的值",
   "estimate the number of distinct elements",
   "近似去重计数",
+  "今天的 UV 估个大概数就行",
 ]
 
 [[case]]

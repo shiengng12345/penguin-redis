@@ -1242,7 +1242,7 @@ pub static TERMS: &[Term] = &[
     },
     Term {
         text: "record",
-        concepts: &["hash", "field"],
+        concepts: &["member"],
     },
     Term {
         text: "remove",
@@ -1590,7 +1590,7 @@ pub static TERMS: &[Term] = &[
     },
     Term {
         text: "item",
-        concepts: &["field", "member"],
+        concepts: &["member"],
     },
     Term {
         text: "left",
@@ -3904,6 +3904,662 @@ pub static TERMS: &[Term] = &[
         text: "项",
         concepts: &["field"],
     },
+    Term {
+        text: "assign",
+        concepts: &["set-value"],
+    },
+    Term {
+        text: "overwriting",
+        concepts: &["set-value"],
+    },
+    Term {
+        text: "overwrit",
+        concepts: &["set-value"],
+    },
+    Term {
+        text: "赋一个值",
+        concepts: &["set-value", "string"],
+    },
+    Term {
+        text: "赋值",
+        concepts: &["set-value", "string"],
+    },
+    Term {
+        text: "look up",
+        concepts: &["read-value"],
+    },
+    Term {
+        text: "stored under",
+        concepts: &["read-value"],
+    },
+    Term {
+        text: "读出",
+        concepts: &["read-value"],
+    },
+    Term {
+        text: "存着的",
+        concepts: &["read-value"],
+    },
+    Term {
+        text: "atomically",
+        concepts: &["atomic"],
+    },
+    Term {
+        text: "take the key away",
+        concepts: &["delete"],
+    },
+    Term {
+        text: "hand back",
+        concepts: &["read-value"],
+    },
+    Term {
+        text: "replace the value",
+        concepts: &["set-value"],
+    },
+    Term {
+        text: "subtract",
+        concepts: &["decrement"],
+    },
+    Term {
+        text: "a given amount",
+        concepts: &["number"],
+    },
+    Term {
+        text: "floating point",
+        concepts: &["float"],
+    },
+    Term {
+        text: "delta",
+        concepts: &["number"],
+    },
+    Term {
+        text: "is absent",
+        concepts: &["set-if-absent"],
+    },
+    Term {
+        text: "multi-key",
+        concepts: &["multiple"],
+    },
+    Term {
+        text: "only if none",
+        concepts: &["set-if-absent"],
+    },
+    Term {
+        text: "keep adding",
+        concepts: &["append"],
+    },
+    Term {
+        text: "superseded",
+        concepts: &["deprecated"],
+    },
+    Term {
+        text: "starting at an offset",
+        concepts: &["offset"],
+    },
+    Term {
+        text: "pairs",
+        concepts: &["multiple"],
+    },
+    Term {
+        text: "middle part",
+        concepts: &["substring"],
+    },
+    Term {
+        text: "add one",
+        concepts: &["increment"],
+    },
+    Term {
+        text: "numeric value",
+        concepts: &["number"],
+    },
+    Term {
+        text: "knock",
+        concepts: &["decrement"],
+    },
+    Term {
+        text: "down by one",
+        concepts: &["decrement"],
+    },
+    Term {
+        text: "wipe",
+        concepts: &["delete"],
+    },
+    Term {
+        text: "out of the database",
+        concepts: &["database"],
+    },
+    Term {
+        text: "干掉",
+        concepts: &["delete"],
+    },
+    Term {
+        text: "background thread",
+        concepts: &["async"],
+    },
+    Term {
+        text: "free the memory",
+        concepts: &["memory", "async"],
+    },
+    Term {
+        text: "serialize",
+        concepts: &["serialise"],
+    },
+    Term {
+        text: "rebuilt later",
+        concepts: &["serialise"],
+    },
+    Term {
+        text: "recreate",
+        concepts: &["deserialise"],
+    },
+    Term {
+        text: "serialized payload",
+        concepts: &["deserialise"],
+    },
+    Term {
+        text: "unix time",
+        concepts: &["timestamp"],
+    },
+    Term {
+        text: "die at",
+        concepts: &["expire"],
+    },
+    Term {
+        text: "deadline",
+        concepts: &["timestamp"],
+    },
+    Term {
+        text: "按毫秒时间戳",
+        concepts: &["timestamp", "milliseconds"],
+    },
+    Term {
+        text: "定时删除",
+        concepts: &["expire"],
+    },
+    Term {
+        text: "absolute second",
+        concepts: &["timestamp"],
+    },
+    Term {
+        text: "permanent",
+        concepts: &["persist"],
+    },
+    Term {
+        text: "transfer",
+        concepts: &["migrate"],
+    },
+    Term {
+        text: "lfu",
+        concepts: &["frequency"],
+    },
+    Term {
+        text: "被访问得",
+        concepts: &["frequency"],
+    },
+    Term {
+        text: "没人读过",
+        concepts: &["idle"],
+    },
+    Term {
+        text: "多久没人",
+        concepts: &["idle"],
+    },
+    Term {
+        text: "arbitrary",
+        concepts: &["random"],
+    },
+    Term {
+        text: "pick an",
+        concepts: &["random"],
+    },
+    Term {
+        text: "change the name",
+        concepts: &["rename"],
+    },
+    Term {
+        text: "ranked output",
+        concepts: &["sort"],
+    },
+    Term {
+        text: "排好的",
+        concepts: &["sort"],
+    },
+    Term {
+        text: "不写回",
+        concepts: &["read-only"],
+    },
+    Term {
+        text: "refresh",
+        concepts: &["touch"],
+    },
+    Term {
+        text: "how recently",
+        concepts: &["idle", "touch"],
+    },
+    Term {
+        text: "lifetime",
+        concepts: &["ttl"],
+    },
+    Term {
+        text: "walk the",
+        concepts: &["iterate"],
+    },
+    Term {
+        text: "scored set",
+        concepts: &["sortedset"],
+    },
+    Term {
+        text: "scored",
+        concepts: &["sortedset"],
+    },
+    Term {
+        text: "排序集合",
+        concepts: &["sortedset"],
+    },
+    Term {
+        text: "打个分",
+        concepts: &["score"],
+    },
+    Term {
+        text: "combined",
+        concepts: &["union", "intersection"],
+    },
+    Term {
+        text: "between a min and a max",
+        concepts: &["range"],
+    },
+    Term {
+        text: "lies between",
+        concepts: &["range"],
+    },
+    Term {
+        text: "destination key",
+        concepts: &["store"],
+    },
+    Term {
+        text: "destination",
+        concepts: &["store"],
+    },
+    Term {
+        text: "写进新的 key",
+        concepts: &["store"],
+    },
+    Term {
+        text: "index positions",
+        concepts: &["rank"],
+    },
+    Term {
+        text: "裁掉名次",
+        concepts: &["rank"],
+    },
+    Term {
+        text: "counting down from",
+        concepts: &["reverse", "rank"],
+    },
+    Term {
+        text: "随机抽几个",
+        concepts: &["random"],
+    },
+    Term {
+        text: "lowest scoring",
+        concepts: &["score", "rank"],
+    },
+    Term {
+        text: "highest scoring",
+        concepts: &["score", "rank"],
+    },
+    Term {
+        text: "evict",
+        concepts: &["remove"],
+    },
+    Term {
+        text: "threshold",
+        concepts: &["range"],
+    },
+    Term {
+        text: "bounds",
+        concepts: &["range"],
+    },
+    Term {
+        text: "同分",
+        concepts: &["sortedset", "lexicographic"],
+    },
+    Term {
+        text: "字典区间",
+        concepts: &["lexicographic", "range"],
+    },
+    Term {
+        text: "shared members",
+        concepts: &["intersection", "union"],
+    },
+    Term {
+        text: "prepend",
+        concepts: &["push", "head"],
+    },
+    Term {
+        text: "newest",
+        concepts: &["head"],
+    },
+    Term {
+        text: "back end",
+        concepts: &["tail"],
+    },
+    Term {
+        text: "队尾",
+        concepts: &["tail"],
+    },
+    Term {
+        text: "just before",
+        concepts: &["insert"],
+    },
+    Term {
+        text: "前面插一条",
+        concepts: &["insert"],
+    },
+    Term {
+        text: "drop the rest",
+        concepts: &["trim"],
+    },
+    Term {
+        text: "handoff",
+        concepts: &["move"],
+    },
+    Term {
+        text: "the front one",
+        concepts: &["head"],
+    },
+    Term {
+        text: "broadcast",
+        concepts: &["publish"],
+    },
+    Term {
+        text: "listener",
+        concepts: &["subscribe"],
+    },
+    Term {
+        text: "wildcard",
+        concepts: &["pattern"],
+    },
+    Term {
+        text: "通配",
+        concepts: &["pattern"],
+    },
+    Term {
+        text: "leave the",
+        concepts: &["unsubscribe"],
+    },
+    Term {
+        text: "运行情况",
+        concepts: &["introspect"],
+    },
+    Term {
+        text: "ignore any duplicates",
+        concepts: &["set"],
+    },
+    Term {
+        text: "标签集合",
+        concepts: &["set"],
+    },
+    Term {
+        text: "丢进",
+        concepts: &["add-member"],
+    },
+    Term {
+        text: "draw a random",
+        concepts: &["random"],
+    },
+    Term {
+        text: "随机抽一个",
+        concepts: &["random"],
+    },
+    Term {
+        text: "queued up",
+        concepts: &["transaction"],
+    },
+    Term {
+        text: "run everything",
+        concepts: &["commit"],
+    },
+    Term {
+        text: "drop all",
+        concepts: &["cancel"],
+    },
+    Term {
+        text: "fail if",
+        concepts: &["optimistic-lock"],
+    },
+    Term {
+        text: "有多少个 1",
+        concepts: &["bit", "count"],
+    },
+    Term {
+        text: "custom width",
+        concepts: &["bit", "offset"],
+    },
+    Term {
+        text: "counters",
+        concepts: &["counter"],
+    },
+    Term {
+        text: "inside a box",
+        concepts: &["search", "radius"],
+    },
+    Term {
+        text: "a circle",
+        concepts: &["radius"],
+    },
+    Term {
+        text: "points",
+        concepts: &["location"],
+    },
+    Term {
+        text: "proximity",
+        concepts: &["search", "distance"],
+    },
+    Term {
+        text: "save the result",
+        concepts: &["store"],
+    },
+    Term {
+        text: "latitude",
+        concepts: &["location"],
+    },
+    Term {
+        text: "longitude",
+        concepts: &["location"],
+    },
+    Term {
+        text: "how far apart",
+        concepts: &["distance"],
+    },
+    Term {
+        text: "neighbour",
+        concepts: &["search", "radius"],
+    },
+    Term {
+        text: "anchored on",
+        concepts: &["radius"],
+    },
+    Term {
+        text: "remaining before",
+        concepts: &["ttl"],
+    },
+    Term {
+        text: "skip the names",
+        concepts: &["list-values"],
+    },
+    Term {
+        text: "cheap",
+        concepts: &["approximate"],
+    },
+    Term {
+        text: "unique counter",
+        concepts: &["cardinality"],
+    },
+    Term {
+        text: "UV",
+        concepts: &["cardinality", "approximate"],
+    },
+    Term {
+        text: "location point",
+        concepts: &["location"],
+    },
+    Term {
+        text: "point",
+        concepts: &["location"],
+    },
+    Term {
+        text: "proximity lookups",
+        concepts: &["search", "distance"],
+    },
+    Term {
+        text: "compact location string",
+        concepts: &["encoding", "location"],
+    },
+    Term {
+        text: "within",
+        concepts: &["radius"],
+    },
+    Term {
+        text: "km",
+        concepts: &["distance", "radius"],
+    },
+    Term {
+        text: "replica safe",
+        concepts: &["read-only"],
+    },
+    Term {
+        text: "safe",
+        concepts: &["read-only"],
+    },
+    Term {
+        text: "不带写操作",
+        concepts: &["read-only"],
+    },
+    Term {
+        text: "area lookup",
+        concepts: &["search", "radius"],
+    },
+    Term {
+        text: "area",
+        concepts: &["radius", "search"],
+    },
+    Term {
+        text: "area query",
+        concepts: &["search", "radius"],
+    },
+    Term {
+        text: "落成新 key",
+        concepts: &["store"],
+    },
+    Term {
+        text: "wall clock",
+        concepts: &["timestamp"],
+    },
+    Term {
+        text: "stays forever",
+        concepts: &["persist"],
+    },
+    Term {
+        text: "stays",
+        concepts: &["persist"],
+    },
+    Term {
+        text: "at position",
+        concepts: &["index"],
+    },
+    Term {
+        text: "head item",
+        concepts: &["head"],
+    },
+    Term {
+        text: "grab the head",
+        concepts: &["head", "pop"],
+    },
+    Term {
+        text: "最前面那条",
+        concepts: &["head"],
+    },
+    Term {
+        text: "最早进来",
+        concepts: &["tail"],
+    },
+    Term {
+        text: "highest-scoring",
+        concepts: &["score", "rank"],
+    },
+    Term {
+        text: "smallest-score",
+        concepts: &["score", "rank"],
+    },
+    Term {
+        text: "blocking while",
+        concepts: &["blocking"],
+    },
+    Term {
+        text: "highest score first",
+        concepts: &["reverse", "rank"],
+    },
+    Term {
+        text: "top ranked",
+        concepts: &["rank", "reverse"],
+    },
+    Term {
+        text: "从高往低",
+        concepts: &["reverse"],
+    },
+    Term {
+        text: "第一个非空",
+        concepts: &["multiple"],
+    },
+    Term {
+        text: "分数合并",
+        concepts: &["intersection", "score"],
+    },
+    Term {
+        text: "分数相加",
+        concepts: &["union", "score"],
+    },
+    Term {
+        text: "存到另一个 key",
+        concepts: &["store"],
+    },
+    Term {
+        text: "string-ordered",
+        concepts: &["lexicographic"],
+    },
+    Term {
+        text: "interval",
+        concepts: &["range"],
+    },
+    Term {
+        text: "不重复的访客",
+        concepts: &["cardinality", "member"],
+    },
+    Term {
+        text: "几点钟",
+        concepts: &["timestamp"],
+    },
+    Term {
+        text: "还有多久",
+        concepts: &["ttl"],
+    },
+    Term {
+        text: "optimistic lock",
+        concepts: &["optimistic-lock", "watch", "transaction"],
+    },
+    Term {
+        text: "乐观地锁住",
+        concepts: &["optimistic-lock", "watch", "transaction"],
+    },
+    Term {
+        text: "a few members",
+        concepts: &["member", "random"],
+    },
+    Term {
+        text: "without taking",
+        concepts: &["read-value"],
+    },
 ];
 
 /// What each command is for, most defining concept first.
@@ -4034,7 +4690,7 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "EXPIRETIME",
-        concepts: &["ttl", "timestamp", "key"],
+        concepts: &["ttl", "timestamp", "key", "read-value"],
     },
     Purpose {
         command: "GEOADD",
@@ -4153,7 +4809,14 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "HEXPIRETIME",
-        concepts: &["ttl", "field-ttl", "timestamp", "hash", "field"],
+        concepts: &[
+            "ttl",
+            "field-ttl",
+            "timestamp",
+            "hash",
+            "field",
+            "read-value",
+        ],
     },
     Purpose {
         command: "HGET",
@@ -4230,11 +4893,19 @@ pub static PURPOSES: &[Purpose] = &[
             "milliseconds",
             "hash",
             "field",
+            "read-value",
         ],
     },
     Purpose {
         command: "HPTTL",
-        concepts: &["ttl", "field-ttl", "milliseconds", "hash", "field"],
+        concepts: &[
+            "ttl",
+            "field-ttl",
+            "milliseconds",
+            "hash",
+            "field",
+            "read-value",
+        ],
     },
     Purpose {
         command: "HRANDFIELD",
@@ -4269,7 +4940,7 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "HTTL",
-        concepts: &["ttl", "field-ttl", "hash", "field"],
+        concepts: &["ttl", "field-ttl", "hash", "field", "read-value"],
     },
     Purpose {
         command: "HVALS",
@@ -4405,7 +5076,7 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "PEXPIRETIME",
-        concepts: &["ttl", "timestamp", "milliseconds", "key"],
+        concepts: &["ttl", "timestamp", "milliseconds", "key", "read-value"],
     },
     Purpose {
         command: "PFADD",
@@ -4447,7 +5118,7 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "PTTL",
-        concepts: &["ttl", "milliseconds", "key"],
+        concepts: &["ttl", "milliseconds", "key", "read-value"],
     },
     Purpose {
         command: "PUBLISH",
@@ -4665,7 +5336,7 @@ pub static PURPOSES: &[Purpose] = &[
     },
     Purpose {
         command: "TTL",
-        concepts: &["ttl", "seconds", "key"],
+        concepts: &["ttl", "seconds", "key", "read-value"],
     },
     Purpose {
         command: "TYPE",
@@ -4704,6 +5375,7 @@ pub static PURPOSES: &[Purpose] = &[
             "conditional",
             "member",
             "set-value",
+            "insert",
         ],
     },
     Purpose {
@@ -4896,4 +5568,25 @@ pub static IMPLIES: &[crate::find::Implication] = &[
     (&["set-value", "ttl"], "set-and-expire", false),
     (&["set-value", "ttl"], "expire", false),
     (&["read-value", "ttl"], "read-and-expire", false),
+    // Family implications: these say what a word *is about*, not what it does.
+    //
+    // A score belongs to a sorted set; there is nowhere else in Redis to put one. A field
+    // belongs to a hash, a channel to pub/sub, a queue is a list. Without these, 「按分数区间
+    // 取一段」 produced {range, score, substring} and no family at all, so `CONTAINERS` never
+    // engaged and `GETRANGE` — a string command that is genuinely about ranges — outranked every
+    // sorted-set answer. The family filter can only help when the query says which family it is
+    // in, and a person who says "score" has said so.
+    (&["score"], "sortedset", false),
+    (&["field"], "hash", false),
+    (&["channel"], "pubsub", false),
+    (&["queue"], "list", false),
+    // Removing a *key* is deleting it. `remove` and `delete` are deliberately different
+    // concepts — `SREM` removes a member, `DEL` deletes a key — but "remove keys from the
+    // database" is the second one said with the first one's verb, and it used to answer
+    // `MOVE`.
+    (&["remove", "key"], "delete", false),
+    // And the mirror image: "delete these members" is a removal, not a `DEL`.
+    (&["delete", "member"], "remove", false),
+    // "Remove and return the highest scoring member" is a pop said the long way round.
+    (&["remove", "read-value"], "pop", false),
 ];

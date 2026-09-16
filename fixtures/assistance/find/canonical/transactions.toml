@@ -20,6 +20,7 @@ phrases = [
   "提交事务里排队的命令",
   "execute the queued transaction",
   "把事务真正执行掉",
+  "run everything that was queued up in the block",
 ]
 
 [[case]]
@@ -36,6 +37,7 @@ phrases = [
   "取消对 key 的监视",
   "stop watching keys",
   "把之前的乐观锁解除",
+  "drop all the optimistic locks on watched keys",
 ]
 
 [[case]]
@@ -44,4 +46,6 @@ phrases = [
   "监视 key 做乐观锁",
   "watch keys for optimistic locking",
   "如果这个键被别人改了事务就失败",
+  "take an optimistic lock and fail if the key changes",
+  "一个 optimistic lock：乐观地锁住这个 key，被别人改了就失败",
 ]

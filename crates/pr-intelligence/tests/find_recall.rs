@@ -158,14 +158,21 @@ fn canonical_recall_meets_the_gate() {
 ///
 /// §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，防止泄漏）」. Kept rather than deleted so
 /// the extensions can be audited.
-const VOID_CORPORA: &[&str] = &["heldout-v1-void", "heldout-v2-void", "heldout-v3-void"];
+const VOID_CORPORA: &[&str] = &[
+    "heldout-v1-void",
+    "heldout-v2-void",
+    "heldout-v3-void",
+    // Written independently, measured once at 67.3% / 75.5%, then used to extend the
+    // vocabulary. Spent, and kept so the extension can be audited against it.
+    "heldout-independent-v1-void",
+];
 
 /// The floor for the void corpora, as a ratchet.
 ///
-/// Not §16.4's gate. The gate is 80%/90% and it is **not met**; see
-/// `heldout_recall_meets_the_independent_gate` below and ADR-034 for why that cannot be
-/// settled by writing another corpus. This floor exists so the number cannot quietly regress
-/// while the real gate waits for its input.
+/// Not §16.4's gate. Every corpus behind this number has been used to extend the vocabulary,
+/// so it measures retention, not generalisation. The gate itself is
+/// `heldout_recall_meets_the_independent_gate`, and it can only ever be read from a corpus
+/// that has not yet been through this door.
 const HELDOUT_FLOOR_TOP3: f64 = 70.0;
 /// The same, for top-5.
 const HELDOUT_FLOOR_TOP5: f64 = 75.0;
@@ -511,7 +518,7 @@ fn search_never_returns_a_command_outside_the_published_scope() {
 /// edit changes it, and a diff that changes both this constant and the held-out numbers in the
 /// same commit is visible for what it is — tuning against the held-out set, which is the one
 /// thing the second corpus exists to prevent.
-const VOCABULARY_SEAL: &str = "0aa2bd415cc87fbaf4f177b54959785a";
+const VOCABULARY_SEAL: &str = "cc708ddf7166cc3481e5e2286d9ac46c";
 
 #[test]
 fn the_vocabulary_is_sealed_against_the_corpora_that_built_it() {

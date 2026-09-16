@@ -28,6 +28,8 @@ phrases = [
   "阻塞等待弹出分数最低的",
   "block until a lowest-score member can be popped",
   "没有就等着，有了取最小分",
+  "block until the lowest scoring member turns up",
+  "consume the smallest-score item, blocking while it is empty",
 ]
 
 [[case]]
@@ -36,6 +38,8 @@ phrases = [
   "往有序集合里加带分数的成员",
   "add a member with a score to a sorted set",
   "给排行榜加一条带分数的记录",
+  "insert a member into a scored set, updating it if present",
+  "给每个成员打个分，放进一个排序集合里",
 ]
 
 [[case]]
@@ -44,6 +48,7 @@ phrases = [
   "有序集合里有多少个成员",
   "how many members a sorted set has",
   "排行榜一共几个人",
+  "how many members are in the scored set",
 ]
 
 [[case]]
@@ -60,6 +65,7 @@ phrases = [
   "求有序集合的差集",
   "members of the first sorted set not in the others",
   "在这个 zset 里但不在那个里的",
+  "members in the first scored set that the others do not have",
 ]
 
 [[case]]
@@ -68,6 +74,7 @@ phrases = [
   "把有序集合差集存起来",
   "store the difference of sorted sets",
   "算 zset 差集并保存",
+  "算出差集，再把结果写进新的 key 里",
 ]
 
 [[case]]
@@ -84,6 +91,8 @@ phrases = [
   "求有序集合的交集",
   "members present in every sorted set",
   "几个 zset 共有的成员",
+  "common members across scored sets with their scores combined",
+  "几个排行榜都出现的成员，分数合并之后返回",
 ]
 
 [[case]]
@@ -116,6 +125,7 @@ phrases = [
   "从多个有序集合中弹出",
   "pop from the first sorted set that has members",
   "同时看几个排行榜谁有就取谁",
+  "在一组 key 里挑第一个非空的，弹出若干条",
 ]
 
 [[case]]
@@ -132,6 +142,8 @@ phrases = [
   "弹出分数最高的成员",
   "pop the member with the highest score",
   "取走分数最大的那个",
+  "remove and return the highest scoring member",
+  "remove and return the highest-scoring member of the set",
 ]
 
 [[case]]
@@ -148,6 +160,8 @@ phrases = [
   "从有序集合里随机取成员",
   "pick a random member of a sorted set",
   "随便抽一个排行榜成员",
+  "sample a few members without removing them",
+  "随机抽几个成员出来但不删",
 ]
 
 [[case]]
@@ -164,6 +178,8 @@ phrases = [
   "按字典序区间取成员",
   "read members within a lexicographic range",
   "按名字排序取一段",
+  "members sliced alphabetically within two string bounds",
+  "同分的情况下按字典区间取一段",
 ]
 
 [[case]]
@@ -172,6 +188,7 @@ phrases = [
   "按分数区间取成员",
   "read members whose score is in a range",
   "取分数在某段之间的人",
+  "entries whose score lies between a min and a max",
 ]
 
 [[case]]
@@ -180,6 +197,8 @@ phrases = [
   "把区间查询的结果存成新 key",
   "store a sorted set range into another key",
   "取一段排行榜并保存下来",
+  "copy that slice of the range into a destination key",
+  "取出的那一段直接存到另一个 key 里",
 ]
 
 [[case]]
@@ -204,6 +223,7 @@ phrases = [
   "按字典序区间删掉成员",
   "remove members in a lexicographic range",
   "字典序范围内的都删掉",
+  "purge the members inside a string-ordered interval",
 ]
 
 [[case]]
@@ -212,6 +232,8 @@ phrases = [
   "按名次区间删掉成员",
   "remove members by rank range",
   "删掉排名第几到第几的",
+  "trim the leaderboard down by index positions",
+  "裁掉名次靠后的一批，只留前面几名",
 ]
 
 [[case]]
@@ -220,6 +242,7 @@ phrases = [
   "按分数区间删掉成员",
   "remove members whose score is in a range",
   "删掉分数在这段的成员",
+  "evict every entry under a score threshold",
 ]
 
 [[case]]
@@ -228,6 +251,7 @@ phrases = [
   "倒序取出有序集合的一段",
   "read a range of a sorted set in reverse",
   "从高到低取排行榜",
+  "the top ranked slice, highest score first",
 ]
 
 [[case]]
@@ -244,6 +268,7 @@ phrases = [
   "按分数区间倒序取成员",
   "read members in a score range, highest first",
   "分数区间内从高到低列出",
+  "按分数从高往低取出一个区间",
 ]
 
 [[case]]
@@ -252,6 +277,7 @@ phrases = [
   "倒序查某个成员排第几",
   "the rank of a member counting from the top",
   "从高到低算这个人第几",
+  "a member's place counting down from the top score",
 ]
 
 [[case]]
@@ -276,6 +302,8 @@ phrases = [
   "求有序集合的并集",
   "all members across several sorted sets",
   "把几个 zset 合并",
+  "merge several scored sets, adding the scores of shared members",
+  "多个有序集合合并，同名成员的分数相加",
 ]
 
 [[case]]

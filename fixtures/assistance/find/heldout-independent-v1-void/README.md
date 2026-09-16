@@ -1,4 +1,4 @@
-# 独立 held-out 语料 · 第一轮（V-F08，§16.4）
+# 独立 held-out 语料 · 第一轮 —— **已作废**（V-F08，§16.4）
 
 ## 它是谁写的
 
@@ -50,3 +50,50 @@ miss 的形状很清楚，分两类：
 
 按 §16.4 的回退条款：**扩词表 → 本集作废 → 换一批新撰写人再测**。作废后本目录移到
 `../heldout-independent-v1-void/`，本文件连同数字一起跟过去。
+
+
+---
+
+## 作废（本轮结束）
+
+按 §16.4 的回退条款，这份语料的 miss 被用来扩词表，因此它**不再是 held-out**，移到本目录并
+进入 `VOID_CORPORA` 的回归护栏。它留在仓库里而不是被删掉：删掉之后，词表会看起来一直就认识
+那些词，扩表过程也就无法审计。
+
+扩表之后在**同一份（已失去 held-out 身份的）语料**上的数字，仅供对照，不是任何门槛：
+
+| 指标 | 首次接触（扩表前） | 扩表后 |
+|---|---:|---:|
+| top-3 | 67.3% | 86.5% |
+| top-5 | 75.5% | 92.3% |
+
+同期 canonical 从 97.8% 变为 95.3%（扩表时新增的 95 + 29 条 canonical 表述本身更难，门槛 95% 仍然满足）。
+
+扩了什么，按这份语料的 miss 形状分三类：
+
+1. **词表缺词**（约 160 个新词条）：`assign` / `overwriting` / 「赋一个值」、`look up` /
+   「读出」、`wipe` / 「干掉」、`serialize` / `recreate` / `serialized payload`、`unix time` /
+   `wall clock` / 「几点钟」、`permanent` / `stays forever`、`prepend` / `back end` / 「队尾」、
+   `subtract`、`destination key`、`scored set` / 「排序集合」、`broadcast` / `wildcard`、
+   `replica` / 「从库」、`area` / `within` / `proximity` / `latitude`、`lfu` / 「没人读过」……
+   每一个都同时在 canonical 里加了一条用它的表述——词表条目必须在语料里真实出现过，这是
+   `every_vocabulary_term_occurs_in_a_corpus_that_built_it` 强制的。
+
+2. **家族蕴含**（新增 4 条 implication）：`score → sortedset`、`field → hash`、
+   `channel → pubsub`、`queue → list`。这些说的是一个词**属于哪一族**，不是它做什么。
+   没有它们，「按分数区间取一段」产出 {range, score, substring} 而没有族，`CONTAINERS` 从不生效，
+   于是 `GETRANGE`（一个确实关于 range 的 string 命令）压过了所有有序集合的答案。
+
+3. **概念标注错误**（3 个词条改指向 + 2 条 implication + 8 个命令补概念）：
+   - `item` / `items` / `record` 原本指向 `field`。加上 `field → hash` 之后，每一个列表问题都
+     被送进哈希族——"read whatever item sits at position five" 的答案是 `HGET`。它们现在指向
+     `member`。
+   - `remove + key → delete`、`delete + member → remove`：`DEL` 与 `SREM` 是两个概念，
+     但「remove keys from the database」是用前者的动词说后者的事，它原本答 `MOVE`。
+   - `remove + read-value → pop`：「remove and return the highest scoring member」是把 pop
+     绕着说了一遍。
+   - `EXPIRETIME` / `PTTL` / `HTTL` 等八个**读取**过期时间的命令补上 `read-value`：
+     没有它，每一个「这个 key 几点过期」都输给了**设置**那个时间的命令。
+
+**下一轮**：`../heldout-independent/` 会换成一批新撰写人写的语料（新的语域设定），
+在**不动词表**的前提下测一次。那一次的数字才是 §16.4 的门槛可以读的。

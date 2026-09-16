@@ -20,6 +20,7 @@ phrases = [
   "往频道发一条消息",
   "publish a message to a channel",
   "广播给所有订阅者",
+  "broadcast an event out to every listener",
 ]
 
 [[case]]
@@ -28,6 +29,7 @@ phrases = [
   "查看发布订阅的状态",
   "inspect the pub/sub subsystem",
   "看看订阅情况",
+  "查看广播系统当前的运行情况",
 ]
 
 [[case]]
@@ -36,6 +38,7 @@ phrases = [
   "列出当前有人订阅的频道",
   "list channels with at least one subscriber",
   "现在哪些频道是活的",
+  "list the channels that currently have listeners",
 ]
 
 [[case]]
@@ -44,6 +47,7 @@ phrases = [
   "查有多少个模式订阅",
   "how many pattern subscriptions exist",
   "通配符订阅的数量",
+  "how many wildcard pattern subscriptions are active",
 ]
 
 [[case]]
@@ -76,6 +80,7 @@ phrases = [
   "取消按模式的订阅",
   "stop listening to a channel pattern",
   "退掉通配符订阅",
+  "通配频道不想再收了",
 ]
 
 [[case]]
@@ -108,6 +113,7 @@ phrases = [
   "取消分片频道订阅",
   "stop listening to a shard channel",
   "退掉分片订阅",
+  "leave the shard channel that was joined earlier",
 ]
 
 [[case]]

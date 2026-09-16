@@ -20,6 +20,9 @@ phrases = [
   "删掉一个 key",
   "delete a key",
   "把这个键从库里去掉",
+  "wipe these keys out of the database",
+  "这几个 key 直接干掉，不要了",
+  "remove these keys from the database entirely",
 ]
 
 [[case]]
@@ -28,6 +31,7 @@ phrases = [
   "把 key 序列化导出",
   "serialise a key's value into a blob",
   "导出这个键的二进制表示",
+  "serialize this value so that it can be rebuilt later from the bytes",
 ]
 
 [[case]]
@@ -52,6 +56,7 @@ phrases = [
   "让 key 在某个时间点过期",
   "expire a key at a unix timestamp",
   "指定绝对时间让键失效",
+  "have the key die at a given unix time",
 ]
 
 [[case]]
@@ -60,6 +65,8 @@ phrases = [
   "查 key 的过期时间点",
   "the unix timestamp at which a key expires",
   "这个键什么时候到期",
+  "what absolute second will this key vanish at",
+  "这个 key 具体几点钟会没",
 ]
 
 [[case]]
@@ -77,6 +84,7 @@ phrases = [
   "move a key to another Redis instance",
   "跨实例搬运键",
   "migrate a key to another node",
+  "transfer one key over to another redis instance",
 ]
 
 [[case]]
@@ -109,6 +117,8 @@ phrases = [
   "查 key 的访问频率计数",
   "access frequency counter of a key",
   "LFU 淘汰用的频率值",
+  "how often has this key been accessed under lfu",
+  "lfu 模式下这个 key 被访问得频不频繁",
 ]
 
 [[case]]
@@ -117,6 +127,8 @@ phrases = [
   "查 key 多久没被访问了",
   "how long a key has been idle",
   "这个键闲置了多久",
+  "how long since anyone read this key",
+  "看看这个 key 已经有多久没人读过了",
 ]
 
 [[case]]
@@ -133,6 +145,7 @@ phrases = [
   "去掉 key 的过期时间",
   "remove the expiry from a key",
   "让这个键不再自动过期",
+  "make this key permanent, with no expiry any more",
 ]
 
 [[case]]
@@ -149,6 +162,8 @@ phrases = [
   "用毫秒时间戳设定 key 过期",
   "expire a key at a millisecond timestamp",
   "按毫秒时间点让键消失",
+  "delete it at a millisecond unix deadline",
+  "按毫秒时间戳定时删除这个 key",
 ]
 
 [[case]]
@@ -173,6 +188,7 @@ phrases = [
   "随便取一个 key",
   "return a random key from the database",
   "随机看看库里有什么键",
+  "pick an arbitrary key out of the db",
 ]
 
 [[case]]
@@ -181,6 +197,7 @@ phrases = [
   "给 key 改名",
   "rename a key",
   "把键换个名字",
+  "change the name of an existing key",
 ]
 
 [[case]]
@@ -197,6 +214,7 @@ phrases = [
   "从序列化数据恢复 key",
   "restore a key from a serialised blob",
   "把导出的数据再写回去",
+  "recreate the key out of a serialized payload",
 ]
 
 [[case]]
@@ -206,6 +224,7 @@ phrases = [
   "iterate over the keyspace a page at a time",
   "游标方式扫 key 不阻塞",
   "scan through keys without blocking the server",
+  "walk the keyspace a page at a time",
 ]
 
 [[case]]
@@ -222,6 +241,8 @@ phrases = [
   "只读地对集合排序",
   "sort a collection without writing anything",
   "排序但保证不写入",
+  "ranked output only, the kind a replica will accept",
+  "只要排好的结果，不写回，从库上也能跑",
 ]
 
 [[case]]
@@ -230,6 +251,7 @@ phrases = [
   "碰一下 key 更新它的访问时间",
   "update the last access time of keys",
   "刷新键的空闲计时",
+  "refresh how recently these keys were used",
 ]
 
 [[case]]
@@ -239,6 +261,8 @@ phrases = [
   "how many seconds until a key expires",
   "这个键还能活多久",
   "how long is the ttl left on this key",
+  "how much lifetime is left on this key",
+  "这个 key 还有多久才过期",
 ]
 
 [[case]]
@@ -255,6 +279,7 @@ phrases = [
   "异步删除 key 不阻塞",
   "delete a key without blocking the server",
   "后台回收内存的删除方式",
+  "free the memory on a background thread instead of now",
 ]
 
 [[case]]

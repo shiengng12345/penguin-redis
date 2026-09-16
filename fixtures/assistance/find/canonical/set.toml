@@ -12,6 +12,8 @@ phrases = [
   "往集合里加成员",
   "add a member to a set",
   "把元素放进 set",
+  "record a value once and ignore any duplicates",
+  "丢进一个会自动去重的标签集合",
 ]
 
 [[case]]
@@ -20,6 +22,7 @@ phrases = [
   "数一数集合有几个成员",
   "how many members a set has",
   "集合的大小",
+  "今天有多少个不重复的访客",
 ]
 
 [[case]]
@@ -100,6 +103,8 @@ phrases = [
   "从集合里随机弹出成员",
   "pop a random member out of a set",
   "随机取走一个并删掉",
+  "draw a random winner and take them out",
+  "随机抽一个成员出来并顺手移走",
 ]
 
 [[case]]
@@ -108,6 +113,8 @@ phrases = [
   "从集合里随机看一个成员",
   "pick a random member without removing it",
   "随便看一个但不删",
+  "peek at a few members without taking any out",
+  "look at a few members without taking any of them out",
 ]
 
 [[case]]

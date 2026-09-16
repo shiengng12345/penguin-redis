@@ -12,6 +12,7 @@ phrases = [
   "在字符串末尾追加内容",
   "append text to the end of a string",
   "往已有的值后面接一段",
+  "keep adding onto the end of an existing value",
 ]
 
 [[case]]
@@ -20,6 +21,7 @@ phrases = [
   "把计数器减一",
   "decrement a counter by one",
   "让这个数字自减",
+  "knock a number down by one on every request",
 ]
 
 [[case]]
@@ -28,6 +30,7 @@ phrases = [
   "给计数器减去指定的数",
   "decrement a number by a given amount",
   "数值减掉某个量",
+  "subtract a given amount off the stored integer",
 ]
 
 [[case]]
@@ -36,6 +39,8 @@ phrases = [
   "读取一个 key 的字符串值",
   "read the string value of a key",
   "取出某个 key 存的内容",
+  "look up the value stored under a key",
+  "读出这个 key 里存着的内容",
 ]
 
 [[case]]
@@ -44,6 +49,7 @@ phrases = [
   "取出值的同时把 key 删掉",
   "read a value and delete the key atomically",
   "读完就删，一步完成",
+  "read it once and take the key away atomically",
 ]
 
 [[case]]
@@ -60,6 +66,7 @@ phrases = [
   "按下标取字符串的一段",
   "read a byte range out of a string",
   "从第几个字符取到第几个",
+  "take the middle part of a stored string",
 ]
 
 [[case]]
@@ -68,6 +75,7 @@ phrases = [
   "取旧值并写入新值",
   "replace a value and return the old one",
   "换成新值但要拿回原来的",
+  "replace the value and hand back what was there",
 ]
 
 [[case]]
@@ -76,6 +84,7 @@ phrases = [
   "把计数器加一",
   "increment a counter by one",
   "让这个数字自增",
+  "add one to a numeric value, atomically",
 ]
 
 [[case]]
@@ -92,6 +101,7 @@ phrases = [
   "给数值加上一个小数",
   "increment a number by a floating point amount",
   "按浮点数增加余额",
+  "add a floating point delta to the number",
 ]
 
 [[case]]
@@ -116,6 +126,7 @@ phrases = [
   "一次写入多个 key",
   "set several keys in one request",
   "批量设置多个键值对",
+  "write several key and value pairs in one go",
 ]
 
 [[case]]
@@ -124,6 +135,7 @@ phrases = [
   "批量写入但只在全都不存在时",
   "set several keys only if none of them exist",
   "多个 key 一起写，有一个存在就整体放弃",
+  "a multi-key write that happens only if none of them exist",
 ]
 
 [[case]]
@@ -132,6 +144,7 @@ phrases = [
   "写入字符串并按毫秒设置过期",
   "set a string with a millisecond expiry",
   "以毫秒为单位设置带过期的值",
+  "set it with a timeout expressed in milliseconds",
 ]
 
 [[case]]
@@ -140,6 +153,8 @@ phrases = [
   "设置一个 key 的字符串值",
   "store a string value under a key",
   "把某个 key 写成指定内容",
+  "assign a value to a key, overwriting whatever was there",
+  "给 key 赋一个值，覆盖原来的内容",
 ]
 
 [[case]]
@@ -156,6 +171,7 @@ phrases = [
   "只在 key 不存在时才写入",
   "set a key only if it does not already exist",
   "不存在才设置，存在就别动",
+  "write it only if the key is absent already",
 ]
 
 [[case]]
@@ -164,6 +180,7 @@ phrases = [
   "从指定位置改写字符串的一段",
   "overwrite part of a string at an offset",
   "在某个偏移量上覆盖一段内容",
+  "overwrite part of the value starting at an offset",
 ]
 
 [[case]]
@@ -180,4 +197,5 @@ phrases = [
   "取字符串的一段",
   "read part of a string by offset",
   "截取值的某个片段",
+  "the legacy substring call, superseded by the range one",
 ]
