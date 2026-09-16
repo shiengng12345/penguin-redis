@@ -73,8 +73,9 @@ pub enum RenderStatus {
     },
 }
 
-/// Opaque handle into the bounded result store.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+/// Opaque handle into the bounded result store. `Copy`, because it is a bare id and passing
+/// it around must never look like transferring ownership of the result.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ResponseHandle(pub u64);
 
 /// Local diagnostic identifier (never a server string).

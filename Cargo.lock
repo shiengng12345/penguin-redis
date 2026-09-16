@@ -497,6 +497,11 @@ version = "0.0.0"
 [[package]]
 name = "pr-catalog"
 version = "0.0.0"
+dependencies = [
+ "pr-core",
+ "serde",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-core"
@@ -583,6 +588,10 @@ dependencies = [
 [[package]]
 name = "pr-results"
 version = "0.0.0"
+dependencies = [
+ "pr-core",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-routing"

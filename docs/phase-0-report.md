@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 22 |
+| PASS | 24 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 40 |
+| IN-PROGRESS | 38 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -70,7 +70,7 @@
 | V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
 | V-D05 | IN-PROGRESS | — | |
 | V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
-| V-D07 | IN-PROGRESS | — | |
+| V-D07 | PASS | `crates/pr-catalog/src/precedence.rs` · 10 tests | 本地 catalog 是 effects 唯一权威；服务器谎称 write 为 readonly 时分类不变、仅标 `server reports`；未分类命令即使服务器说 readonly 仍算 mutating |
 | V-D08 | IN-PROGRESS | — | |
 | V-D09 | IN-PROGRESS | — | |
 
@@ -80,7 +80,7 @@
 |---|---|---|---|
 | V-E01 | PASS | `crates/pr-json/` · 17 tests · `docs/spikes/SPIKE-004.md` | occurrence DOM；重复成员保留+`#n` 寻址；数字词法逐字节保留；歧义路径拒绝；span 局部重写 |
 | V-E02 | PASS | `crates/pr-render/src/{table,width}.rs` · 43 tests | 每 field 横线、表头双线、JSON 在 cell 内不加内部横线；宽度采样后冻结；窄屏改纵向块不隐藏列；宽字符/ZWJ/组合字符帧对齐；SEC-05 控制字节不外泄 |
-| V-E03 | IN-PROGRESS | — | |
+| V-E03 | PASS | `crates/pr-results/src/store.rs` · 14 tests | 64 MiB/16 MiB 预算、oldest-first 淘汰；`Evicted`/`TooLarge`/`Unknown`/`ScopeExpired` 四种原因分开报；**§8.2 顺序**：已知长度且未开始输出才可询问，非 TTY 永不询问 |
 | V-E04 | IN-PROGRESS | — | |
 | V-E05 | PASS | `crates/pr-render/src/generic.rs` · 16 tests | 未知/模块结果走 generic RESP tree：double 保留词法、map 保序且保留重复 key、非 UTF-8 转义并报字节数、attribute 不丢弃、深度有界；任意 shape 不 panic（CMD-10/12、SEC-07） |
 
@@ -166,3 +166,4 @@
 | 2026-09-16 | V-E02 → PASS（TableModel + 显示宽度策略）；299 tests 全绿 |
 | 2026-09-16 | V-E05 / V-B04 → PASS（generic RESP 渲染、outcome 组合矩阵）；327 tests 全绿 |
 | 2026-09-16 | V-H06 / V-D06 → PASS（history 存储与按环境脱敏）；346 tests 全绿 |
+| 2026-09-16 | V-E03 / V-D07 → PASS（有界 result store、catalog 权威性）；370 tests 全绿 |
