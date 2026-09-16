@@ -894,6 +894,7 @@ dependencies = [
  "pr-core",
  "proptest",
  "thiserror 2.0.20",
+ "toml",
 ]
 
 [[package]]

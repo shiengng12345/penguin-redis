@@ -1,0 +1,139 @@
+# Trust boundaries and the acceptance cases that cover them (V-J03, v2.1 §23, §33).
+#
+# A "trust boundary" here means a place where data crosses from somewhere we do not control
+# into somewhere we do. Listing them is the cheap part; the point of this file is the
+# `cases` column, and the test in `crates/pr-security/tests/threat_model.rs` that refuses to
+# let a boundary exist without one.
+#
+# The rule the test enforces, in both directions:
+#   - every boundary names at least one SEC case
+#   - every SEC case is claimed by at least one boundary
+#
+# The second direction matters as much as the first. A SEC case nobody claims is a case that
+# passes without anyone knowing what it was protecting.
+
+schema_version = 1
+source = "v2.1 §23 (策略与安全), §33 (验收案例)"
+
+[[boundary]]
+id = "input"
+name = "what the user types"
+crosses = "a person's keystrokes into an argv the kernel will send"
+why = "A line the user typed is not a command until it has been through the same tokenizer the server would use. A client that splits arguments differently from `sdssplitargs` sends something the user did not write."
+cases = ["SEC-02", "SEC-10"]
+covered_by = ["crates/pr-repl/src/quoting.rs", "crates/pr-security/tests/approval.rs"]
+
+[[boundary]]
+id = "parser"
+name = "bytes off the wire"
+crosses = "server-chosen bytes into the decoder"
+why = "A length prefix is a number the server chose. A decoder that trusts it allocates what the server asks for, and a malformed frame becomes an out-of-memory kill or an infinite loop."
+cases = ["SEC-07"]
+covered_by = ["crates/pr-protocol/src/decoder.rs", "fixtures/protocol/"]
+
+[[boundary]]
+id = "config"
+name = "profile and configuration files"
+crosses = "a file on disk, possibly written by something else, into connection and policy decisions"
+why = "A profile decides where credentials are sent. One that can name an external program, or be edited by another process mid-read, decides more than it should."
+cases = ["SEC-04"]
+covered_by = ["crates/pr-profiles/src/journal.rs", "crates/pr-repl/src/local.rs"]
+
+[[boundary]]
+id = "connection"
+name = "who answered"
+crosses = "a TLS identity and a service identity into a decision to send a credential"
+why = "The address is chosen by DNS, by a failover, or by a `MOVED` the server sent. Binding a credential to an address means the server can move where the password goes."
+cases = ["SEC-05"]
+covered_by = ["crates/pr-security/src/trust.rs", "crates/pr-security/tests/trust_binding.rs"]
+
+[[boundary]]
+id = "errors"
+name = "error text from the server"
+crosses = "server-authored text into a terminal, a log and an exit path"
+why = "An error message carries whatever the server put in it, including the key name the user asked about. It reaches the screen at the moment the user is least likely to be reading carefully."
+cases = ["SEC-01", "SEC-05"]
+covered_by = ["crates/pr-core/src/safetext.rs", "crates/pr-render/tests/safetext_boundary.rs"]
+
+[[boundary]]
+id = "trace"
+name = "wire traces and debug output"
+crosses = "everything on the connection into a file the user may share"
+why = "A trace is the one artefact that contains the AUTH command. §23.4 puts it on the secret path for that reason."
+cases = ["SEC-01"]
+covered_by = ["crates/pr-application/src/output.rs", "crates/pr-profiles/src/credentials.rs"]
+
+[[boundary]]
+id = "history"
+name = "the command history file"
+crosses = "commands the user ran into a file that outlives the session"
+why = "History is read back by a later session and is often copied between machines. A password typed once is a password stored until somebody deletes the file."
+cases = ["SEC-01"]
+covered_by = ["crates/pr-repl/src/history.rs"]
+
+[[boundary]]
+id = "clipboard"
+name = "copy to the clipboard"
+crosses = "a value from the result store into every other application on the machine"
+why = "The clipboard is readable by anything running as the user. Copying is an export, and §23.4 treats it as one."
+cases = ["SEC-08"]
+covered_by = ["crates/pr-core/src/safetext.rs"]
+
+[[boundary]]
+id = "export"
+name = "writing results to a file"
+crosses = "server data onto the local filesystem"
+why = "An export decides where the data lands, and `--rdb -` makes a shell redirect decide it. Nothing should leave without the destination being shown."
+cases = ["SEC-08"]
+covered_by = ["compatibility/redis-cli-modes.toml", "crates/pr-application/tests/cli_modes.rs"]
+
+[[boundary]]
+id = "crash"
+name = "panics and crash reports"
+crosses = "in-memory state, including secrets, into a report or a core file"
+why = "A panic message is assembled from whatever was in scope. A crash path that formats a request formats its arguments."
+cases = ["SEC-07"]
+covered_by = ["crates/pr-core/src/safetext.rs", "crates/pr-profiles/src/credentials.rs"]
+
+[[boundary]]
+id = "suggestion"
+name = "what the assistance engine offers"
+crosses = "observed server data back into a command the user is about to run"
+why = "§23.7 calls this a new trust boundary, and it is the least obvious one: a completion menu built from key names the server returned is the server influencing what the user sends next."
+cases = ["SEC-06"]
+covered_by = [
+  "crates/pr-intelligence/tests/zero_send.rs",
+  "crates/pr-catalog/tests/grammar_table.rs",
+]
+
+[[boundary]]
+id = "metadata"
+name = "server-reported command metadata"
+crosses = "a server's claim about what a command does into a policy decision"
+why = "R19: a server that reports a write command as readonly would otherwise relax the guard that exists to protect against it."
+cases = ["SEC-11"]
+covered_by = ["crates/pr-catalog/src/precedence.rs"]
+
+[[boundary]]
+id = "plugin"
+name = "renderers and adapters"
+crosses = "third-party code into the render path"
+why = "A renderer that panics must not take the session with it, and must not cause the command to run twice on the way back."
+cases = ["SEC-07"]
+covered_by = ["crates/pr-render/src/generic.rs"]
+
+[[boundary]]
+id = "mcp"
+name = "an agent over MCP"
+crosses = "a request from a program into the same kernel a person uses"
+why = "§23.1: an agent cannot create its own approval. Every write, consuming read, admin or unclassified command needs a human-issued token, and a policy cannot issue one."
+cases = ["SEC-03", "SEC-06", "SEC-09"]
+covered_by = ["crates/pr-security/src/approval.rs", "crates/pr-application/src/pipe.rs"]
+
+[[boundary]]
+id = "pipe"
+name = "frames from --pipe stdin"
+crosses = "a byte stream, possibly generated by another program, into commands"
+why = "PIPE/SEC-09: a pipe is an argv the user never read. Policy has to apply frame by frame, and a refusal has to stop rather than skip."
+cases = ["SEC-09"]
+covered_by = ["crates/pr-application/src/pipe.rs"]

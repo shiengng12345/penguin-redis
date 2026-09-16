@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 46 |
+| PASS | 47 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 15 |
+| IN-PROGRESS | 14 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -135,7 +135,7 @@
 |---|---|---|---|
 | V-J01 | PASS | `docs/adr/ADR-001..030.md` + `README.md` | 30 条全部 accepted；ADR-023/026 的**结论**分别由 V-I03 / SPIKE-001 填入 |
 | V-J02 | IN-PROGRESS | — | 进行中：`pr-core`(SafeText/ExecutionOutcome/CommandRequest/TaskScope)、`pr-security`(TrustIdentity/ApprovalToken)、`pr-json`(JsonNode) 已冻结；`pr-intelligence`/`pr-repl` 待办 |
-| V-J03 | IN-PROGRESS | — | |
+| V-J03 | PASS | `docs/threat-model/boundaries.toml`（15 条边界的机器可读登记）+ `docs/threat-model/README.md`（给人读的说明）+ `crates/pr-security/tests/threat_model.rs`（8 个测试，全绿） | 15 条信任边界：input / parser / config / connection / errors / trace / history / clipboard / export / crash / suggestion / metadata / plugin / mcp / pipe（V-J03 点名 14 条，`pipe` 是补的）。每条带 `crosses`、`why`（>80 字符的真实理由）、`cases`（SEC-xx）与 `covered_by`（真实文件路径）。 「无未覆盖边界」不是写在文档里的一句话，而是被 8 个测试**双向**强制：(1) 每条边界至少有一个 SEC 用例；(2) **每个 SEC-01…SEC-11 都被某条边界认领**——没人认领的用例是一个「通过了但没人知道它在保护什么」的测试；(3) **每条 `covered_by` 引用的文件必须真实存在**——引用一个被改名的路径，等于一条已经悄悄变成假话的覆盖声明；(4) 每条 `why` 不得用复述自己的名字来解释自己。另有两条针对最容易漏的边界：`errors` 必须引用 `safetext`（§23.5 要求由**类型**而非约定来强制），`suggestion` 必须引用 `zero_send`（§23.7 称其为**新的**信任边界，因为它不像一条边界——补全菜单里的 key 名来自服务器，用户接受一条补全就是服务器在影响用户下一条发什么）。 `README.md` 明写了尚未覆盖的四项（SSH 隧道 V-G03、真实 TLS 握手 V-G04、L2 插件外部进程隔离 V-D09、MCP stdio 通道 V-D08），因为这些 V 项落地时 `no_sec_case_is_unclaimed` 不会提醒——它只检查已列出的用例。 |
 | V-J04 | IN-PROGRESS | — | |
 
 ## Meta
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-security --test threat_model` → 8 passed；`cargo clippy --workspace --all-targets -- -D warnings` → 干净；`cargo test --workspace` → 832 passed / 0 failed。 |
 | 2026-09-16 | V-E04 → PASS（JSON projection v1）；与 pinned `redis-cli --json` 实测 6 处差异入 manifest，其中 5 处是 baseline 的缺陷（错误回复不是合法 JSON、big number/attribute 解析不了、整数 key 被强转）；824 tests |
 | 2026-09-16 | V-I03 → PASS（catalog 再分发结论 + `prc` 许可）；快照移除上游散文（343 KB → 286 KB），`license` 由占位符改为 `MIT OR Apache-2.0`；795 tests |
 | 2026-09-16 | V-I04 → PASS（`redis-cli` 特殊模式 inventory）；双向校验抓到未分类 flag 与两个 §28.4 未覆盖的模式；`ci/mark-phase0.py` 改为从文件读证据与备注（反引号曾被 shell 命令替换吃掉） |
