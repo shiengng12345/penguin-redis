@@ -14,6 +14,7 @@ workspace = true
 [dependencies]
 pr-core = { path = "../pr-core" }
 pr-json = { path = "../pr-json" }
+pr-protocol = { path = "../pr-protocol" }
 bytes = { workspace = true }
 thiserror = { workspace = true }
 unicode-width = "0.2"

@@ -17,3 +17,6 @@ thiserror = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }
+pr-core = { path = "../pr-core" }
+resp-server = { path = "../../xtask/resp-server" }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }

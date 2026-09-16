@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 18 |
+| PASS | 20 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 44 |
+| IN-PROGRESS | 42 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -43,7 +43,7 @@
 | V-B01 | IN-PROGRESS | — | |
 | V-B02 | PASS | `crates/pr-protocol/` · 23 tests（含 316 样本 corpus 逐字节喂入） | 增量 RESP2/3 解码含 streamed；预算与协议错误分离；词法保真；bare-LF 即时报错 |
 | V-B03 | IN-PROGRESS | — | |
-| V-B04 | IN-PROGRESS | — | `pr-core::outcome` 四维度+退出码映射已实现并测试；待 V-A03 组合矩阵全量 |
+| V-B04 | PASS | `crates/pr-protocol/tests/outcome_matrix.rs` · 12 tests | 经真实 wire 字节驱动：截断回复/连接关闭/协议错误 → `UnknownAfterSend`；分片不改变结论；push 不占回复槽；全组合映射表 + 每个退出码可达性 |
 | V-B05 | PASS | `crates/pr-core/src/session.rs` · 18 tests | HELLO/AUTH/SELECT/RESET/MULTI/WATCH/CLIENT REPLY 状态机；`may_probe()` 在事务内与 reply-suppressed 时拒绝注入；断线返回 `ReconnectLosses` 且不静默恢复 |
 | V-B06 | IN-PROGRESS | — | |
 | V-B07 | PASS | `crates/prc/src/args.rs` · 17 tests | §3.2 顶层语法；§3.3 profile×flag 矩阵逐格用例；`-h` 恒为 host；输出模式互斥不做 last-wins |
@@ -82,7 +82,7 @@
 | V-E02 | PASS | `crates/pr-render/src/{table,width}.rs` · 43 tests | 每 field 横线、表头双线、JSON 在 cell 内不加内部横线；宽度采样后冻结；窄屏改纵向块不隐藏列；宽字符/ZWJ/组合字符帧对齐；SEC-05 控制字节不外泄 |
 | V-E03 | IN-PROGRESS | — | |
 | V-E04 | IN-PROGRESS | — | |
-| V-E05 | IN-PROGRESS | — | |
+| V-E05 | PASS | `crates/pr-render/src/generic.rs` · 16 tests | 未知/模块结果走 generic RESP tree：double 保留词法、map 保序且保留重复 key、非 UTF-8 转义并报字节数、attribute 不丢弃、深度有界；任意 shape 不 panic（CMD-10/12、SEC-07） |
 
 ## Track F · 智能输入引擎
 
@@ -164,3 +164,4 @@
 | 2026-09-16 | V-D02 → PASS（凭证 journal 与崩溃 reconciliation）；256 tests 全绿 |
 | 2026-09-16 | V-C06 → PASS（三主题 token + 量化降级）；测试暴露 mono/plain 语义混淆并分离；270 tests 全绿 |
 | 2026-09-16 | V-E02 → PASS（TableModel + 显示宽度策略）；299 tests 全绿 |
+| 2026-09-16 | V-E05 / V-B04 → PASS（generic RESP 渲染、outcome 组合矩阵）；327 tests 全绿 |

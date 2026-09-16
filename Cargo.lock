@@ -500,8 +500,11 @@ name = "pr-protocol"
 version = "0.0.0"
 dependencies = [
  "bytes",
+ "pr-core",
  "proptest",
+ "resp-server",
  "thiserror 2.0.20",
+ "tokio",
 ]
 
 [[package]]
@@ -511,6 +514,7 @@ dependencies = [
  "bytes",
  "pr-core",
  "pr-json",
+ "pr-protocol",
  "proptest",
  "thiserror 2.0.20",
  "unicode-width",
