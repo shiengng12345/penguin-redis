@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 4 |
+| PASS | 7 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 59 |
+| IN-PROGRESS | 56 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -29,12 +29,12 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-A01 | IN-PROGRESS | — | |
+| V-A01 | PASS | `xtask/pty-harness/` · 8 tests · portable-pty 0.9 | 统一 Unix PTY + Windows ConPTY；send/resize/bracketed-paste/wait_for；录制可回放且 golden 确定性 |
 | V-A02 | IN-PROGRESS | — | |
 | V-A03 | PASS | `xtask/resp-server/` · `fixtures/protocol/` (316 samples / 12 categories) · 15 tests | RESP2/3 encoder incl. streamed+push+attribute; scripted delivery; 1 GiB streamer; hostile corpus每类≥20 |
-| V-A04 | IN-PROGRESS | — | |
+| V-A04 | PASS | `xtask/src/fault.rs` · 8 tests | TCP 代理：客户端/服务端定点切断、blackhole、慢速、分片、单字节损坏、拒连；FS：只读/填充 |
 | V-A05 | IN-PROGRESS | — | CI workflow + 8 个 gate job 已写；**待首次 push 后确认三平台全绿** |
-| V-A06 | IN-PROGRESS | — | |
+| V-A06 | PASS | `xtask/src/measure.rs` · 8 tests · `cargo run -p xtask -- measure-baseline` | 计数 allocator（live/peak/calls）+ RSS 采样 + 预算表；heap 与 RSS 分列不混计 |
 
 ## Track B · 协议与执行内核
 
@@ -153,3 +153,4 @@
 | 2026-09-16 | 建立报告；workspace 骨架；环境记录 |
 | 2026-09-16 | V-A03 / V-I01 / V-J01 → PASS；pr-core + pr-security 契约冻结；CI workflow 与 4 个 gate 脚本落地 |
 | 2026-09-16 | V-E01 → PASS（pr-json occurrence DOM，SPIKE-004）；workspace 85 tests 全绿 |
+| 2026-09-16 | V-A01 / V-A04 / V-A06 → PASS（PTY harness、故障注入、资源测量）；111 tests 全绿 |

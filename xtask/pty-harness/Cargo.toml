@@ -1,0 +1,18 @@
+[package]
+name = "pty-harness"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Penguin Redis — V-A01 PTY harness: one driver for Unix PTY and Windows ConPTY, with record/replay"
+
+[lints]
+workspace = true
+
+[dependencies]
+portable-pty = "0.9"
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

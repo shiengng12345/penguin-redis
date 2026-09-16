@@ -6,9 +6,13 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — xtask"
+description = "Penguin Redis — xtask: V-A06 measurement and V-A04 fault injection harnesses"
 
 [lints]
 workspace = true
 
 [dependencies]
+tokio = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
