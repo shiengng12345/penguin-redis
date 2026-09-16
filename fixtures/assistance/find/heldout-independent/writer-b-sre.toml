@@ -1,0 +1,289 @@
+# Held-out natural-language phrasings, written from Redis knowledge only.
+# Voice: SRE typing into a client search box. 2 phrasings per command (zh, en).
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "把骑手的经纬度写进去存着",
+  "record a location point for later proximity lookups",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "算两个已存点之间隔了多远",
+  "how far apart are these two stored places",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "把坐标转成那种短的位置编码串",
+  "turn a saved point into a compact location string",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "反查某个成员当时存的经纬度",
+  "read back the latitude and longitude of a member",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "给定经纬度找方圆五公里内的点",
+  "which stored points sit within 5km of here",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "以已经存好的某个点为中心找周边",
+  "nearby entries around one existing member point",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "从库上查某成员周边，绝对不能带写操作",
+  "replica safe neighbour lookup anchored on a member",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "只读版按坐标查附近，不允许落结果",
+  "read only proximity query from a coordinate pair",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "按圆形或者矩形范围查附近并排序",
+  "area lookup by box or circle with sorting",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "把范围查询的结果直接落成新 key",
+  "persist an area query result into another key",
+]
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "把对象里某几个字段清掉",
+  "drop specific fields off an object key",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "判断这个字段在不在，不想取值",
+  "check whether a field is present at all",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "给单个字段设一个几秒后失效",
+  "let one field die after N seconds",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "让字段在指定的那个秒级时间点失效",
+  "field should expire at a unix timestamp in seconds",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "查字段到底哪个时间戳会没",
+  "what wall clock second will this field expire",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "取对象里某一个字段的值",
+  "read a single field out of an object",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "整个对象全部 dump 出来看",
+  "dump every field and value in one go",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "读完顺手把这个字段清掉，原子的",
+  "consume a field: read it and remove it atomically",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "取值的同时顺手把存活时间续上",
+  "fetch a value and refresh its lifetime together",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "对象里那个计数字段加个整数",
+  "bump an integer counter kept inside an object",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "在字段上累加带小数的金额",
+  "add a decimal amount onto an object field",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "只要字段名的列表，值不用",
+  "list the field names without pulling values",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "这个对象里到底有多少个字段",
+  "how many fields does this object hold",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "一次性批量取好几个字段，少几次 RTT",
+  "fetch several fields in one round trip",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "老代码里那种一次写多个字段的写法",
+  "legacy bulk write of field value pairs",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "过期设错了，想把字段的过期去掉",
+  "cancel the expiry so a field stays forever",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "字段毫秒级倒计时，几百毫秒就没",
+  "field lifetime counted down in milliseconds",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "按毫秒时间戳精确指定字段失效时刻",
+  "expire a field at an exact millisecond epoch",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "字段到期时间，精确到毫秒时间戳",
+  "absolute expiry instant of a field in milliseconds",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "这个 field 还剩多少毫秒",
+  "milliseconds left before this field vanishes",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "随便抽一个字段出来抽查一下",
+  "pick an arbitrary entry out for a spot check",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "大对象分批游标遍历，别阻塞主线程",
+  "iterate a huge object incrementally with a cursor",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "往对象里写字段和值",
+  "write field values into an object key",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "写字段的时候直接把存活时间带上",
+  "write a field and give it a lifetime in one shot",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "字段不存在才写，避免覆盖别人的",
+  "only write if that field is not already there",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "看某个字段的值有多长，怀疑存了大对象",
+  "byte length of one stored field value",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "这个 field 还剩多少秒过期",
+  "seconds remaining before a field expires",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "只要所有的值，字段名不用",
+  "pull every value and skip the names",
+]
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "把 uid 丢进去做省内存的去重计数",
+  "feed items into a cheap unique counter",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "估一下今天的 UV 大概多少",
+  "approximate distinct visitors without storing every id",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "把七天的去重结构合成一个再算",
+  "combine several cardinality sketches into a single one",
+]

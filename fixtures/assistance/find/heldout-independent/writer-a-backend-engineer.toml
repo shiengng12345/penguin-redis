@@ -1,0 +1,279 @@
+[[case]]
+command = "BITCOUNT"
+phrases = [
+  "统计这个 key 里有多少个 1",
+  "how many bits are set in this value",
+]
+
+[[case]]
+command = "BITFIELD"
+phrases = [
+  "在一个 string 里塞多个小整数并自增",
+  "pack several custom width counters into one value",
+]
+
+[[case]]
+command = "BITFIELD_RO"
+phrases = [
+  "只想读位域，从库上也能跑",
+  "fetch packed integers on a replica without writing",
+]
+
+[[case]]
+command = "BITOP"
+phrases = [
+  "两个 bitmap 做与或异或存成新 key",
+  "combine bitmaps with AND OR XOR",
+]
+
+[[case]]
+command = "BITPOS"
+phrases = [
+  "第一个为 1 的位在第几位",
+  "where is the first zero bit",
+]
+
+[[case]]
+command = "GETBIT"
+phrases = [
+  "看某一位到底是 0 还是 1",
+  "is the flag at position 7 on or off",
+]
+
+[[case]]
+command = "SETBIT"
+phrases = [
+  "把第 100 位置成 1",
+  "flip one bit on in a bitmap",
+]
+
+[[case]]
+command = "COPY"
+phrases = [
+  "把一个 key 原样克隆一份",
+  "duplicate a value under another name",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "把这几个 key 干掉",
+  "remove keys from the database",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "把 value 导出成二进制串备份",
+  "serialize a value so it can be rebuilt later",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "判断这个 key 在不在",
+  "check whether a key is there",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "让这个 key 60 秒后自动消失",
+  "set a timeout in seconds on a key",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "指定一个 unix 时间点让它过期",
+  "have a key die at a given unix time",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "这个 key 具体几点钟没",
+  "what absolute second will this key vanish",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "按 pattern 一次列出所有匹配的 key",
+  "list every key matching a glob pattern",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "把 key 搬到另一个实例上去",
+  "transfer a key to a different redis server",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "换到另一个 db 编号里去",
+  "shift a key into another database number",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "查 key 底层内部信息的那组命令",
+  "introspection subcommands for a stored value",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "这个 hash 底层是 listpack 还是 hashtable",
+  "which internal representation is this value using",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "lfu 模式下这个 key 被访问得有多频繁",
+  "access frequency counter used by lfu eviction",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "这个 key 多久没人读过了",
+  "how long since this key was last used",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "这个值被共享引用了几次",
+  "reference count of the shared value",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "别让它过期了，把超时去掉",
+  "make a key permanent again",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "毫秒级的超时怎么设",
+  "timeout in milliseconds on a key",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "按毫秒时间戳定时删除",
+  "delete at a millisecond unix deadline",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "过期时刻精确到毫秒是多少",
+  "the exact millisecond a key goes away",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "还剩多少毫秒就没了",
+  "milliseconds left before it is gone",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随便挑一个 key 出来看看",
+  "pick an arbitrary key from the db",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "给这个 key 改个名字",
+  "change a key's name",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "改名，但目标已存在就别覆盖",
+  "rename only if the new name is free",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "用之前导出的二进制把 key 建回来",
+  "recreate a key from a serialized payload",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "分批遍历 keyspace，不要阻塞线上",
+  "iterate the keyspace with a cursor",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "给 list 排个序，还能 by 别的 key",
+  "order the elements of a list or set",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "只要排好的结果，不写回，从库能执行",
+  "ranked output that a replica will accept",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "刷新几个 key 的最后访问时间",
+  "bump last access time without fetching values",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "这个 key 还有多久过期",
+  "seconds left before a key expires",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "这个 key 存的是什么结构",
+  "what kind of value is stored here",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "删大 key 不想卡住主线程",
+  "free keys in a background thread",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "等写入同步到 N 个副本再返回",
+  "block until replicas acknowledge my writes",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "确认刚才的写已经 fsync 落盘",
+  "wait for local and replica aof fsync",
+]

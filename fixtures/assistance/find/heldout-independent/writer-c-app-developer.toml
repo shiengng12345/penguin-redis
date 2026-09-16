@@ -1,0 +1,370 @@
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "等着把任务挪到处理中队列",
+  "block until I can hand a job to another queue",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "同时盯着好几个队列，哪个有货就取",
+  "wait across several queues and take from whichever fills first",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "队列空就挂着等最前面那条消息",
+  "wait for a job to show up at the front",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "阻塞等最早进来的那条任务",
+  "hang around until something lands at the tail",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "老写法：等任务并顺手存进备份队列",
+  "legacy blocking handoff from one queue tail into another head",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "看看待办里第三条是什么",
+  "read whatever item sits at position five",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "在某条记录前面插一条新的",
+  "squeeze an entry in right before an existing one",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "看队列现在积压了多少条",
+  "how many jobs are backlogged right now",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "把任务从待处理搬到处理中，不等待",
+  "shift one job between two queues in one shot",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "一次从多个队列里挑有内容的那个取",
+  "take from the first of several queues that has anything",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "拿走最前面那条，没有就直接返回空",
+  "grab the head item and return immediately",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "找某个元素在列表里排第几",
+  "find where a value sits inside the list",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "把新消息塞到队列最前面",
+  "prepend an entry so the newest shows first",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "只有这个队列已经存在才往前面加",
+  "prepend only if that list already exists",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "翻时间线最近二十条",
+  "read one page of the feed by range",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "把重复的那条任务从列表里删掉",
+  "delete entries matching a value from the list",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "把列表第几条的内容改掉",
+  "overwrite the item at a given slot",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "只保留最近一百条，老的丢掉",
+  "keep only the newest hundred entries and drop the rest",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "从队尾拿一条出来处理",
+  "take the item off the back end",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "旧版：把尾部任务转到另一个队列头部",
+  "older way to shuttle a task from tail into another head",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "把新任务追加到队列末尾排队",
+  "append a job so it gets served last",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "追加到尾部，但key不存在就算了",
+  "append at the tail but skip when the key is missing",
+]
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "按通配符一次订阅一批频道",
+  "listen to every channel matching a pattern",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "给聊天频道广播一条消息",
+  "broadcast an event out to all listeners",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "查看广播系统当前运行情况",
+  "inspect the state of the message fan-out",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "现在有人在听的频道有哪些",
+  "list channels that currently have listeners",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "通配订阅一共有多少个",
+  "count the wildcard subscriptions in use",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "这个频道现在有多少订阅者",
+  "how many clients are listening to this channel",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "集群分片上活跃的频道列表",
+  "which shard-local channels are active on this node",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "分片频道上有几个人在收",
+  "subscriber count for a shard-scoped channel",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "不再听那批通配频道了",
+  "stop following a wildcard group of channels",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "在集群分片内部发一条消息",
+  "send a message that stays on one cluster shard",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "订阅集群里分片作用域的频道",
+  "start listening on a shard-scoped channel",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "监听一个聊天频道的推送",
+  "start receiving pushes from a channel",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "退出之前加入的分片频道",
+  "leave the sharded channel I joined",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "取消监听某个频道",
+  "stop getting messages from a channel",
+]
+
+[[case]]
+command = "SADD"
+phrases = [
+  "把用户丢进去重的标签集合",
+  "record a value once and ignore duplicates",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "今天有多少个不重复访客",
+  "count the unique members in a bucket",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "在A里但不在B里的那批用户",
+  "who is in the first group but not the others",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "算出差集并存成新的key",
+  "save the difference of two groups into a key",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "两个人共同关注的好友",
+  "friends that both users have in common",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "只要重合的数量，不要名单",
+  "how many items overlap, with a cap",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "把交集结果存起来以后复用",
+  "persist the overlap of several groups",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "判断这个用户在不在黑名单里",
+  "check whether one value belongs to the group",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "把这个集合里所有人都列出来",
+  "dump every member of the collection",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "一次判断好几个用户在不在里面",
+  "check membership for a batch of values at once",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "把用户从待审组挪到已通过组",
+  "move one member across two groups atomically",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "随机抽一个中奖用户并移走",
+  "draw a random winner and remove them",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "随便看几个成员但不要删",
+  "sample random members without taking them out",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "把某个用户从这个标签里去掉",
+  "take a value back out of the group",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "大集合分批遍历，别卡住服务",
+  "iterate a huge group in small chunks",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "几个圈子的人合起来去重",
+  "merge several groups with duplicates removed",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "合并后的名单写到新key里",
+  "combine groups and write the result to a key",
+]

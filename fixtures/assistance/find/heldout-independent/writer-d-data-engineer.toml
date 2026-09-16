@@ -1,0 +1,433 @@
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "在多个有序集合上挂起等待，有了就弹一批",
+  "block across several scored sets until one has members",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "阻塞等待最高分的那个成员出现",
+  "wait for the top-scoring entry, then take it",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "优先队列取最小的一条，空了就挂着",
+  "consume smallest-score item, blocking when empty",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "给成员打个分放进排序集合",
+  "insert member with a score, update if present",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "这个排行榜一共多少个成员",
+  "number of members in a scored set",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "统计分数落在某个区间的成员个数",
+  "count entries whose score falls inside a window",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "第一个集合有、其他集合没有的成员",
+  "members present in the first scored set only",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "求差集之后把结果写进新的 key",
+  "subtract scored sets and persist the result",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给某个成员的分数加一个增量",
+  "bump one member's score by a delta",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "几个排行榜都出现的成员，分数合并返回",
+  "common members across scored sets with combined scores",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "只要交集的数量，不要具体成员",
+  "size of the overlap without materializing it",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "带权重求交集，结果落到目标 key",
+  "write weighted intersection into a destination key",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "同分情况下按字典区间数一数有多少",
+  "count members between two lexicographic bounds",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "从一组 key 里挑第一个非空的弹出若干",
+  "pop entries from the first non-empty scored set",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "一次查好几个成员各自的分数",
+  "fetch scores for a batch of members",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "取走分数最高的那条并删掉",
+  "remove and return the highest-scoring member",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "弹出分数最低的一条，同时移除",
+  "take off the lowest score entry",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "随机抽几个成员出来，不删除",
+  "sample random members without removing them",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "按名次取第几到第几名",
+  "slice members by rank position, low to high",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "同分集合按字典序取一段前缀范围",
+  "slice members alphabetically between two string bounds",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "按分数区间取一段，从低到高",
+  "entries whose score lies between min and max",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "取出的那一段直接存到另一个 key",
+  "copy a range slice into a destination key",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "某个成员排第几，从低分开始数",
+  "position of a member counting up from lowest",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "把指定成员从排序集合里删掉",
+  "delete named members from a scored set",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "按字典序区间批量清掉成员",
+  "purge members inside a string-ordered interval",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "裁掉名次靠后的一批，只留 top N",
+  "trim a leaderboard by index positions",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "清理分数小于某个时间戳的旧数据",
+  "evict entries below a score threshold",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "按名次倒序取前几名",
+  "top ranked slice, highest score first",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "字典序反着取一段，从大到小",
+  "reverse alphabetical slice between string bounds",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "分数从高往低取一个区间",
+  "score window returned high to low",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "这个成员在倒序榜里排第几",
+  "member's place counting down from the top score",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "用游标分批遍历成员和分数",
+  "cursor iterate member and score pairs",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "查一个成员当前的分数是多少",
+  "current score of a single member",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "多个集合合并，同名成员分数相加返回",
+  "merge scored sets, summing duplicate member scores",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "合并多个排行榜，结果写到新 key",
+  "aggregate a union into a destination key",
+]
+
+[[case]]
+command = "APPEND"
+phrases = [
+  "在原有字符串末尾追加内容",
+  "concatenate bytes onto an existing string value",
+]
+
+[[case]]
+command = "DECR"
+phrases = [
+  "计数器减一",
+  "decrement an integer counter by one",
+]
+
+[[case]]
+command = "DECRBY"
+phrases = [
+  "给整数值减去指定的数",
+  "subtract a given amount from a stored integer",
+]
+
+[[case]]
+command = "GET"
+phrases = [
+  "读出这个 key 存的值",
+  "read the value stored at a key",
+]
+
+[[case]]
+command = "GETDEL"
+phrases = [
+  "读一次就把这个 key 回收掉，原子的",
+  "read the value and remove the key atomically",
+]
+
+[[case]]
+command = "GETEX"
+phrases = [
+  "读值并顺手改一下过期时间",
+  "fetch a value while resetting its TTL",
+]
+
+[[case]]
+command = "GETRANGE"
+phrases = [
+  "按字节偏移截取字符串的一段",
+  "substring by start and end byte offsets",
+]
+
+[[case]]
+command = "GETSET"
+phrases = [
+  "写新值并把旧值拿回来",
+  "replace a value and return the previous one",
+]
+
+[[case]]
+command = "INCR"
+phrases = [
+  "自增一，用来做计数",
+  "atomically add one to a numeric value",
+]
+
+[[case]]
+command = "INCRBY"
+phrases = [
+  "计数器一次加上指定步长",
+  "increase a stored integer by a given step",
+]
+
+[[case]]
+command = "INCRBYFLOAT"
+phrases = [
+  "给数值加一个小数增量",
+  "add a floating point delta to a value",
+]
+
+[[case]]
+command = "LCS"
+phrases = [
+  "比较两个字符串最长公共的那部分",
+  "longest common subsequence between two values",
+]
+
+[[case]]
+command = "MGET"
+phrases = [
+  "一次性批量读多个 key",
+  "fetch many keys in a single round trip",
+]
+
+[[case]]
+command = "MSET"
+phrases = [
+  "一次写入多组键值",
+  "set several key value pairs at once",
+]
+
+[[case]]
+command = "MSETNX"
+phrases = [
+  "批量写入，只有全都不存在时才生效",
+  "multi-key write only if none already exist",
+]
+
+[[case]]
+command = "PSETEX"
+phrases = [
+  "写值并带上毫秒级存活时间",
+  "store a value with a millisecond expiry",
+]
+
+[[case]]
+command = "SET"
+phrases = [
+  "给 key 赋一个值，覆盖原来的",
+  "assign a value to a key, overwriting it",
+]
+
+[[case]]
+command = "SETEX"
+phrases = [
+  "写值同时挂一个秒级 TTL",
+  "write a value with a seconds timeout attached",
+]
+
+[[case]]
+command = "SETNX"
+phrases = [
+  "key 不存在才写，用来抢分布式锁",
+  "write only when the key is absent",
+]
+
+[[case]]
+command = "SETRANGE"
+phrases = [
+  "从指定偏移开始覆盖写一段字节",
+  "overwrite bytes starting at a given offset",
+]
+
+[[case]]
+command = "STRLEN"
+phrases = [
+  "看这个字符串值有多少字节",
+  "byte length of the stored string",
+]
+
+[[case]]
+command = "SUBSTR"
+phrases = [
+  "老接口按位置截子串，已废弃",
+  "legacy substring extraction by index",
+]
+
+[[case]]
+command = "DISCARD"
+phrases = [
+  "放弃已经排队的那批命令",
+  "abort queued commands without running them",
+]
+
+[[case]]
+command = "EXEC"
+phrases = [
+  "把排队的命令一次性提交执行",
+  "run everything queued in the block",
+]
+
+[[case]]
+command = "MULTI"
+phrases = [
+  "开始把命令攒成一个原子批",
+  "start queuing commands as one atomic unit",
+]
+
+[[case]]
+command = "UNWATCH"
+phrases = [
+  "取消之前对 key 的乐观锁监视",
+  "drop all optimistic locks on watched keys",
+]
+
+[[case]]
+command = "WATCH"
+phrases = [
+  "盯住某个 key，被改了事务就失败",
+  "optimistic lock, fail if the key changes",
+]
