@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 55 |
+| PASS | 56 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 4 |
+| IN-PROGRESS | 3 |
 | BLOCKED | 1 |
 
 ## 环境记录
@@ -107,7 +107,7 @@
 | V-G02 | PASS | `ci/topology/sentinel-{up,down}.sh` · 3 个 `topology_sentinel_*` | 1 primary + 1 replica + 3 sentinel；根因是缺 `sentinel resolve-hostnames yes`（6.2+ 默认拒绝主机名） |
 | V-G03 | IN-PROGRESS | — | |
 | V-G04 | PASS | `crates/pr-transport/src/tls.rs`、`crates/pr-transport/tests/tls_matrix.rs`（11 tests）、`crates/prc/src/args.rs`（6 tests）、`tests/topology/tls/README.md`、[ADR-032](adr/ADR-032.md) | NET-01 通过：错名 / 过期 / 未知 CA 三项均被拒**且错误分别指向名字、有效期、签发者**；client cert 要求满足时连上、不满足时被拒；连 `127.0.0.1` 验 `redis.internal` 通过，同一张证书改用地址当验证名则被拒（SNI 独立的两面）；空 / 非 PEM 的 CA bundle 报错而**不回退**到系统根或空集。 每张证书都在测试运行时由自签 CA 现场签发。把它们提交进仓库会更糟：一个 `notAfter` 固定的 fixture 会变成一个在没人挑的日子突然变红的测试，而「已过期」那一格最终会和「有效」那一格没有区别。 **「无静默 insecure」是两件事。** 第一件：**没有那个开关**——不是默认关闭，是不存在。`there_is_no_configuration_that_turns_verification_off` 在源码上断言 `dangerous`、`ServerCertVerifier`、`accept_invalid` 这些标识符不出现在 TLS 模块的**代码**里，先剥掉注释与字符串字面量——否则「这里没有 insecure 模式」这句说明本身会触发检查，而人们修这种失败的方式是把说明删掉。第二件：**拒绝必须是重定向**，`--tls-ca` / `--tls-name` / `--tls-cert` / `--tls-key` 就是去处，`--help` 的 TLS 段由 parser 自己的 flag 表生成（两边不会漂移），拒绝的错误信息里点名。只说「不行」而不说「那该怎么办」，是变通方案被发明出来的方式。 **在命令行侧发现并修掉一个真实缺口**：`--insecure` / `--no-verify` / `--tls-verify=none` 之前**只在有 profile 时**被拒绝。没有 profile 时（`prc -h host --insecure`）它被记录下来然后静默忽略——正是 §21.1 禁止的静默 insecure，而且是更坏的一种：操作者以为这个 flag 起了作用。现在两种情况都拒绝，有 profile 时给更具体的那条（说出是谁的验证会被削弱）；因为 `@prod` 可能出现在 flag 之后，判定被推迟到 profile 已知时再做。 栈选 rustls 0.23 + `ring`（ADR-032）：rustls 默认就没有「接受任何证书」模式，要绕过必须显式实现 `ServerCertVerifier` 并调 `dangerous()`——一段任何 review 都看得见的代码，而不是一个 `bool`。`ring` 而非默认 provider，是为了三个 CI runner 都不需要 C 工具链。 `ca_set_hash`（blake3 over CA 集合的 DER 字节，按出现顺序）就是 §21.3 的 `TrustIdentity::Ca { ca_set_hash, server_name }`：两个不同 CA 为同一个名字背书是两个不同的 trust identity；往集合里加一个 CA 也会改变它——放宽「谁可以背书」是身份的改变，不是细节。`TlsConfig` 的 `Debug` 手写而非 derive，私钥不进 panic message / 日志 / 诊断包（§23.4），并有测试守住。 顺带把 `rustls-pemfile` 换成 `rustls-pki-types` 自带的 PEM API：前者已不再维护（RUSTSEC-2025-0134）。走维护中的那条路，比在 `deny.toml` 里留一条活得比理由更久的例外更便宜。 |
-| V-G05 | IN-PROGRESS | — | |
+| V-G05 | PASS | `crates/pr-profiles/src/{shared,perms}.rs`、`crates/pr-profiles/tests/shared_files.rs`（7 tests，三平台常驻）、`crates/pr-profiles/tests/credential_store.rs`（4 tests，3 个碰真实系统凭证库）、`crates/pr-profiles/examples/shared_writer.rs`、`tests/config/locking/README.md`、CI job `shared-files`（ubuntu / macos / windows 三矩阵） | §12.10 的协议完整实现并逐条测过：advisory lock → 读版本 → 修改 → 临时文件 → fsync → 原子 rename → 版本 +1；版本不匹配不覆盖，写 `conflicts/`。 **LIFE-03「无丢更新」用真实进程测**：8 个**进程** × 20 轮 = 160 次更新，一次不丢，版本号恰好走到 160。用进程而不是线程，因为 advisory lock 是**进程之间**的承诺——同一进程里的线程在多数平台上共享这把锁，一个多线程版本的测试会在一个根本不工作的实现上通过。worker 遇冲突会重试：要证明的是没有更新被**丢掉**，不是没有更新被**拒绝**；一次保住了编辑的拒绝正是协议在工作。 每个环节挡的是不同的东西：**锁**挡两个进程 read-modify-write 交错；**版本检查**挡锁挡不住的那一种（读过、放开了锁或根本没拿、回来写一个基于过期输入算出的值）；**fsync 在 rename 之前**——没有它，rename 可能先于内容落盘，断电后活下来的是一个看起来合法的空文件；**`conflicts/`** 因为拒绝写入之后把用户的编辑丢掉，仍然是丢了。锁加在**单独的锁文件**上而不是数据文件上：数据文件是被 rename 替换的，加在它身上的锁是加在一个即将不再是「大家看的那个文件」的 inode 上。 锁来自 `std::fs::File::lock`（Rust 1.89 稳定）：Unix 上 `flock`，Windows 上 `LockFileEx`，不需要依赖也不需要我们写 unsafe。 **没有版本头的文件不会被盲写**：那不是我们写的，给它猜一个版本号就是版本协议不再保护任何东西的那一刻。**目的地永不原地改写**：测试比对替换前后的 inode（Windows 上比创建时间与大小）并检查无 `.tmp` 残留——如果它被以写模式打开并截断，中间就有一个它是空的窗口。 **WIN-03 的 ACL**：Unix `chmod 0600`；Windows 是显式的 **protected** DACL（`D:P(A;;FA;;;<当前用户 SID>)`），只授权当前用户。这是整个 workspace 里唯一的 `unsafe`，理由写在模块头：Rust 的 `std` 无法给文件挂 security descriptor，而「继承 `%LOCALAPPDATA%` 恰好授予的权限」不是同一个承诺——那是对别人配置的那个目录的一个猜测。四次 Win32 调用，每次返回值都检查，每处分配在成功与失败路径上都释放，并且**把结果读回来验证**，一个静默的 no-op 不能冒充成功。三类文件都受限：数据文件、锁文件、以及 `conflicts/` 下的——最后这类最容易忘，因为它写在失败路径上。检查函数必须能说「不」，否则它什么也没说：有一条 Unix 测试先把文件设成 0644 断言被判为不安全，再修复再断言。 **凭证存取碰真实系统库**（macOS Keychain / Windows Credential Manager / Linux Secret Service），不是 mock——mock 只能证明 mock 能工作，而要验证的是平台接受我们递过去的东西。密码里塞了非 ASCII、引号、换行、制表符。这三个测试 `#[ignore]`，理由只有一个：一台没有 D-Bus 会话的无头 Linux 上没有库可谈，那里的失败报告的是环境而不是代码；CI 在三平台显式跑，Linux 上先起会话 keyring。写进去的东西按进程号命名并在**每一条路径上**（含断言失败）删除——一个会在开发者 Keychain 里留下条目的测试，是一个会被他们关掉的测试。**两个引用不会撞车**覆盖 LIFE-03 的「凭证误绑定」那一半：如果两个 profile 共用一个条目，改其中一个的密码会悄悄改掉另一个。 |
 
 ## Track H · 资源预算与性能基线
 
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-profiles --test shared_files` → 7 passed（含 8 进程 × 20 轮无丢更新）；`--test credential_store -- --ignored` → 3 passed（macOS Keychain 真实往返）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 1037 passed / 0 failed。Windows 的 `LockFileEx` 与 DACL 路径由 CI 的 `shared-files` 矩阵在 windows-latest 上验证。 |
 | 2026-09-16 | `cargo test -p prc --test contracts` → 6 passed；各 crate 的 `--doc` 全绿（pr-core 7、pr-intelligence 7、pr-catalog 4、pr-security 3、pr-json 2）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 1029 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test find_recall` → 13 passed（canonical 97.8%/98.8%；独立门槛因缺输入而等待并打印说明）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 992 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test find_recall` → 13 passed（canonical 97.8%/98.8%；独立门槛因缺输入而等待并打印说明）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 992 passed / 0 failed。 |

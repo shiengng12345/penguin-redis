@@ -23,6 +23,15 @@ keyring = { version = "3", features = ["apple-native"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 keyring = { version = "3", features = ["windows-native"] }
+# WIN-03: `std` cannot attach a security descriptor to a file, and inheriting whatever the
+# parent directory grants is a guess rather than a promise. See `perms::platform` -- the one
+# `unsafe` in the workspace, four calls, verified by reading the DACL back.
+windows-sys = { version = "0.61", features = [
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_Security_Authorization",
+  "Win32_System_Threading",
+] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 keyring = { version = "3", features = ["sync-secret-service", "linux-native"] }

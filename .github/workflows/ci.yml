@@ -161,6 +161,41 @@ jobs:
         if: always()
         run: ./ci/topology/${{ matrix.topology }}-down.sh || true
 
+  # ---------------------------------------------------------------- Shared files (V-G05)
+  shared-files:
+    name: config locking + credential store (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config gnome-keyring dbus-x11
+      # LIFE-03's no-lost-updates case spawns real processes, and WIN-03's ACL check is
+      # meaningless anywhere but Windows. Both run on all three so the platform-specific half
+      # is exercised where it matters rather than only where it was written.
+      - name: advisory lock, atomic replace, per-user permissions
+        run: cargo test -p pr-profiles --test shared_files -- --nocapture
+      # The credential store tests touch the real OS store, so they are #[ignore]d for a
+      # developer on a headless box and run explicitly here. On Linux that needs a session
+      # keyring; without one the test would be reporting the environment, not the code.
+      - name: credential store round trip (non-Linux)
+        if: runner.os != 'Linux'
+        run: cargo test -p pr-profiles --test credential_store -- --ignored --nocapture
+      - name: credential store round trip (Linux, with a session keyring)
+        if: runner.os == 'Linux'
+        run: |
+          export $(dbus-launch)
+          echo -n "ci" | gnome-keyring-daemon --unlock --replace --daemonize > /dev/null 2>&1 || true
+          cargo test -p pr-profiles --test credential_store -- --ignored --nocapture
+
   # ---------------------------------------------------------------- Safety gate
   safety:
     name: safety (secrets, injection, supply chain)

@@ -5,6 +5,8 @@
 
 pub mod credentials;
 pub mod journal;
+pub mod perms;
+pub mod shared;
 
 pub use credentials::{
     CredentialError, CredentialStore, HeadlessFallback, PlatformStore, SERVICE, SecretRef,
