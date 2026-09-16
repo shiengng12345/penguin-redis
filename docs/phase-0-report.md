@@ -9,8 +9,8 @@
 | 状态 | 数量 |
 |---|---|
 | PASS | 47 |
-| FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 14 |
+| FALLBACK-ADOPTED | 2 |
+| IN-PROGRESS | 13 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -40,7 +40,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-B01 | IN-PROGRESS | — | |
+| V-B01 | FALLBACK-ADOPTED | `docs/spikes/SPIKE-002.md`、[ADR-031](adr/ADR-031.md)、`crates/pr-protocol/tests/spike_002_redis_rs.rs`（19 tests，全绿）、`ci/check-redis-rs-is-dev-only.sh`（已用一次真实违规验证会红） | **FALLBACK-ADOPTED(ADR-031)** —— §31.2 预先命名的回退分支：`pr-protocol` 自研 codec 为唯一 kernel 协议边界，`redis` 1.7.0 降为互操作测试对象。 做法不是读文档下结论，而是把 **V-A03 的 316 个 fixture 全部**同时喂给两个 decoder，并把比对结果**冻结成断言**：一致 271 / 有损接受 10 / 未实现 28（**全部是 RESP3 streamed 类型**，测试单独断言了这一点）/ 过度接受 5 / 超出我方预算 2。冻结是重点——写在 md 里的结论会随版本升级悄悄过期，写成 `assert_eq!` 的结论在 `redis-rs` 变化那一刻就让 CI 红。 §31.2 六条门槛：完整通过 0 条，部分通过 1 条。关键不达标项：(1) **RESP3 streamed 类型完全未实现**——`$?`/`*?`/`%?`/`~?`/`;N`/`.` 不在 dispatch 表里，而这正是协议自己用来说「装不进内存」的机制；(2) **verbatim 与 blob error 走 `String::from_utf8_lossy`**，非 UTF-8 字节静默变 `U+FFFD` 且返回 `Ok`，ADR-005 的存在就是为了防这个；(3) double 丢词法（`,1.2300`→`1.23`，`,1e999`→`inf` 且 `Ok`）；(4) 三种 null 拼写塌缩成一个 `Nil`；(5) **没有 budget 也没有地方放**——`$1073741824` 与「还没收完」不可分；(6) **取消后连接不可复用**——`Parser::parse_value` 收阻塞 `Read`，遇 `WouldBlock` 返回错误且不报告已消耗字节数，正是 ADR-007 的 `UnknownAfterSend`，却由一次普通慢网络产生；(7) `retry_method()` 是 `pub(crate)`、`ServerErrorKind` 是 `#[non_exhaustive]`，重试策略既不可观测也不可覆盖，与 ADR-007 冲突；(8) **过度接受 5 例**：`$-5`/`*-5`/`~-5`→`Nil`（RESP 只定义 `-1` 一个负长度）、`:+1`→`Int(1)`、`(12a` 完全不校验——一个看起来像值的协议违规比一个看起来像错误的更糟，因为上层永远不会知道。 如实记录它做对的地方，否则这不叫比较：map 顺序与重复 key 保留、big number 保留数字串、attribute 在此层保留、bulk string 二进制安全含 NUL、**截断与畸形可区分**（IO 类 vs parse 类错误）——最后这条原本预期它做不到，它做到了，缺的是消耗字节计数。 `redis` 锁在 `crates/pr-protocol` 的 `[dev-dependencies]`，由 `ci/check-redis-rs-is-dev-only.sh` 用 `cargo tree -e no-dev` 解析真实链接图来强制，直接引入或被间接拉入都会被抓到。该脚本已用一次真实违规（把 redis 挪进 `[dependencies]`）验证过确实会红。 |
 | V-B02 | PASS | `crates/pr-protocol/` · 23 tests（含 316 样本 corpus 逐字节喂入） | 增量 RESP2/3 解码含 streamed；预算与协议错误分离；词法保真；bare-LF 即时报错 |
 | V-B03 | PASS | `crates/pr-application/src/pipe.rs` · 14 tests | 逐帧解码→同一 catalog 分类→同一 policy；prod 遇写帧即停不跳过（SEC-09）；畸形/截断/非命令帧 fail-closed 并报帧号与字节偏移（PIPE-08）；agent 完全不可用；停止帧之后一帧都不放行 |
 | V-B04 | PASS | `crates/pr-protocol/tests/outcome_matrix.rs` · 12 tests | 经真实 wire 字节驱动：截断回复/连接关闭/协议错误 → `UnknownAfterSend`；分片不改变结论；push 不占回复槽；全组合映射表 + 每个退出码可达性 |
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-protocol --test spike_002_redis_rs` → 19 passed；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 851 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-security --test threat_model` → 8 passed；`cargo clippy --workspace --all-targets -- -D warnings` → 干净；`cargo test --workspace` → 832 passed / 0 failed。 |
 | 2026-09-16 | V-E04 → PASS（JSON projection v1）；与 pinned `redis-cli --json` 实测 6 处差异入 manifest，其中 5 处是 baseline 的缺陷（错误回复不是合法 JSON、big number/attribute 解析不了、整数 key 被强转）；824 tests |
 | 2026-09-16 | V-I03 → PASS（catalog 再分发结论 + `prc` 许可）；快照移除上游散文（343 KB → 286 KB），`license` 由占位符改为 `MIT OR Apache-2.0`；795 tests |

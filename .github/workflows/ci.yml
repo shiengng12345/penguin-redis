@@ -181,6 +181,11 @@ jobs:
       - uses: taiki-e/install-action@cargo-deny
       - name: cargo deny (licences, advisories, bans, sources)
         run: cargo deny check
+      # ADR-031: redis-rs is an interop test subject. A decision that only lives in a document
+      # drifts; this resolves the real link graph, so an accidental promotion to a product
+      # dependency fails here rather than in a release.
+      - name: redis-rs stays a dev-dependency (ADR-031)
+        run: ./ci/check-redis-rs-is-dev-only.sh
       - name: security test suite
         run: cargo nextest run --workspace --no-fail-fast -E 'test(/security_|secret_|injection_|approval_/)' --no-tests=pass
 

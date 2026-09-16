@@ -33,3 +33,4 @@
 | [ADR-028](ADR-028.md) | `pr-json` 是服务器业务 JSON 的唯一权威模型；重复成员以 occurrence 索引寻址；`serde_json` 只用于 Penguin 自有 schema | accepted | V-E01 |
 | [ADR-029](ADR-029.md) | 所有内存 / 并发 / 速率预算为单进程预算；无 daemon 架构不做跨进程仲裁 | accepted | V-F09、V-H01、V-A06 |
 | [ADR-030](ADR-030.md) | 本地签名 catalog / overlay 是 effects、危险性、审批等级与 key extraction 的唯一权威；远端 metadata 只补充 availability 与文档 | accepted | V-D07、V-F01 |
+| [ADR-031](ADR-031.md) | `pr-protocol` 自研 codec 是唯一 kernel 协议边界；`redis-rs` 降为互操作测试对象 | accepted | V-B01、V-J04 |

@@ -20,3 +20,8 @@ proptest = { workspace = true }
 pr-core = { path = "../pr-core" }
 resp-server = { path = "../../xtask/resp-server" }
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+# SPIKE-002 / V-B01. Dev-only, on purpose: redis-rs is the interop test subject (ADR-031),
+# not part of the kernel. Moving this line into `[dependencies]` fails
+# `ci/check-redis-rs-is-dev-only.sh`.
+redis = { workspace = true }
+serde_json = { workspace = true }   # reading the fixture manifest in tests only
