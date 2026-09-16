@@ -114,6 +114,26 @@ pub enum Layout {
     Stacked,
 }
 
+/// How cell boundaries are positioned (v2.1 §14.6).
+///
+/// Padding with spaces is correct only while the width policy agrees with the terminal. They
+/// disagree in practice — East Asian Ambiguous characters, ZWJ sequences and variation
+/// selectors are rendered differently by different terminals and fonts — and when they do, a
+/// padded table's right-hand border walks further out of line with every row.
+///
+/// [`DrawMode::CursorReset`] is §14.6's stated fallback: every cell boundary is reached by an
+/// absolute cursor move, so the frame stays aligned **even when the width judgement is
+/// wrong**. The content inside a cell may still be too wide or too narrow; the box around it
+/// will not be.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum DrawMode {
+    /// Pad with spaces. The default, and correct when the policy matches the terminal.
+    #[default]
+    Padded,
+    /// Reposition the cursor absolutely at every cell boundary.
+    CursorReset,
+}
+
 /// A rendered table plus what the user must be told about it.
 #[derive(Clone, Debug)]
 pub struct Rendered {
@@ -239,6 +259,21 @@ impl Table {
     /// The first render freezes the widths, so later rows in a stream wrap instead of
     /// rewriting rows already printed (§6.2).
     pub fn render(&mut self, total_cols: usize, theme: Theme, p: WidthPolicy) -> Rendered {
+        self.render_with(total_cols, theme, p, DrawMode::Padded)
+    }
+
+    /// Render, choosing how cell boundaries are positioned (§14.6).
+    ///
+    /// `DrawMode::CursorReset` is what a width probe switches to when it finds the terminal
+    /// disagrees with the policy.
+    #[allow(clippy::too_many_lines)]
+    pub fn render_with(
+        &mut self,
+        total_cols: usize,
+        theme: Theme,
+        p: WidthPolicy,
+        mode: DrawMode,
+    ) -> Rendered {
         let natural = self.frozen.clone().unwrap_or_else(|| self.sample_widths(p));
         let Some(widths) = self.fit(&natural, total_cols) else {
             return self.render_stacked(theme, p);
@@ -261,10 +296,32 @@ impl Table {
             s
         };
 
+        // Column of every vertical border, so `CursorReset` can go straight to it:
+        // `│` + space + content + space, repeated.
+        let mut bounds = vec![0usize];
+        for w in &widths {
+            let last = *bounds.last().unwrap_or(&0);
+            bounds.push(last + w + 3);
+        }
+        let at = move |i: usize| -> String {
+            match mode {
+                DrawMode::Padded => String::new(),
+                DrawMode::CursorReset => {
+                    let col = bounds[i];
+                    if col == 0 {
+                        "\r".to_owned()
+                    } else {
+                        format!("\r\x1b[{col}C")
+                    }
+                }
+            }
+        };
+
         lines.push(rule('╭', '┬', '╮', '─', &widths));
 
         // Header. Bold plus a double rule, so hierarchy survives with colour off (UX-04).
-        let mut head = String::from("│");
+        let mut head = at(0);
+        head.push('│');
         for (i, c) in self.columns.iter().enumerate() {
             let w = widths[i];
             let (text, tw) = p.truncate(&c.title, w);
@@ -281,6 +338,7 @@ impl Table {
                 head.push(' ');
             }
             head.push(' ');
+            head.push_str(&at(i + 1));
             head.push('│');
         }
         lines.push(head);
@@ -289,7 +347,8 @@ impl Table {
         for (ri, row) in self.rows.iter().enumerate() {
             let height = row.iter().map(Cell::height).max().unwrap_or(1);
             for li in 0..height {
-                let mut line = String::from("│");
+                let mut line = at(0);
+                line.push('│');
                 for (ci, cell) in row.iter().enumerate() {
                     let w = widths[ci];
                     let cl = cell.lines();
@@ -321,6 +380,7 @@ impl Table {
                         }
                     }
                     line.push(' ');
+                    line.push_str(&at(ci + 1));
                     line.push('│');
                 }
                 lines.push(line);

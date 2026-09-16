@@ -49,6 +49,17 @@ fn main() {
             print!("{}", startup::version());
             std::process::exit(ExitCode::Success as i32);
         }
+        Fast::ProbeWidth => {
+            let (text, agreed) = startup::probe_width();
+            print!("{text}");
+            std::process::exit(if agreed {
+                ExitCode::Success as i32
+            } else {
+                // A disagreement is information, not a failure of the command; only an
+                // unusable terminal is an error.
+                ExitCode::Success as i32
+            });
+        }
         Fast::None => {}
     }
 

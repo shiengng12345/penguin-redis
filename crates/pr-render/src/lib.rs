@@ -9,6 +9,6 @@ pub mod theme;
 pub mod width;
 
 pub use generic::{MAX_RENDER_DEPTH, render as render_generic};
-pub use table::{Align, Cell, Column, Layout, Rendered, SAMPLE_ROWS, Table};
+pub use table::{Align, Cell, Column, DrawMode, Layout, Rendered, SAMPLE_ROWS, Table};
 pub use theme::{ColorDepth, Rgb, Styled, Theme, ThemeKind, Token};
 pub use width::{AmbiguousWidth, WidthPolicy};

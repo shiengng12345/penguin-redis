@@ -22,6 +22,8 @@ pub enum Fast {
     Help,
     /// `--version`.
     Version,
+    /// `--probe-width` (§14.6): measure this terminal and report what it does.
+    ProbeWidth,
     /// Nothing special; carry on to the normal path.
     None,
 }
@@ -37,6 +39,7 @@ pub fn fast_path(argv: &[String]) -> Fast {
             "--help" | "-h" if argv.len() == 1 => return Fast::Help,
             "--help" => return Fast::Help,
             "--version" | "-V" => return Fast::Version,
+            "--probe-width" => return Fast::ProbeWidth,
             _ => {}
         }
     }
@@ -68,6 +71,7 @@ pub fn help() -> String {
         "    -2, -3                choose the RESP version explicitly\n",
         "\n",
         "OTHER:\n",
+        "    --probe-width         measure this terminal's character widths (§14.6)\n",
         "    --tui                 open the terminal UI\n",
         "    --help                this text\n",
         "    --version             version and the catalog it was built from\n",
@@ -92,6 +96,46 @@ pub fn version() -> String {
         }
     }
     s
+}
+
+/// Measure the terminal and report what it does with the characters that terminals disagree
+/// about (§14.6).
+///
+/// Prints the table and says whether tables will switch to the cursor-reset drawing mode.
+/// Never run implicitly: it writes to the screen and waits for a reply.
+#[must_use]
+pub fn probe_width() -> (String, bool) {
+    use pr_render::WidthPolicy;
+    use pr_terminal::probe;
+
+    let policy = WidthPolicy::from_locale(
+        std::env::var("LC_CTYPE")
+            .or_else(|_| std::env::var("LANG"))
+            .ok()
+            .as_deref(),
+    );
+    match probe::run_on_terminal(policy, std::time::Duration::from_millis(500)) {
+        Err(e) => (format!("width probe: {e}\n"), false),
+        Ok(samples) => {
+            let c = probe::conclude(&samples);
+            let mut out = String::from("char      assumed  measured\n");
+            for s in &samples {
+                let mark = if s.agrees() { ' ' } else { '!' };
+                let _ = writeln!(
+                    out,
+                    "{mark} U+{:04X}  {:>7}  {:>8}",
+                    s.ch as u32, s.assumed, s.measured
+                );
+            }
+            let _ = writeln!(
+                out,
+                "\n{} disagreement(s); tables will draw {:?}",
+                c.disagreements.len(),
+                c.draw
+            );
+            (out, c.disagreements.is_empty())
+        }
+    }
 }
 
 /// Which subsystem an idle probe should bring up.
@@ -244,6 +288,21 @@ mod tests {
         assert!(v.contains("catalog valkey:"));
         assert!(v.contains("@sha256:"), "the pinned image is named: {v}");
         assert!(v.contains("catalog integrity: verified"), "{v}");
+    }
+
+    #[test]
+    fn probe_width_is_its_own_fast_path_and_is_documented() {
+        assert_eq!(fast_path(&argv(&["--probe-width"])), Fast::ProbeWidth);
+        assert!(help().contains("--probe-width"));
+    }
+
+    #[test]
+    fn probe_width_against_a_pipe_reports_rather_than_hangs() {
+        // Under `cargo test` stdout is not a terminal, which is the case that must not write
+        // an escape sequence into the user's data and then wait forever.
+        let (text, agreed) = probe_width();
+        assert!(!agreed);
+        assert!(text.contains("not a tty"), "{text}");
     }
 
     #[test]

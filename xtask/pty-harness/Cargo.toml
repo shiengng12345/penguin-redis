@@ -12,6 +12,7 @@ description = "Penguin Redis — V-A01 PTY harness: one driver for Unix PTY and 
 workspace = true
 
 [dependencies]
+unicode-width = { workspace = true }
 portable-pty = "0.9"
 serde = { workspace = true }
 serde_json = { workspace = true }

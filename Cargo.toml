@@ -25,6 +25,7 @@ blake3 = "1"
 crossterm = "0.29"   # ADR-022: the single event source and raw-mode owner
 ratatui = { version = "0.29", default-features = false, features = ["crossterm"] }  # §31.1 TUI layout
 tracing = "0.1"
+unicode-width = "0.2"
 
 [workspace.lints.rust]
 unsafe_code = "deny"

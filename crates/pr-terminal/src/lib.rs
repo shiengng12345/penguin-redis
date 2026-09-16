@@ -13,6 +13,7 @@ pub mod coordinator;
 pub mod event;
 pub mod ownership;
 pub mod paint;
+pub mod probe;
 pub mod testing;
 
 pub use bridge::{translate, translate_key};
@@ -20,3 +21,4 @@ pub use coordinator::{Action, Coordinator, Menu, Surface};
 pub use event::{Input, Key, Mailbox, Merged, Notice, NoticeOrigin, Scripted, Source};
 pub use ownership::{Ownership, OwnershipError};
 pub use paint::{Capture, Painter, Sink, Stdout};
+pub use probe::{Conclusion, ProbeError, Sample, conclude, parse_cursor_report};

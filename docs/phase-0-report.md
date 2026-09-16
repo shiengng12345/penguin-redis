@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 36 |
+| PASS | 37 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 26 |
+| IN-PROGRESS | 25 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -55,7 +55,7 @@
 | V-C01 | FALLBACK-ADOPTED(ADR-026) | `docs/spikes/SPIKE-001.md` · `crates/pr-repl/src/buffer.rs` · 20 tests | Reedline 不满足 (b)：undo 在私有 `Editor` 上；且 mid-codepoint 光标会在库内 panic。采用预命名回退：自有 grapheme LineBuffer + EditTransaction |
 | V-C02 | PASS | `crates/pr-terminal/`（ownership/event/paint/coordinator + `pr-terminal-demo`）· `tests/owner.rs` 19 tests · `tests/pty_owner.rs` 7 PTY tests | 「无第二个 stdin 读者/并发 stdout 写者」做成资源而非约定：`Ownership` 进程级 token，第二个 `Coordinator::new` 返回 `AlreadyOwned`，`Painter` 必须同时持 token 与 `&mut Sink`；worker 只能 `Mailbox::post`，由 coordinator 决定何时 print-and-redraw。ASSIST-062：25/20 条 push 涌入与打字交错，buffer、光标、菜单焦点均不变，通知逐条进 scrollback 且从不落在 prompt 行内；UX-12/场景 H：F1 帮助不动命令框，Esc 先关帮助再退 TUI，草稿与来源 `@r2 / DB 0 / result #17` 原样带回且**不执行**；alternate screen 进/出各恰好一次，TUI 期间通知排队、回到 REPL 后按序补印 |
 | V-C03 | IN-PROGRESS | — | |
-| V-C04 | IN-PROGRESS | — | |
+| V-C04 | PASS | `crates/pr-terminal/tests/width_matrix.rs` 12 tests · `crates/pr-terminal/src/probe.rs` 12 tests · `crates/pr-render/src/table.rs` `DrawMode::CursorReset` · `xtask/pty-harness/src/screen.rs` `CellWidth` · `docs/manual-verification/MV-V-C04-width.md` | 降级绘制不能靠「渲染完再读回自己的输出」证明——那只说明渲染器同意自己。测试改为**用一种宽度模型渲染、用另一种模型显示**：屏幕模型的 `CellWidth::UnicodeWide` 扮演 CJK 终端，narrow 策略渲染的 padded 表格右边框逐行漂移（先断言这个漂移真的发生，否则降级测试是空的），`CursorReset` 每个单元格边界发绝对光标移动，框线仍对齐。`CSI 6 n` 探测：仅 TTY、仅用户触发（`prc --probe-width`），非 TTY 直接拒绝且**一个字节都不写**，无应答 500 ms 放弃而非挂起，一处分歧即切换。过程中修正屏幕模型两个真实错误：组合字符被强制成 1 列（终端会合成到前一格，格子改存 grapheme cluster），以及 box-drawing 按 Ambiguous 判宽（真实终端特例化为窄，否则任何 TUI 都是坏的）。真实终端差异 → `MV-V-C04-*` 人工记录，编号已分配 |
 | V-C05 | IN-PROGRESS | — | |
 | V-C06 | PASS | `crates/pr-render/src/theme.rs` · 14 tests | Dark/Light/High-contrast 三套 token 全定义；WCAG 对比度自动校验；24bit→256→16→mono 量化后 JSON token 仍可分辨；**mono 保留 bold、plain 零转义** |
 | V-C07 | IN-PROGRESS | — | |
@@ -177,3 +177,4 @@
 | 2026-09-16 | V-H01 → PASS（启动与空闲基线）；`prc` 链接全依赖图，`pr-tui` 接入 Ratatui，RSS 测量补 Windows 路径；三项预算余量 95 ms / 25 MiB / 53 MiB 并记入 `benches/baseline/` |
 | 2026-09-16 | PTY harness 补屏幕模型（`Screen`，14 tests）与 DSR 应答器；Windows 上 crossterm 的 `KeyEventKind::Release` 导致每个字符输入两次，translate 搬进 `pr-terminal::bridge` 并加 8 个测试；`tasklist` RSS 解析被千位分隔符截断（48 MB 读成 120 KB）已修；603 tests |
 | 2026-09-16 | V-H04 → PASS（任务监督 leak detection / PERF-03）；修正 `TaskScope` 的取消语义（`select!` 竞速使协作清理永远跑不到、`shutdown` 返回值失真）；617 tests |
+| 2026-09-16 | V-C04 → PASS（Unicode 宽度矩阵）；新增 `DrawMode::CursorReset` 降级绘制、`CSI 6 n` 探测与 `prc --probe-width`；屏幕模型改为 grapheme cluster 格子；651 tests |

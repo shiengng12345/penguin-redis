@@ -22,5 +22,6 @@ pr-repl = { path = "../pr-repl" }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+unicode-width = { workspace = true }
 portable-pty = "0.9"
 pty-harness = { path = "../../xtask/pty-harness" }

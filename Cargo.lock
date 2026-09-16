@@ -908,6 +908,7 @@ dependencies = [
  "pr-repl",
  "pty-harness",
  "thiserror 2.0.20",
+ "unicode-width 0.2.0",
 ]
 
 [[package]]
@@ -982,6 +983,7 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+ "unicode-width 0.2.0",
 ]
 
 [[package]]

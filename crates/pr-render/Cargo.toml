@@ -17,7 +17,7 @@ pr-json = { path = "../pr-json" }
 pr-protocol = { path = "../pr-protocol" }
 bytes = { workspace = true }
 thiserror = { workspace = true }
-unicode-width = "0.2"
+unicode-width = { workspace = true }
 
 [dev-dependencies]
 proptest = { workspace = true }
