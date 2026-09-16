@@ -31,6 +31,12 @@ jobs:
           toolchain: "1.97.1"
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - name: fmt
         run: cargo fmt --all -- --check
       - name: clippy (workspace lint level; warnings are errors)
@@ -52,6 +58,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - uses: taiki-e/install-action@nextest
       - name: unit + integration
         run: cargo nextest run --workspace --no-fail-fast
@@ -93,6 +105,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - uses: taiki-e/install-action@nextest
       - name: start server (pinned by digest)
         run: |
@@ -126,6 +144,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - uses: taiki-e/install-action@nextest
       - name: bring up ${{ matrix.topology }}
         run: ./ci/topology/${{ matrix.topology }}-up.sh
@@ -147,6 +171,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - uses: taiki-e/install-action@nextest
       - uses: taiki-e/install-action@cargo-deny
       - name: cargo deny (licences, advisories, bans, sources)
@@ -189,6 +219,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - uses: taiki-e/install-action@nextest
       - name: regenerate and diff
         run: |
@@ -208,6 +244,12 @@ jobs:
         with:
           toolchain: "1.97.1"
       - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        if: runner.os == 'Linux'
+        # libdbus-1-dev is what `keyring`'s secret-service backend links against (ADR-014).
+        # The runner image stopped shipping it, and a missing system library is not something
+        # to discover per-job: every job that compiles the workspace installs it.
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
       - name: fingerprints match, and each snapshot re-captures byte-identically
         run: ./ci/check-catalog-snapshots.sh
       - name: the compiled catalog classifies every command

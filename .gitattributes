@@ -1,0 +1,10 @@
+# Line endings must never be rewritten on checkout.
+#
+# Two kinds of file here are fingerprinted by their exact bytes, and a CRLF conversion changes
+# the fingerprint without changing the content — which looks exactly like tampering. Windows
+# CI found this the hard way: the catalog snapshots hashed differently after checkout.
+* -text
+
+# Belt and braces for the artefacts whose byte-for-byte identity is the whole point.
+crates/pr-catalog/snapshots/** -text -diff
+fixtures/** -text

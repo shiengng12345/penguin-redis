@@ -158,7 +158,10 @@ impl Journal {
         f.set_permissions(p)
     }
 
+    // The signature has to match the Unix arm, which really can fail; clippy sees only this
+    // branch when it lints for Windows and concludes the Result is pointless.
     #[cfg(not(unix))]
+    #[allow(clippy::unnecessary_wraps)]
     fn set_private(_f: &std::fs::File) -> std::io::Result<()> {
         // Windows ACLs are applied to the containing directory at creation (WIN-03).
         Ok(())
