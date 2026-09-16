@@ -8,12 +8,14 @@
 //! terminal at once — is enforced as a resource rather than described as a convention. See
 //! [`ownership`].
 
+pub mod bridge;
 pub mod coordinator;
 pub mod event;
 pub mod ownership;
 pub mod paint;
 pub mod testing;
 
+pub use bridge::{translate, translate_key};
 pub use coordinator::{Action, Coordinator, Menu, Surface};
 pub use event::{Input, Key, Mailbox, Merged, Notice, NoticeOrigin, Scripted, Source};
 pub use ownership::{Ownership, OwnershipError};

@@ -22,45 +22,7 @@
 use std::io::Write as _;
 use std::time::Duration;
 
-use crossterm::event::{Event, KeyCode, KeyEvent, KeyModifiers};
-use pr_terminal::{Action, Coordinator, Input, Key, Mailbox, NoticeOrigin, Stdout};
-
-/// Translate a crossterm event into our own input.
-///
-/// Deliberately total: an event we do not model becomes `None` rather than a panic, because a
-/// terminal can send anything and a client that dies on an unexpected escape sequence is
-/// worse than one that ignores it.
-fn translate(ev: &Event) -> Option<Input> {
-    match ev {
-        Event::Key(KeyEvent {
-            code, modifiers, ..
-        }) => {
-            let k = match code {
-                KeyCode::Char(c) if modifiers.contains(KeyModifiers::CONTROL) => {
-                    Key::Ctrl(c.to_ascii_lowercase())
-                }
-                KeyCode::Char(c) => Key::Char(*c),
-                KeyCode::Backspace => Key::Backspace,
-                KeyCode::Enter => Key::Enter,
-                KeyCode::Tab => Key::Tab,
-                KeyCode::Esc => Key::Esc,
-                KeyCode::Up => Key::Up,
-                KeyCode::Down => Key::Down,
-                KeyCode::Left => Key::Left,
-                KeyCode::Right => Key::Right,
-                KeyCode::F(n) => Key::Function(*n),
-                _ => return None,
-            };
-            Some(Input::Key(k))
-        }
-        Event::Paste(s) => Some(Input::Paste(s.as_bytes().to_vec())),
-        Event::Resize(cols, rows) => Some(Input::Resize {
-            cols: *cols,
-            rows: *rows,
-        }),
-        _ => None,
-    }
-}
+use pr_terminal::{Action, Coordinator, Input, Key, Mailbox, NoticeOrigin, Stdout, translate};
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     // Printed before anything else touches the terminal, so a PTY test that times out can

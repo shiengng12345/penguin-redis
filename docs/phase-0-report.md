@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 33 |
+| PASS | 35 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 29 |
+| IN-PROGRESS | 27 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -45,7 +45,7 @@
 | V-B03 | PASS | `crates/pr-application/src/pipe.rs` · 14 tests | 逐帧解码→同一 catalog 分类→同一 policy；prod 遇写帧即停不跳过（SEC-09）；畸形/截断/非命令帧 fail-closed 并报帧号与字节偏移（PIPE-08）；agent 完全不可用；停止帧之后一帧都不放行 |
 | V-B04 | PASS | `crates/pr-protocol/tests/outcome_matrix.rs` · 12 tests | 经真实 wire 字节驱动：截断回复/连接关闭/协议错误 → `UnknownAfterSend`；分片不改变结论；push 不占回复槽；全组合映射表 + 每个退出码可达性 |
 | V-B05 | PASS | `crates/pr-core/src/session.rs` · 18 tests | HELLO/AUTH/SELECT/RESET/MULTI/WATCH/CLIENT REPLY 状态机；`may_probe()` 在事务内与 reply-suppressed 时拒绝注入；断线返回 `ReconnectLosses` 且不静默恢复 |
-| V-B06 | IN-PROGRESS | — | |
+| V-B06 | PASS | `crates/pr-application/src/output.rs` · `tests/push_output.rs` 25 tests | push 路由由**模式**决定而非 flag：reply 模式丢弃并在 stderr 计数 `N push frames suppressed`；`--show-pushes` 转 stderr NDJSON（带 arrival seq）；`ndjson`/`typed-json` 按到达顺序进 stdout 且 `--show-pushes` 不重复投递。push 在回复前/后/前后夹/单独四种时序均不占回复槽位；带 attribute 的 push 仍识别为 push。`--output resp` 规范化再编码（三种 null → `_`、attribute 紧邻其值、bytes 无损往返），与 `--trace-wire` 原始 wire 分离且测试断言二者不同。输出 flag 冲突报错不做 last-wins；`--json` 的 RESP3 偏好不覆盖显式 `-2` |
 | V-B07 | PASS | `crates/prc/src/args.rs` · 17 tests | §3.2 顶层语法；§3.3 profile×flag 矩阵逐格用例；`-h` 恒为 host；输出模式互斥不做 last-wins |
 
 ## Track C · 终端与编辑器
@@ -113,7 +113,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-H01 | IN-PROGRESS | — | |
+| V-H01 | PASS | `crates/prc/tests/budgets.rs` 8 tests（CI 三平台跑）· `benches/baseline/README.md` · `crates/pr-core/src/mem.rs` 4 tests | `prc` 刻意链接整条依赖图（tokio / rusqlite bundled / keyring / crossterm / ratatui / blake3 / serde_json / 内嵌 catalog 586 条命令）——只链一半无法回答「依赖有没有先把预算吃掉」。release 实测：`--help` p95 **4.86 ms**（预算 100 ms，余 95 ms）、idle REPL **5.0 MiB**（预算 30，余 25）、idle TUI **6.5 MiB**（预算 60，余 53）、binary 1.6 MiB。CI 断言跑 debug build（更大更慢，通过即保守成立）。`--help` 便宜是**结构性**的而非计时侥幸：catalog 懒编译，测试断言 `--help` 不打印 catalog provenance 而 `--version` 打印。RSS 测量补齐 Windows（`tasklist`）——此前 `rss_bytes()` 在 Windows 返回 `None`，预算根本无从检查。**未链接**：TLS 栈与 `redis-rs`（`pr-transport` 仍为空），上述 headroom 就是它们要装得下的空间，落地后必须重测 |
 | V-H02 | IN-PROGRESS | — | |
 | V-H03 | IN-PROGRESS | — | |
 | V-H04 | IN-PROGRESS | — | `pr-core::scope::TaskScope` 实现，含 1000 次开关与阻塞任务测试；待接入真实会话 |
@@ -173,3 +173,5 @@
 | 2026-09-16 | V-F10 / V-D05 → PASS（零发送不变量、SafeText 显示边界）；441 tests 全绿 |
 | 2026-09-16 | V-F01 / V-F04 → PASS（catalog 编译流水线 + §11.7 语法全表）；walker 抓到两个真 bug（Choice 选不到无关键字分支、numkeys 解析失败仍吞 key）；`deny_unknown_fields` 抓到快照残留字段；新增 `catalog` CI 门禁；488 tests 全绿 |
 | 2026-09-16 | V-C02 → PASS（单一 terminal owner）；引入 crossterm（ADR-022 指定）作 raw mode 与事件源；真实 PTY 上跑 ASSIST-062 / UX-12 / 场景 H；524 tests 全绿 |
+| 2026-09-16 | V-B06 → PASS（push 帧与 one-shot 输出契约）；PTY harness 补 DSR 应答器——Windows CI 显示 ConPTY 启动发 `ESC[6n` 并阻塞等待，harness 不应答导致子进程输出永远发不出（V-A01 的 Windows 路径此前全被 `#[ignore]`，V-C02 是第一次真跑）；catalog 嵌入二进制并 fail-closed；558 tests |
+| 2026-09-16 | V-H01 → PASS（启动与空闲基线）；`prc` 链接全依赖图，`pr-tui` 接入 Ratatui，RSS 测量补 Windows 路径；三项预算余量 95 ms / 25 MiB / 53 MiB 并记入 `benches/baseline/` |

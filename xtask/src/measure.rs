@@ -98,33 +98,10 @@ unsafe impl GlobalAlloc for CountingAllocator {
 
 /// Resident set size of this process, in bytes.
 ///
-/// Returns `None` when the platform source is unavailable rather than guessing — a budget
-/// check must fail loudly, not silently pass on a fabricated number.
-#[must_use]
-pub fn rss_bytes() -> Option<u64> {
-    #[cfg(target_os = "linux")]
-    {
-        let s = std::fs::read_to_string("/proc/self/statm").ok()?;
-        let pages: u64 = s.split_whitespace().nth(1)?.parse().ok()?;
-        // `sysconf(_SC_PAGESIZE)` is 4096 on every supported Linux target.
-        Some(pages * 4096)
-    }
-    #[cfg(target_os = "macos")]
-    {
-        // `ps` is the dependency-free route; it reports RSS in kilobytes.
-        let out = std::process::Command::new("ps")
-            .args(["-o", "rss=", "-p"])
-            .arg(std::process::id().to_string())
-            .output()
-            .ok()?;
-        let kb: u64 = String::from_utf8_lossy(&out.stdout).trim().parse().ok()?;
-        Some(kb * 1024)
-    }
-    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
-    {
-        None
-    }
-}
+/// Re-exported from [`pr_core::mem`] so the measurement harness and the product read the same
+/// number from the same source. Two implementations that disagree by a megabyte would make
+/// every budget argument unfalsifiable.
+pub use pr_core::mem::{rss_available, rss_bytes, rss_of};
 
 /// One measurement.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

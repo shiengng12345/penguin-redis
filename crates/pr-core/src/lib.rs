@@ -7,12 +7,14 @@
 //! This crate depends on no terminal, renderer, network or AI code — the dependency arrow
 //! points *into* it (v2.1 §31.4).
 
+pub mod mem;
 pub mod outcome;
 pub mod request;
 pub mod safetext;
 pub mod scope;
 pub mod session;
 
+pub use mem::{rss_available, rss_bytes, rss_of};
 pub use outcome::{
     Delivery, DiagnosticId, EffectsCertainty, ExecutionOutcome, ExitCode, RenderStatus, Reply,
     ResponseHandle, ServerError,

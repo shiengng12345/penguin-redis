@@ -13,6 +13,7 @@ workspace = true
 
 [dependencies]
 pr-catalog = { path = "../crates/pr-catalog" }
+pr-core = { path = "../crates/pr-core" }
 tokio = { workspace = true }
 
 [dev-dependencies]

@@ -1,0 +1,281 @@
+//! Startup paths and the idle probes (v2.1 §24.6, V-H01).
+//!
+//! §24.6 gives three numbers: `prc --help` in 100 ms, an idle REPL under 30 MiB RSS, an idle
+//! TUI under 60 MiB. V-H01's question is not whether *our* code fits — it is whether the
+//! dependency chain has already eaten the budget before we write a line of feature code.
+//!
+//! So `prc` links everything: tokio, rusqlite, keyring, crossterm, ratatui, blake3, the
+//! embedded catalog. And the fast path is defended by construction rather than by hope:
+//!
+//! - `--help` reads no catalog, opens no database, claims no terminal and starts no runtime.
+//!   The catalog's `is_loaded()` flag lets a test prove it, so making the catalog eager
+//!   becomes a failing test rather than a startup regression nobody measures.
+//! - the idle probes initialise exactly one subsystem each and report RSS, so the two numbers
+//!   are attributable.
+
+use std::fmt::Write as _;
+
+/// What the process was asked to do before any target is considered.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Fast {
+    /// `--help`.
+    Help,
+    /// `--version`.
+    Version,
+    /// Nothing special; carry on to the normal path.
+    None,
+}
+
+/// Recognise the paths that must stay cheap.
+///
+/// Checked before argument parsing so that `prc --help` is answered even when the rest of the
+/// command line is nonsense — a user asking for help is usually a user who got it wrong.
+#[must_use]
+pub fn fast_path(argv: &[String]) -> Fast {
+    for a in argv {
+        match a.as_str() {
+            "--help" | "-h" if argv.len() == 1 => return Fast::Help,
+            "--help" => return Fast::Help,
+            "--version" | "-V" => return Fast::Version,
+            _ => {}
+        }
+    }
+    Fast::None
+}
+
+/// The help text.
+///
+/// Built from a literal rather than assembled from the catalog: help that needs the catalog
+/// is help that costs 600 KB of parsing to print.
+#[must_use]
+pub fn help() -> String {
+    concat!(
+        "prc — Penguin Redis client\n",
+        "\n",
+        "USAGE:\n",
+        "    prc [@profile | -h HOST -p PORT | -u URL] [OPTIONS] [COMMAND ...]\n",
+        "\n",
+        "OUTPUT:\n",
+        "    --raw                 the official CLI's raw behaviour\n",
+        "    --json                the official CLI's JSON (RESP3 unless -2 is given)\n",
+        "    --csv                 CSV for one command\n",
+        "    --bytes               one blob, no delimiter\n",
+        "    --output FORMAT       pretty | raw | json | csv | typed-json | ndjson | resp\n",
+        "    --show-pushes         write push frames to stderr as NDJSON events\n",
+        "    --trace-wire FILE     record the raw wire bytes, unnormalised\n",
+        "\n",
+        "PROTOCOL:\n",
+        "    -2, -3                choose the RESP version explicitly\n",
+        "\n",
+        "OTHER:\n",
+        "    --tui                 open the terminal UI\n",
+        "    --help                this text\n",
+        "    --version             version and the catalog it was built from\n",
+    )
+    .to_owned()
+}
+
+/// Version text, including which pinned servers the catalog was captured from.
+///
+/// This one *does* load the catalog: a version string that cannot say which catalog is inside
+/// the binary is no use in a bug report.
+#[must_use]
+pub fn version() -> String {
+    let mut s = format!("prc {}\n", env!("CARGO_PKG_VERSION"));
+    for (family, detail) in pr_catalog::embedded::provenance() {
+        let _ = writeln!(s, "catalog {family}: {detail}");
+    }
+    match pr_catalog::embedded::verify() {
+        Ok(()) => s.push_str("catalog integrity: verified\n"),
+        Err(e) => {
+            let _ = writeln!(s, "catalog integrity: FAILED — {e}");
+        }
+    }
+    s
+}
+
+/// Which subsystem an idle probe should bring up.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Probe {
+    /// Everything an idle REPL holds.
+    Repl,
+    /// Everything an idle TUI holds, on top of the REPL.
+    Tui,
+    /// The compiled catalog alone, to attribute its share.
+    Catalog,
+}
+
+impl Probe {
+    /// Parse the probe name.
+    #[must_use]
+    pub fn parse(name: &str) -> Option<Self> {
+        match name {
+            "repl" => Some(Self::Repl),
+            "tui" => Some(Self::Tui),
+            "catalog" => Some(Self::Catalog),
+            _ => None,
+        }
+    }
+
+    /// Its name, for the report.
+    #[must_use]
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Repl => "repl",
+            Self::Tui => "tui",
+            Self::Catalog => "catalog",
+        }
+    }
+}
+
+/// Bring `probe` up, hold it, and report RSS.
+///
+/// The value is *kept alive* across the measurement — a probe that lets the subsystem drop
+/// before sampling measures nothing at all.
+///
+/// # Errors
+/// A string describing what could not be initialised.
+pub fn run_probe(probe: Probe) -> Result<String, String> {
+    let rss = match probe {
+        Probe::Catalog => {
+            let n = pr_catalog::embedded::merged().commands.len();
+            let rss = pr_core::mem::rss_bytes();
+            format_probe(probe, rss, &format!("commands={n}"))
+        }
+        Probe::Repl => {
+            // What an idle REPL actually holds: the line editor, the terminal coordinator,
+            // the renderer's theme, the result store and the compiled catalog.
+            let mut buffer = pr_repl::LineBuffer::new();
+            buffer.set_text("");
+            let theme =
+                pr_render::Theme::new(pr_render::ThemeKind::Dark, pr_render::ColorDepth::TrueColor);
+            let coordinator = pr_terminal::Coordinator::new(pr_terminal::Capture::new(), 80, 24)
+                .map_err(|e| e.to_string())?;
+            let catalog = pr_catalog::embedded::merged();
+            let rss = pr_core::mem::rss_bytes();
+            let detail = format!(
+                "commands={} theme={:?} rows={}",
+                catalog.commands.len(),
+                theme.background(),
+                coordinator.size().1
+            );
+            drop(coordinator);
+            format_probe(probe, rss, &detail)
+        }
+        Probe::Tui => {
+            let mut tui = pr_tui::Idle::new(200, 60).map_err(|e| e.to_string())?;
+            tui.draw("@r2 / DB 0 / result #17")
+                .map_err(|e| e.to_string())?;
+            let catalog = pr_catalog::embedded::merged();
+            let rss = pr_core::mem::rss_bytes();
+            let detail = format!(
+                "commands={} lines={}",
+                catalog.commands.len(),
+                tui.lines().len()
+            );
+            format_probe(probe, rss, &detail)
+        }
+    };
+    Ok(rss)
+}
+
+fn format_probe(probe: Probe, rss: Option<u64>, detail: &str) -> String {
+    match rss {
+        // Reported in bytes, not megabytes: rounding at the source is how a budget quietly
+        // gains 500 KB of headroom.
+        Some(b) => format!("probe={} rss_bytes={b} {detail}\n", probe.name()),
+        None => format!("probe={} rss_bytes=unavailable {detail}\n", probe.name()),
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use super::*;
+
+    fn argv(a: &[&str]) -> Vec<String> {
+        a.iter().map(|s| (*s).to_owned()).collect()
+    }
+
+    #[test]
+    fn help_is_recognised_even_alongside_a_broken_command_line() {
+        // Someone asking for help usually got the rest wrong.
+        assert_eq!(fast_path(&argv(&["--help"])), Fast::Help);
+        assert_eq!(
+            fast_path(&argv(&["@nosuch", "--bogus", "--help"])),
+            Fast::Help
+        );
+        assert_eq!(fast_path(&argv(&["--version"])), Fast::Version);
+        assert_eq!(fast_path(&argv(&["-V"])), Fast::Version);
+        assert_eq!(fast_path(&argv(&["GET", "k"])), Fast::None);
+    }
+
+    #[test]
+    fn a_bare_dash_h_is_help_but_dash_h_with_a_host_is_not() {
+        // `-h` means "host" in the official CLI, and silently turning `prc -h myhost` into a
+        // help screen would be a surprising incompatibility.
+        assert_eq!(fast_path(&argv(&["-h"])), Fast::Help);
+        assert_eq!(fast_path(&argv(&["-h", "redis.example"])), Fast::None);
+    }
+
+    #[test]
+    fn the_help_text_names_every_output_mode() {
+        let h = help();
+        for mode in [
+            "--raw",
+            "--json",
+            "--csv",
+            "--bytes",
+            "typed-json",
+            "ndjson",
+            "resp",
+            "--show-pushes",
+            "--trace-wire",
+        ] {
+            assert!(h.contains(mode), "help does not mention {mode}");
+        }
+    }
+
+    #[test]
+    fn version_reports_the_catalog_it_was_built_from() {
+        let v = version();
+        assert!(v.starts_with("prc "));
+        assert!(v.contains("catalog redis:"));
+        assert!(v.contains("catalog valkey:"));
+        assert!(v.contains("@sha256:"), "the pinned image is named: {v}");
+        assert!(v.contains("catalog integrity: verified"), "{v}");
+    }
+
+    #[test]
+    fn probe_names_round_trip() {
+        for p in [Probe::Repl, Probe::Tui, Probe::Catalog] {
+            assert_eq!(Probe::parse(p.name()), Some(p));
+        }
+        assert_eq!(Probe::parse("nosuch"), None);
+    }
+
+    #[test]
+    fn a_probe_reports_a_plausible_number() {
+        let out = run_probe(Probe::Catalog).unwrap();
+        assert!(out.starts_with("probe=catalog rss_bytes="), "{out}");
+        // Both families merged: ~577 Redis plus the Valkey-only entries.
+        let n: usize = out
+            .split("commands=")
+            .nth(1)
+            .unwrap()
+            .trim()
+            .parse()
+            .unwrap();
+        assert!(n > 500, "the whole catalog is loaded, got {n}");
+        let n: u64 = out
+            .split("rss_bytes=")
+            .nth(1)
+            .unwrap()
+            .split(' ')
+            .next()
+            .unwrap()
+            .parse()
+            .expect("rss is a number on this platform");
+        assert!(n > 1024 * 1024, "implausibly small: {n}");
+    }
+}

@@ -12,3 +12,7 @@ description = "Penguin Redis — pr-tui"
 workspace = true
 
 [dependencies]
+ratatui = { workspace = true }
+pr-render = { path = "../pr-render" }
+pr-terminal = { path = "../pr-terminal" }
+thiserror = { workspace = true }

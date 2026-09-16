@@ -319,13 +319,44 @@ mod tests {
         assert!(headless_options(true).contains(&HeadlessFallback::AskPass));
     }
 
+    /// The OS credential store is one shared resource, and `cargo test` runs tests in
+    /// parallel. Two of these writing at once is how a Keychain call comes back with a
+    /// transient error and fails a test that has nothing to do with what it is checking —
+    /// which is exactly what happened twice before this lock existed.
+    static STORE_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+    /// Claim the store for one test, or say why it cannot run here.
+    ///
+    /// Returns the guard and the store. A `None` means there is genuinely no store on this
+    /// platform; that is a legitimate environment (§4.2 fail-closed), and every caller says
+    /// so out loud rather than passing silently.
+    fn claim_store() -> Option<(std::sync::MutexGuard<'static, ()>, PlatformStore)> {
+        let guard = STORE_LOCK
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        let store = PlatformStore;
+        if store.kind() == StoreKind::None {
+            println!("no credential store on this platform; skipping");
+            return None;
+        }
+        Some((guard, store))
+    }
+
+    /// Whether a store error means "not available here" rather than "the contract is broken".
+    ///
+    /// On macOS there is always a Keychain, so an unavailable store there is a real failure
+    /// and this returns false — a skip that can fire anywhere is a test that can stop testing
+    /// anything without anyone noticing.
+    fn is_environment_limit(e: &CredentialError) -> bool {
+        matches!(e, CredentialError::Unavailable(_)) && !is_macos()
+    }
+
     #[test]
     fn platform_store_round_trips_a_secret() {
         // V-D01 on this platform. Skips only where there is genuinely no store, and says so.
-        let store = PlatformStore;
-        if store.kind() == StoreKind::None {
+        let Some((_guard, store)) = claim_store() else {
             return;
-        }
+        };
         let r = unique_ref();
         match store.set(&r, "s3cret-value") {
             Ok(()) => {}
@@ -353,14 +384,14 @@ mod tests {
 
     #[test]
     fn secrets_with_awkward_bytes_round_trip() {
-        let store = PlatformStore;
-        if store.kind() == StoreKind::None {
+        let Some((_guard, store)) = claim_store() else {
             return;
-        }
+        };
         let r = unique_ref();
         let secret = "pä$$ word\twith\nnewline 中文 🐧";
-        if store.set(&r, secret).is_err() {
-            return; // unavailable store; covered by the test above
+        if let Err(e) = store.set(&r, secret) {
+            assert!(is_environment_limit(&e), "unexpected store error: {e}");
+            return;
         }
         assert_eq!(store.get(&r).unwrap(), secret);
         store.delete(&r).unwrap();
@@ -368,15 +399,18 @@ mod tests {
 
     #[test]
     fn two_references_do_not_collide() {
-        let store = PlatformStore;
-        if store.kind() == StoreKind::None {
+        let Some((_guard, store)) = claim_store() else {
             return;
-        }
+        };
         let a = unique_ref();
         let b = unique_ref();
-        if store.set(&a, "AAA").is_err() {
+        if let Err(e) = store.set(&a, "AAA") {
+            assert!(is_environment_limit(&e), "unexpected store error: {e}");
             return;
         }
+        // Everything from here is unconditional: the invariant under test is that the two
+        // entries are independent, and a store that accepted the first write but refused the
+        // second is a failure of that invariant, not an environment limit.
         store.set(&b, "BBB").unwrap();
         assert_eq!(store.get(&a).unwrap(), "AAA");
         assert_eq!(store.get(&b).unwrap(), "BBB");

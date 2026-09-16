@@ -12,7 +12,21 @@ description = "Penguin Redis — prc executable: argument parsing, startup, exit
 workspace = true
 
 [dependencies]
+# V-H01 links the whole chain on purpose: the budget question is whether the dependencies
+# themselves have eaten it, and a skeleton that links half of them cannot answer that.
+pr-application = { path = "../pr-application" }
+pr-catalog = { path = "../pr-catalog" }
 pr-core = { path = "../pr-core" }
+pr-intelligence = { path = "../pr-intelligence" }
+pr-json = { path = "../pr-json" }
+pr-profiles = { path = "../pr-profiles" }
+pr-protocol = { path = "../pr-protocol" }
+pr-render = { path = "../pr-render" }
 pr-repl = { path = "../pr-repl" }
+pr-results = { path = "../pr-results" }
+pr-routing = { path = "../pr-routing" }
+pr-security = { path = "../pr-security" }
+pr-terminal = { path = "../pr-terminal" }
+pr-tui = { path = "../pr-tui" }
 bytes = { workspace = true }
 thiserror = { workspace = true }
