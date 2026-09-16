@@ -204,13 +204,13 @@ jobs:
       # keyring; without one the test would be reporting the environment, not the code.
       - name: credential store round trip (non-Linux)
         if: runner.os != 'Linux'
-        run: cargo test -p pr-profiles --test credential_store -- --ignored --nocapture
+        run: ./ci/run-ignored.sh -p pr-profiles --test credential_store -- --nocapture
       - name: credential store round trip (Linux, with a session keyring)
         if: runner.os == 'Linux'
         run: |
           export $(dbus-launch)
           echo -n "ci" | gnome-keyring-daemon --unlock --replace --daemonize > /dev/null 2>&1 || true
-          cargo test -p pr-profiles --test credential_store -- --ignored --nocapture
+          ./ci/run-ignored.sh -p pr-profiles --test credential_store -- --nocapture
 
   # ---------------------------------------------------------------- SSH tunnels (V-G03)
   ssh-tunnels:
@@ -229,7 +229,7 @@ jobs:
       # Both §21.5 modes follow MOVED through a real sshd, host key checking refuses an
       # unknown key, and the tunnel is proved load-bearing by stopping the bastion.
       - name: both modes, end to end
-        run: cargo test -p pr-transport --test ssh_live -- --ignored --test-threads=1 --nocapture
+        run: ./ci/run-ignored.sh -p pr-transport --test ssh_live -- --test-threads=1 --nocapture
       - name: bastion log on failure
         if: failure()
         run: docker logs pr-ssh-bastion || true
@@ -294,7 +294,7 @@ jobs:
       # let V-C07's Windows PTY tests never run, so it is given its own job and run
       # explicitly, rather than left to a flag someone might drop.
       - name: two servers, five cases, four layers
-        run: cargo test -p differential -- --ignored --test-threads=1
+        run: ./ci/run-ignored.sh -p differential -- --test-threads=1
       - name: the committed report still reproduces
         run: ./ci/check-differential.sh
       - name: report on failure
@@ -316,7 +316,7 @@ jobs:
       # The pure half runs in the ordinary test job. This one adds a real server with 10^6
       # keys and a real ACL refusal, which is what ADR-033's numbers were measured against.
       - name: 10^6 keys, two match modes, a real NOPERM
-        run: cargo test -p pr-intelligence --test discovery_live -- --ignored --nocapture --test-threads=1
+        run: ./ci/run-ignored.sh -p pr-intelligence --test discovery_live -- --nocapture --test-threads=1
 
   # ---------------------------------------------------------------- Large values (V-H02)
   large-values:
@@ -333,7 +333,7 @@ jobs:
       # The synthetic 1 GiB case runs in the ordinary test job too. This one adds the real
       # server at its stock 512 MB limit, which needs Docker and half a gigabyte.
       - name: real Redis at its documented string limit
-        run: cargo test -p pr-protocol --test large_values -- --ignored --nocapture
+        run: ./ci/run-ignored.sh -p pr-protocol --test large_values -- --nocapture
 
   # ---------------------------------------------------------------- Manifest gate
   manifest-pinned:
