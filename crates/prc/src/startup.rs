@@ -71,6 +71,7 @@ pub fn help() -> String {
         "    -2, -3                choose the RESP version explicitly\n",
         "\n",
         "OTHER:\n",
+        "    --mcp-stdio           speak JSON-RPC over stdin/stdout for an MCP host\n",
         "    --probe-width         measure this terminal's character widths (§14.6)\n",
         "    --tui                 open the terminal UI\n",
         "    --help                this text\n",

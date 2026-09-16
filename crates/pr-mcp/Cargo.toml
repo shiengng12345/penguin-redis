@@ -12,3 +12,9 @@ description = "Penguin Redis — pr-mcp"
 workspace = true
 
 [dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }   # Penguin-owned schema (JSON-RPC), not server business JSON
+thiserror = { workspace = true }
+bytes = { workspace = true }
+pr-core = { path = "../pr-core" }
+pr-security = { path = "../pr-security" }

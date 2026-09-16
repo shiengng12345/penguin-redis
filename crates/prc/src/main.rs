@@ -53,6 +53,28 @@ fn main() {
         }
     }
 
+    // §29.4: `--mcp-stdio` is a **separate** bootstrap path, and separate means it branches
+    // here — before the argument contract, before the catalog, before anything that might
+    // print. A path that shares the ordinary start-up and then suppresses output is one stray
+    // `println!` away from breaking every MCP host that talks to it, with a JSON parse error
+    // that points nowhere near the cause.
+    if argv.iter().any(|a| a == "--mcp-stdio") {
+        let stdin = std::io::stdin();
+        let code = match pr_mcp::stdio::serve(
+            stdin.lock(),
+            std::io::stdout().lock(),
+            std::io::stderr().lock(),
+            &pr_mcp::stdio::EmptyBackend,
+        ) {
+            Ok(()) => ExitCode::Success,
+            Err(e) => {
+                eprintln!("prc: mcp-stdio: {e}");
+                ExitCode::LocalFailure
+            }
+        };
+        std::process::exit(code as i32);
+    }
+
     // `--help` must reach the terminal without loading the catalog, opening a database,
     // claiming the terminal or starting a runtime. V-H01 asserts exactly that.
     match startup::fast_path(&argv) {

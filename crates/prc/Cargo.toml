@@ -19,6 +19,7 @@ pr-catalog = { path = "../pr-catalog" }
 pr-core = { path = "../pr-core" }
 pr-intelligence = { path = "../pr-intelligence" }
 pr-json = { path = "../pr-json" }
+pr-mcp = { path = "../pr-mcp" }
 pr-profiles = { path = "../pr-profiles" }
 pr-protocol = { path = "../pr-protocol" }
 pr-render = { path = "../pr-render" }

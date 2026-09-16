@@ -1184,6 +1184,14 @@ dependencies = [
 [[package]]
 name = "pr-mcp"
 version = "0.0.0"
+dependencies = [
+ "bytes",
+ "pr-core",
+ "pr-security",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-ops"
@@ -1321,6 +1329,7 @@ dependencies = [
  "pr-core",
  "pr-intelligence",
  "pr-json",
+ "pr-mcp",
  "pr-profiles",
  "pr-protocol",
  "pr-render",
