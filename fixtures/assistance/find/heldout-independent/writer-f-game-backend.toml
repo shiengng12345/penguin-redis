@@ -1,0 +1,457 @@
+# Held-out phrasing corpus, written by a game backend developer.
+# One Chinese and one English phrasing per command, intent only.
+
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "同时盯几个匹配队列 有人就阻塞取走",
+  "wait on several ranked queues then pop top or bottom",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "在匹配队列里等到分最高的玩家再返回",
+  "block until the highest scoring entry leaves the queue",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "挂起等待 优先级最小的那个任务出队",
+  "hang there until the lowest ranked item pops off",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "把玩家和他的赛季积分放进排行榜",
+  "put a player onto the leaderboard with a score",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "这个排行榜上总共有多少个玩家",
+  "how many entries the whole ranking holds",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "统计积分在某个区间的玩家人数",
+  "number of players rated between two values",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "昨天上榜但今天不在榜上的那批人",
+  "ranked ids in one board and missing from the others",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "两个榜相减的结果落到一个新 key",
+  "save the subtracted ranking straight into another key",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给这个玩家的段位分再加几分",
+  "bump one player rating up on the ladder",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "两个榜都在的玩家 直接返回带分数",
+  "players on every board with their points added up",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "只想知道两个榜重合多少人 名单不要",
+  "just the size of the overlap between two ladders",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "加权合并共同上榜的玩家 结果存成新榜",
+  "write the weighted overlap ranking to a destination key",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "同分的情况下 昵称在某段区间的有几条",
+  "count equally scored entries between two names",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "从一串队列里挑第一个非空的弹几个出来",
+  "take entries off whichever ranked queue is not empty",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "一次查一堆玩家各自的积分",
+  "fetch points for several players in one shot",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "摘掉榜首那个玩家 顺手拿到他是谁",
+  "remove and hand back the current top player",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "把垫底的那条记录取出来并删掉",
+  "pull the weakest entry off the ladder",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "从榜里随便抽个玩家发奖励",
+  "grab a random name out of the ranking",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "按名次取前二十名",
+  "list leaderboard slots one through ten",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "同分玩家按昵称字典序取一段",
+  "slice equally scored entries by alphabetical name range",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "取出积分在 1000 到 2000 之间的玩家",
+  "everyone whose rating falls inside a bracket",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "把前一百名截出来 存到另一个 key",
+  "copy a slice of the ladder into its own key",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "这个玩家从低往高数排在第几位",
+  "position of one player counting up from the bottom",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "把作弊的玩家从榜单里踢掉",
+  "drop specific players off the ranking",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "按昵称区间批量清掉那些同分记录",
+  "delete equal score entries falling in a name range",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "只保留前一千名 后面的名次全砍掉",
+  "trim the ladder by position and keep the top slots",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "清掉积分低于门槛的所有玩家",
+  "purge entries whose rating sits under a cutoff",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "从第一名往下倒着取十条",
+  "top ten listed from highest position downward",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "同分记录按昵称倒着字典序翻页",
+  "walk equal score names backwards through the alphabet",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "按分数从高到低取这个区间的玩家",
+  "players in a rating window ordered best first",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "玩家在榜上是第几名 榜首算 0",
+  "where a player sits counting down from the top",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "分批遍历整个大排行榜 别卡住服务器",
+  "cursor through a huge ranking a page at a time",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "查这个玩家现在多少积分",
+  "current rating value stored for one player",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "几个分区榜合起来看 分数相加",
+  "merge several ladders and read the combined list",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "各服排行榜合并 写成一份全服总榜",
+  "build a global ranking key out of regional ones",
+]
+
+[[case]]
+command = "SADD"
+phrases = [
+  "把道具塞进玩家背包的去重集合",
+  "register a player id into a group",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "这个房间里现在有多少人",
+  "how many unique members the bucket has",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "在线玩家里还没进房间的是哪些",
+  "ids in the first bucket but not in the rest",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "排除之后剩下的玩家名单存成新集合",
+  "persist the leftover ids into another key",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "同时拿到两个成就的玩家有谁",
+  "members shared by all of these groups",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "两个标签的重合人数 名单不用给我",
+  "how many ids overlap without listing them out",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "交集算完直接写进一个新的 key",
+  "save the common members as a fresh bucket",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "判断这个玩家在不在黑名单里",
+  "check whether one id belongs to the group",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "列出房间里全部玩家 id",
+  "dump every member of the bucket at once",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "一次判断好几个道具在不在背包里",
+  "test a batch of ids for membership together",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "把玩家从等待房挪到战斗房",
+  "shift one id between buckets atomically",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "随机抽走一个玩家去开局",
+  "take a random member out for good",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "随机看一个玩家 但别把他移出来",
+  "peek at random ids and leave them in place",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "玩家退房 把他从名单里移除",
+  "delete the given ids from the group",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "用游标分页扫这个超大集合",
+  "iterate a big membership bucket incrementally",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "把几个房间的人合成一份名单",
+  "everyone across these buckets with duplicates collapsed",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "合并后的名单直接落到新 key",
+  "write the merged membership into another key",
+]
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "记录今天登录的玩家 只要大概去重",
+  "feed player ids into an approximate unique counter",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "估算今天日活大概多少人",
+  "read the estimated number of distinct visitors",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "把每天的去重计数合成一周的",
+  "combine several approximate counters into a single one",
+]
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "把玩家的经纬度写进地图索引",
+  "store a lat lon point for a player",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "这两个玩家之间隔了多远",
+  "distance in meters between two stored points",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "拿到这个位置的那串标准编码字符串",
+  "standard short string encoding of a stored location",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "反查某个玩家存的经纬度是多少",
+  "read back the coordinates for given members",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "以某个坐标为圆心找附近玩家 老版本写法",
+  "legacy nearby lookup around a given point",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "以某个玩家为中心找周围的人 旧命令",
+  "older proximity search centred on an existing entry",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "以成员为中心的附近查询 只读版本 可以走从库",
+  "replica safe form of the member centred proximity query",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "按坐标找附近 保证不会写入的那个变体",
+  "non writing variant of the coordinate based nearby lookup",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "查附近的玩家 支持圆形或者矩形范围",
+  "find entries inside a radius or a rectangle",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "把附近搜索的结果存到另一个 key",
+  "save the proximity query output into a destination key",
+]

@@ -1,0 +1,335 @@
+[[case]]
+command = "COPY"
+phrases = [
+  "把一个 key 的内容复制成另一个 key",
+  "duplicate a key under a new name, original untouched",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "直接把这几个 key 删掉，同步释放内存",
+  "remove one or more keys right now",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "把某个 key 的值导出成二进制串做备份",
+  "serialize a single key value for later restore",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "确认这个 key 还在不在",
+  "check whether a key is still present",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "给 key 设置多少秒之后自动过期",
+  "make a key auto expire in N seconds",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "让 key 在指定的 unix 秒时间戳失效",
+  "expire a key at an exact wall clock time",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "查 key 到底哪个时间点会被清掉，秒级时间戳",
+  "read back the absolute expiry timestamp in seconds",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "按 pattern 一次列出全部 key，生产上会阻塞",
+  "list every key matching a glob pattern, blocking scan",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "把 key 搬到另一个实例上去",
+  "transfer a key across to a different redis server",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "把 key 挪到同一个实例的别的 db",
+  "shift a key into another database number",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "查看 key 底层对象的内部信息",
+  "inspect internal details about a stored value",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "这个 hash 底层到底是 listpack 还是 hashtable",
+  "which internal representation is this value using",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "LFU 淘汰策略下这个 key 的访问频率计数",
+  "access frequency counter used by the lfu policy",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "这个 key 多久没被人访问过了",
+  "how long since anything last read this value",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "这个值被共享引用了多少次",
+  "number of references held on a shared value",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "去掉 key 的过期时间，让它永久留着",
+  "stop a key from ever expiring",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "按毫秒给 key 设定存活时间",
+  "set a lifetime in milliseconds rather than seconds",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "指定一个毫秒时间戳，到点让 key 失效",
+  "expire at an absolute millisecond timestamp",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "读出过期时刻的毫秒时间戳",
+  "look up the exact expiry instant in milliseconds",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "还剩多少毫秒就过期",
+  "remaining lifetime at millisecond precision",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随便抽一个 key 出来看看",
+  "pick an arbitrary key out of the keyspace",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "给 key 改个名字，目标存在也直接覆盖",
+  "rename a key, clobbering the target if it exists",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "改名，但新名字已被占用就不要动",
+  "rename only when the new name is still free",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "把导出的序列化数据灌回成一个 key",
+  "recreate a key from its serialized payload",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "用游标分批遍历 keyspace，不阻塞线上",
+  "walk the keyspace in small batches with a cursor",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "对 list 或 set 排序，还能按外部 key 取值",
+  "order the elements of a collection, optionally storing the result",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "只读版排序，可以打到只读从库上跑",
+  "sort a collection on a replica with no write flag",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "刷新 key 的最后访问时间，别被 LRU 淘汰",
+  "bump last access time on keys without reading them",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "看看这个 key 还有几秒就没了",
+  "how many seconds of life are left",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "这个 key 里存的是什么数据结构",
+  "find out what kind of value a key holds",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "后台异步回收大 key，别卡住主线程",
+  "delete huge keys in a background thread",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "等写入同步到指定数量的从库再返回",
+  "block until N replicas acknowledge my writes",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "等写入真正 fsync 落盘到 AOF 再继续",
+  "block until writes are fsynced to the append only file",
+]
+
+[[case]]
+command = "BITCOUNT"
+phrases = [
+  "统计这串 bit 里面有多少个 1",
+  "count how many bits are set within a range",
+]
+
+[[case]]
+command = "BITFIELD"
+phrases = [
+  "把 string 当成整数数组做位段读写和自增",
+  "pack several small integers into one string and update them",
+]
+
+[[case]]
+command = "BITFIELD_RO"
+phrases = [
+  "只读取位段里的数值，从库也能执行",
+  "read packed integer fields without any write",
+]
+
+[[case]]
+command = "BITOP"
+phrases = [
+  "对多个 bitmap 做与或异或，结果存成新 key",
+  "combine two bitmaps with a boolean operation",
+]
+
+[[case]]
+command = "BITPOS"
+phrases = [
+  "找出第一个为 1 的 bit 在第几位",
+  "locate the first zero or one bit in a string",
+]
+
+[[case]]
+command = "GETBIT"
+phrases = [
+  "看某个 offset 上那一位是 0 还是 1",
+  "read the single bit sitting at a given offset",
+]
+
+[[case]]
+command = "SETBIT"
+phrases = [
+  "把指定 offset 上的那一位置成 1",
+  "flip one bit at an offset to zero or one",
+]
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "把用户 id 丢进去做去重基数统计",
+  "feed items into an approximate unique counter",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "估算独立访客大概有多少",
+  "get the estimated number of distinct items",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "把几天的去重结构合并成一个总的",
+  "combine several approximate counters into one",
+]
+
+[[case]]
+command = "DISCARD"
+phrases = [
+  "把排队的那批命令全部取消，不要执行",
+  "throw away queued commands instead of running them",
+]
+
+[[case]]
+command = "EXEC"
+phrases = [
+  "提交刚才排队的那一批命令",
+  "run the whole queued batch atomically",
+]
+
+[[case]]
+command = "MULTI"
+phrases = [
+  "开一段原子命令块，后面的先排队",
+  "begin queuing commands to run as one unit",
+]
+
+[[case]]
+command = "UNWATCH"
+phrases = [
+  "取消之前对那些 key 的监视",
+  "forget all keys marked for optimistic locking",
+]
+
+[[case]]
+command = "WATCH"
+phrases = [
+  "盯住这些 key，别人改过事务就失败",
+  "mark keys so a concurrent change aborts my batch",
+]

@@ -1,0 +1,253 @@
+# Held-out phrasing corpus, written from memory of Redis, beginner register.
+
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "把一条数据从这个队列挪到那个队列，空的话就等着",
+  "take one item off a list into another and wait if there is nothing",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "同时盯着好几个列表，谁先有东西就从谁那儿拿，没有就等",
+  "watch a few lists at once and grab from whichever fills up first",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "从最前面取走一条，暂时没有就一直等着",
+  "grab the first one, and hang there until something shows up",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "从后面那头拿走一个，没有的话就挂着别急着返回",
+  "pull the one at the back, blocking until one arrives",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "把末尾那条搬到另一个队列的开头去，空了就等新的",
+  "move the last entry onto the front of a second list, waiting if empty",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "看看排在第三个的那条到底是什么",
+  "read whatever is sitting at a given spot",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "在某个已有的值旁边插一条新的进去",
+  "squeeze a new value in right after an existing one",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "这串东西一共有多少条",
+  "how many things are in here altogether",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "把一头的那条直接搬去另一个列表，不用等",
+  "shift an entry from one list straight onto another",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "一次查好几个列表，从第一个不空的里面取",
+  "take from the first of several lists that has anything in it",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "把开头那条取出来，同时从里面去掉",
+  "pull off the first one and remove it at the same time",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "查某个值现在排在第几个",
+  "find out where a certain value sits in the order",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "往最前面塞一条新的进去",
+  "put a new entry at the very front",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "只有这串东西已经存在时才往前面加",
+  "add at the head only if it already exists, otherwise do nothing",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "取出第几条到第几条之间的那一段",
+  "get a chunk between two positions without deleting it",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "把里面等于某个值的那几条删掉",
+  "delete the entries that match a certain value",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "把某个位置上的内容改成新的",
+  "overwrite whatever is at position number three",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "只留下开头那一百条，后面的全丢掉",
+  "cut it down so only a range of positions stays",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "把排在最后面的那条拿走",
+  "take off the one at the back and hand it over",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "末尾那条直接挪到另一个列表的开头",
+  "last item of one list becomes the head of another",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "在后面接着追加一条",
+  "tack something onto the end",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "存在的时候才往末尾加，不存在就算了",
+  "append at the end only when the key is already there",
+]
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "用通配符一次订阅一批名字相近的频道",
+  "listen on every channel whose name matches a pattern",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "往一个频道里丢一条消息，谁在听谁收到",
+  "broadcast a message out to whoever is currently listening",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "看看这套消息广播现在是什么情况",
+  "poke around the state of the message broadcasting system",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "列出眼下有人在听的那些频道名字",
+  "show which channels currently have someone on them",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "现在一共挂了多少个通配符形式的订阅",
+  "count how many wildcard style listeners exist in total",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "某个频道现在有几个人在听",
+  "how many clients are tuned into a given channel",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "列出集群分片上正在用的那种频道",
+  "list the per shard channels that have listeners right now",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "分片上的那个频道有多少人在收",
+  "number of clients listening on a shard local channel",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "取消之前按通配符定下的那批频道",
+  "stop following the channels I matched with a wildcard",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "在集群里只把消息发到这一个分片上",
+  "send a message that stays inside one shard",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "订阅集群分片内部的那种频道",
+  "start listening on a shard scoped channel",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "盯住一个频道，等别人发东西过来",
+  "start receiving whatever gets sent on a named channel",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "不再接收那个分片频道上的消息",
+  "stop listening on a shard channel I joined earlier",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "退出来，不想再收这个频道的消息了",
+  "quit getting messages from a channel I joined",
+]

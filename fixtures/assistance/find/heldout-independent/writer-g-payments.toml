@@ -1,0 +1,349 @@
+[[case]]
+command = "APPEND"
+phrases = [
+  "把一段内容拼到已有字符串后面，不覆盖原来的",
+  "tack extra bytes onto the end of an existing value",
+]
+
+[[case]]
+command = "DECR"
+phrases = [
+  "余额计数原子减一，不能有并发问题",
+  "knock a counter down by one atomically",
+]
+
+[[case]]
+command = "DECRBY"
+phrases = [
+  "从计数里一次扣掉指定的整数",
+  "subtract a given amount from a stored number",
+]
+
+[[case]]
+command = "GET"
+phrases = [
+  "读出某个 key 现在存的值",
+  "just read back whatever is stored under a key",
+]
+
+[[case]]
+command = "GETDEL"
+phrases = [
+  "取值的同时把 key 删掉，保证只被消费一次",
+  "fetch a value and remove it in the same atomic step",
+]
+
+[[case]]
+command = "GETEX"
+phrases = [
+  "读值顺便续期，刷新它的存活时间",
+  "read a value and reset its expiry at the same time",
+]
+
+[[case]]
+command = "GETRANGE"
+phrases = [
+  "按起止下标取字符串中间的一段",
+  "pull a substring out by start and end offset",
+]
+
+[[case]]
+command = "GETSET"
+phrases = [
+  "写入新值并把旧值原子地拿回来",
+  "replace a value and return what was there before",
+]
+
+[[case]]
+command = "INCR"
+phrases = [
+  "原子自增一，用来生成不重号的流水号",
+  "bump a number up by one with no race",
+]
+
+[[case]]
+command = "INCRBY"
+phrases = [
+  "给已存的数字加上指定整数增量",
+  "add a specific whole number to a counter",
+]
+
+[[case]]
+command = "INCRBYFLOAT"
+phrases = [
+  "对金额字段做带小数的累加",
+  "increase a stored number by a decimal amount",
+]
+
+[[case]]
+command = "LCS"
+phrases = [
+  "比对两个字符串，找出最长公共子序列",
+  "diff two stored values by longest common subsequence",
+]
+
+[[case]]
+command = "MGET"
+phrases = [
+  "一次批量读出多个 key，少几次往返",
+  "read several keys in a single round trip",
+]
+
+[[case]]
+command = "MSET"
+phrases = [
+  "一口气写入多个键值对",
+  "write many key value pairs in one shot",
+]
+
+[[case]]
+command = "MSETNX"
+phrases = [
+  "批量写入，只要有一个已经存在就整批都不写",
+  "write the whole batch only if none of them exist yet",
+]
+
+[[case]]
+command = "PSETEX"
+phrases = [
+  "写值的同时给个毫秒级的存活时间",
+  "store a value with a lifetime measured in milliseconds",
+]
+
+[[case]]
+command = "SET"
+phrases = [
+  "把值写进 key，原来的直接覆盖掉",
+  "store a value under a key, overwriting anything there",
+]
+
+[[case]]
+command = "SETEX"
+phrases = [
+  "写值并同时指定多少秒后自动失效",
+  "write a value that dies after N seconds",
+]
+
+[[case]]
+command = "SETNX"
+phrases = [
+  "只有 key 不存在时才写进去，抢分布式锁",
+  "claim a key only if nobody else holds it",
+]
+
+[[case]]
+command = "SETRANGE"
+phrases = [
+  "从指定偏移量开始，就地覆盖写一段内容",
+  "overwrite part of a value starting at a byte offset",
+]
+
+[[case]]
+command = "STRLEN"
+phrases = [
+  "看看这个值到底占多少字节",
+  "how long is the value stored at this key",
+]
+
+[[case]]
+command = "SUBSTR"
+phrases = [
+  "老写法，按下标截取值的一部分",
+  "legacy way to slice a portion of a stored string",
+]
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "把记录里的某几个字段删掉",
+  "drop one or more fields from a record",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "判断这个字段在不在，做幂等校验",
+  "check whether a field is present in a record",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "给单个字段设几秒后过期，不影响整个 key",
+  "let individual fields expire after some seconds",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "让字段在某个 unix 秒时间点作废",
+  "expire one field at an absolute second timestamp",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "查这个字段到期的绝对秒时间戳是多少",
+  "what unix second is this field due to vanish",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "读记录里某一个字段的值",
+  "read a single field out of a record",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "把整条记录的字段和值全都取出来",
+  "dump every field and value of one record",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "取字段值并顺手把该字段移除，只消费一次",
+  "read a field and remove it atomically",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "读字段的同时改它的存活时间",
+  "fetch a field and adjust its expiry in one go",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "对记录内部的整数字段做原子累加",
+  "increment a counter that lives inside a record",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "记录里的金额字段加一个小数",
+  "add a decimal amount to a field of a record",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "只列出记录有哪些字段名",
+  "list just the field names of a record",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "数一下这条记录有多少个字段",
+  "count how many fields a record holds",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "一次读同一条记录里的好几个字段",
+  "pull several fields of one record together",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "老接口，一次给记录写多个字段",
+  "deprecated way to write multiple fields at once",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "去掉字段上的过期设置，让它长期留着",
+  "make an expiring field permanent again",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "按毫秒给某个字段设一个超时",
+  "give one field a millisecond timeout",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "字段在指定的毫秒时间戳那一刻失效",
+  "expire a field at an exact millisecond instant",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "查字段过期的毫秒级时间戳",
+  "the millisecond deadline sitting on a field",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "这个字段还剩多少毫秒",
+  "milliseconds left before a field disappears",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "从记录里随机挑几个字段做抽样对账",
+  "pick random fields out of a record for sampling",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "分批游标遍历超大记录，不阻塞线上",
+  "walk a huge record incrementally without blocking",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "往记录里写字段和对应的值",
+  "write field values into a record",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "写字段的同时就带上过期时间",
+  "set fields and their lifetime in a single call",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "字段不存在才写，绝不覆盖已有数据",
+  "add a field only when it is not already there",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "看记录里某个字段值有多长",
+  "length of the value held in one field",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "这个字段还有多少秒到期",
+  "seconds remaining on a single record field",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "只要记录里的所有值，不要字段名",
+  "get all the values of a record without the names",
+]
