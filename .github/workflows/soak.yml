@@ -1,8 +1,7 @@
 name: Soak
 
-# V-H05 / PERF-04 (v2.1 §32.1 Soak). Its own workflow for two reasons: it runs for five and a
-# hours, and `ci.yml` cancels superseded runs — which would kill this one the moment
-# anybody pushed.
+# V-H05 / PERF-04 (v2.1 §32.1 Soak). Its own workflow for two reasons: it runs for hours, and
+# `ci.yml` cancels superseded runs — which would kill this one the moment anybody pushed.
 #
 # §32.1 asks for eight hours. A GitHub-hosted runner kills any job at six, and a release build
 # has to happen first, so this runs five and the full eight-hour evidence comes from a machine
