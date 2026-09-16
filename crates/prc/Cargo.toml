@@ -27,6 +27,7 @@ pr-results = { path = "../pr-results" }
 pr-routing = { path = "../pr-routing" }
 pr-security = { path = "../pr-security" }
 pr-terminal = { path = "../pr-terminal" }
+pr-transport = { path = "../pr-transport" }
 pr-tui = { path = "../pr-tui" }
 bytes = { workspace = true }
 thiserror = { workspace = true }

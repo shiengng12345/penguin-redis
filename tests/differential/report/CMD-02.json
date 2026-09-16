@@ -1,0 +1,51 @@
+{
+  "case_id": "CMD-02",
+  "baseline_cli": "redis-cli 7.4.11",
+  "server_image_digest": "redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7",
+  "protocol": "RESP2",
+  "initial_state_fixture": "empty",
+  "request": [
+    "set",
+    "diff:CMD02:MixedKey",
+    "VaLuE"
+  ],
+  "expected_reply": "simple string OK",
+  "criterion": "只识别命令，不修改 key/value",
+  "execution_status": "PASS",
+  "layers": {
+    "argv_bytes": {
+      "verdict": "same"
+    },
+    "reply_bytes": {
+      "verdict": "same"
+    },
+    "final_state": {
+      "verdict": "same"
+    },
+    "output_and_exit": {
+      "verdict": "same"
+    }
+  },
+  "baseline_observed": {
+    "sent": "[set diff:CMD02:MixedKey VaLuE]",
+    "received": "+OK\\r\\n",
+    "stdout": "OK\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"VaLuE\")",
+      "Integer(0)"
+    ]
+  },
+  "penguin_observed": {
+    "sent": "[set diff:CMD02:MixedKey VaLuE]",
+    "received": "+OK\\r\\n",
+    "stdout": "OK\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"VaLuE\")",
+      "Integer(0)"
+    ]
+  }
+}

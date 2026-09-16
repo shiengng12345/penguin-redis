@@ -1,0 +1,50 @@
+{
+  "case_id": "CMD-05",
+  "baseline_cli": "redis-cli 7.4.11",
+  "server_image_digest": "redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7",
+  "protocol": "RESP2",
+  "initial_state_fixture": "hash-existing-field",
+  "request": [
+    "HSET",
+    "diff:cmd05",
+    "status",
+    "SUSPENDED"
+  ],
+  "expected_reply": "integer 0",
+  "criterion": "不显示失败，不捏造修改数",
+  "execution_status": "PASS",
+  "layers": {
+    "argv_bytes": {
+      "verdict": "same"
+    },
+    "reply_bytes": {
+      "verdict": "same"
+    },
+    "final_state": {
+      "verdict": "same"
+    },
+    "output_and_exit": {
+      "verdict": "same"
+    }
+  },
+  "baseline_observed": {
+    "sent": "[HSET diff:cmd05 status SUSPENDED]",
+    "received": ":0\\r\\n",
+    "stdout": "0\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"SUSPENDED\")"
+    ]
+  },
+  "penguin_observed": {
+    "sent": "[HSET diff:cmd05 status SUSPENDED]",
+    "received": ":0\\r\\n",
+    "stdout": "0\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"SUSPENDED\")"
+    ]
+  }
+}

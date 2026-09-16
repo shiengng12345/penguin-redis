@@ -189,6 +189,29 @@ jobs:
       - name: security test suite
         run: cargo nextest run --workspace --no-fail-fast -E 'test(/security_|secret_|injection_|approval_/)' --no-tests=pass
 
+  # ---------------------------------------------------------------- Differential gate
+  differential:
+    name: differential (prc vs pinned redis-cli, four layers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      # The live half is `#[ignore]` because it needs Docker. That is exactly the shape that
+      # let V-C07's Windows PTY tests never run, so it is given its own job and run
+      # explicitly, rather than left to a flag someone might drop.
+      - name: two servers, five cases, four layers
+        run: cargo test -p differential -- --ignored --test-threads=1
+      - name: the committed report still reproduces
+        run: ./ci/check-differential.sh
+      - name: report on failure
+        if: failure()
+        run: cat tests/differential/report/*.json || true
+
   # ---------------------------------------------------------------- Manifest gate
   manifest-pinned:
     name: compatibility manifest is digest-pinned

@@ -12,3 +12,6 @@ description = "Penguin Redis — pr-transport"
 workspace = true
 
 [dependencies]
+bytes = { workspace = true }
+thiserror = { workspace = true }
+pr-protocol = { path = "../pr-protocol" }

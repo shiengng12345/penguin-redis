@@ -1,0 +1,50 @@
+{
+  "case_id": "CMD-03",
+  "baseline_cli": "redis-cli 7.4.11",
+  "server_image_digest": "redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7",
+  "protocol": "RESP2",
+  "initial_state_fixture": "one-string",
+  "request": [
+    "MGET",
+    "diff:cmd03",
+    "diff:cmd03",
+    "diff:cmd03:absent"
+  ],
+  "expected_reply": "array of three: bulk, the same bulk again, null",
+  "criterion": "保留重复、顺序、nil",
+  "execution_status": "PASS",
+  "layers": {
+    "argv_bytes": {
+      "verdict": "same"
+    },
+    "reply_bytes": {
+      "verdict": "same"
+    },
+    "final_state": {
+      "verdict": "same"
+    },
+    "output_and_exit": {
+      "verdict": "same"
+    }
+  },
+  "baseline_observed": {
+    "sent": "[MGET diff:cmd03 diff:cmd03 diff:cmd03:absent]",
+    "received": "*3\\r\\n$7\\r\\npresent\\r\\n$7\\r\\npresent\\r\\n$-1\\r\\n",
+    "stdout": "present\\npresent\\n\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"present\")"
+    ]
+  },
+  "penguin_observed": {
+    "sent": "[MGET diff:cmd03 diff:cmd03 diff:cmd03:absent]",
+    "received": "*3\\r\\n$7\\r\\npresent\\r\\n$7\\r\\npresent\\r\\n$-1\\r\\n",
+    "stdout": "present\\npresent\\n\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Bulk(b\"present\")"
+    ]
+  }
+}

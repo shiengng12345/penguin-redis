@@ -18,6 +18,25 @@ budget. Linking half of them could not answer that.
 | catalog alone RSS | — | 5.2 MiB | 5.0 MiB | — |
 | `prc` binary | — | — | 1.6 MiB | — |
 
+## 2026-09-16, re-measured — after V-B01 (ADR-031) and V-A02's passthrough landed
+
+Same machine and toolchain. Re-measured because the previous run's caveat said to: at that
+point `pr-transport` was empty and the protocol-library question was open.
+
+| measurement | budget (§24.6) | debug | release | headroom (release) | vs first run |
+|---|---|---|---|---|---|
+| `prc --help` p50 | — | 2.05 ms | 1.77 ms | — | −1.95 ms |
+| `prc --help` p95 | ≤ 100 ms | 2.30 ms | 1.91 ms | **98 ms** | −2.95 ms |
+| idle REPL RSS | ≤ 30 MiB | 5.2 MiB | 4.3 MiB | **25.7 MiB** | −0.7 MiB |
+| idle TUI RSS | ≤ 60 MiB | 6.9 MiB | 6.2 MiB | **53.8 MiB** | −0.3 MiB |
+| catalog alone RSS | — | 5.0 MiB | 4.5 MiB | — | −0.5 MiB |
+| `prc` binary | — | — | 1.69 MiB | — | +0.09 MiB |
+
+Nothing regressed, which needs saying carefully rather than celebrating: the run-to-run spread
+on an idle laptop is larger than most of these deltas, so the honest reading is "the transport
+and the passthrough cost nothing measurable", not "startup got 2 ms faster". The binary grew
+90 KB, which is `pr-transport` plus the passthrough renderer, and that number is real.
+
 The debug figures are the ones CI asserts. That is the conservative direction: a debug build
 is larger and slower, so a debug build that fits proves a release build does.
 
@@ -27,9 +46,17 @@ Linked: `tokio`, `rusqlite` (bundled SQLite), `keyring`, `crossterm`, `ratatui`,
 `serde`/`serde_json`/`toml`, `unicode-width`, and the embedded catalog (~600 KB of pinned
 snapshots for Redis 8.0.6 and Valkey 8.1.10, 586 merged commands).
 
-**Not yet linked**, because the choice has not been made: the TLS stack and `redis-rs`.
-`pr-transport` is still an empty crate. The headroom above — 95 ms and 25 MiB — is what those
-have to fit inside, and this table must be re-measured when they land. Recording the headroom
+`pr-transport` is no longer empty: V-A02 needed a passthrough to run the differential harness
+against, so it now carries `oneshot` — a blocking TCP client and the RESP command encoder. It
+is deliberately small and Phase 1 replaces it.
+
+**`redis-rs` will never be linked.** ADR-031 settled that: it is a dev-dependency and an
+interop test subject, and `ci/check-redis-rs-is-dev-only.sh` resolves the real link graph to
+keep it one. So the headroom below does not have to hold room for it.
+
+**Still not linked**, because the choice has not been made: the TLS stack (V-G04) and the
+controlled SSH path (V-G03). The headroom above — now 98 ms and 25.7 MiB — is what those have
+to fit inside, and this table must be re-measured when they land. Recording the headroom
 rather than only the pass/fail is the point: it is the number a later decision is made from.
 
 ## Why `--help` is cheap, structurally

@@ -1,0 +1,50 @@
+{
+  "case_id": "CMD-04",
+  "baseline_cli": "redis-cli 7.4.11",
+  "server_image_digest": "redis@sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7",
+  "protocol": "RESP2",
+  "initial_state_fixture": "hash-with-empty-field",
+  "request": [
+    "HMGET",
+    "diff:cmd04",
+    "empty",
+    "absent"
+  ],
+  "expected_reply": "array of two: empty bulk, null — distinguishable on the wire only",
+  "criterion": "nil 与 empty string 明确区分",
+  "execution_status": "PASS",
+  "layers": {
+    "argv_bytes": {
+      "verdict": "same"
+    },
+    "reply_bytes": {
+      "verdict": "same"
+    },
+    "final_state": {
+      "verdict": "same"
+    },
+    "output_and_exit": {
+      "verdict": "same"
+    }
+  },
+  "baseline_observed": {
+    "sent": "[HMGET diff:cmd04 empty absent]",
+    "received": "*2\\r\\n$0\\r\\n\\r\\n$-1\\r\\n",
+    "stdout": "\\n\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Array([Bulk(b\"present\"), Bulk(b\"P\"), Bulk(b\"empty\"), Bulk(b\"\")])"
+    ]
+  },
+  "penguin_observed": {
+    "sent": "[HMGET diff:cmd04 empty absent]",
+    "received": "*2\\r\\n$0\\r\\n\\r\\n$-1\\r\\n",
+    "stdout": "\\n\\n",
+    "stderr": "",
+    "exit": 0,
+    "final_state": [
+      "Array([Bulk(b\"present\"), Bulk(b\"P\"), Bulk(b\"empty\"), Bulk(b\"\")])"
+    ]
+  }
+}

@@ -7,6 +7,7 @@
 
 mod args;
 mod binout;
+mod passthrough;
 mod startup;
 
 use pr_core::ExitCode;
@@ -78,7 +79,22 @@ fn main() {
     }
 
     let code = match args::parse(&argv) {
-        Ok(_inv) => ExitCode::Success,
+        // V-A02 scaffolding: a direct target plus a command is executed as a passthrough, so
+        // the differential harness has something to compare against `redis-cli`. Everything
+        // else still stops at the argument contract — Phase 0 owns the contract, not the
+        // kernel. See `pr_transport::oneshot` for why this must not grow.
+        Ok(inv) => match &inv.target {
+            args::Target::Direct { host, port, url } if !inv.command.is_empty() => {
+                if url.is_some() {
+                    eprintln!("prc: -u is not implemented in the Phase 0 passthrough");
+                    ExitCode::Usage
+                } else {
+                    let host = host.clone().unwrap_or_else(|| "127.0.0.1".to_owned());
+                    passthrough::run(&inv, &host, port.unwrap_or(6379))
+                }
+            }
+            _ => ExitCode::Success,
+        },
         Err(e) => {
             eprintln!("prc: {e}");
             ExitCode::Usage

@@ -1,0 +1,24 @@
+[package]
+name = "differential"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Penguin Redis — V-A02 differential harness: prc vs a pinned redis-cli, four layers, two servers"
+
+[lints]
+workspace = true
+
+[dependencies]
+bytes = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+pr-protocol = { path = "../../crates/pr-protocol" }
+pr-transport = { path = "../../crates/pr-transport" }
+
+[[bin]]
+name = "differential"
+path = "src/bin/differential.rs"
