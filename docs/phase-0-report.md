@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 9 |
+| PASS | 10 |
 | FALLBACK-ADOPTED | 0 |
-| IN-PROGRESS | 54 |
+| IN-PROGRESS | 53 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -46,7 +46,7 @@
 | V-B04 | IN-PROGRESS | — | `pr-core::outcome` 四维度+退出码映射已实现并测试；待 V-A03 组合矩阵全量 |
 | V-B05 | IN-PROGRESS | — | |
 | V-B06 | IN-PROGRESS | — | |
-| V-B07 | IN-PROGRESS | — | |
+| V-B07 | PASS | `crates/prc/src/args.rs` · 17 tests | §3.2 顶层语法；§3.3 profile×flag 矩阵逐格用例；`-h` 恒为 host；输出模式互斥不做 last-wins |
 
 ## Track C · 终端与编辑器
 
@@ -156,3 +156,4 @@
 | 2026-09-16 | V-A01 / V-A04 / V-A06 → PASS（PTY harness、故障注入、资源测量）；111 tests 全绿 |
 | 2026-09-16 | V-B02 → PASS（增量 RESP decoder）；首次 CI 实跑暴露 4 个真实问题并修复；134 tests 全绿 |
 | 2026-09-16 | V-F03 → PASS（quoting + 本地命令 grammar）；第二轮 CI 暴露 5 个问题并修复；Cluster/Sentinel 起停脚本落地；160 tests 全绿 |
+| 2026-09-16 | V-B07 → PASS（prc 参数契约）；177 tests 全绿。**会话暂停点** |

@@ -432,6 +432,12 @@ version = "0.0.0"
 [[package]]
 name = "prc"
 version = "0.0.0"
+dependencies = [
+ "bytes",
+ "pr-core",
+ "pr-repl",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "proc-macro2"

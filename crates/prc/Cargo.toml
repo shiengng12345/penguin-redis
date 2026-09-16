@@ -6,9 +6,13 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — prc"
+description = "Penguin Redis — prc executable: argument parsing, startup, exit codes"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+pr-repl = { path = "../pr-repl" }
+bytes = { workspace = true }
+thiserror = { workspace = true }
