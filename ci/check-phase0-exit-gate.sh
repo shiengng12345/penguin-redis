@@ -171,6 +171,15 @@ while IFS= read -r id; do
 done < <(grep -oE '^\| (V-[A-J][0-9]{2}) \|' docs/penguin-redis-phase-plan.md | tr -d '| ' | sort -u)
 [ -z "$missing" ] && pass "every V item has a status and evidence" \
                   || bad "rows without evidence:$missing"
+# And the other direction: a criterion the plan names but nothing else mentions is a criterion
+# nobody wrote a test for, and it fails silently because the tests that *were* written still
+# pass. This is what let V-D06 sit at `PASS（history 路径）` with nine of ten paths untested.
+if ./ci/check-plan-cases-are-claimed.sh >/dev/null 2>&1; then
+  pass "every acceptance case the plan names is claimed somewhere"
+else
+  ./ci/check-plan-cases-are-claimed.sh 2>&1 | sed 's/^/        /' || true
+  bad "the plan names acceptance cases that appear nowhere else"
+fi
 
 echo
 if [ "$fail" -eq 0 ]; then

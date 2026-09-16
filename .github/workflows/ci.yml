@@ -404,6 +404,10 @@ jobs:
       # reason string naming a `credentials` job that has never existed.
       - name: every ignored test names a CI job that exists
         run: ./ci/check-ignored-tests-have-a-job.sh
+      # A criterion named only in the plan is a criterion nobody wrote a test for, and the V
+      # item still goes green on the tests that were written.
+      - name: every acceptance case the plan names is claimed somewhere
+        run: ./ci/check-plan-cases-are-claimed.sh
       # V-F08 / ADR-034: §16.4's held-out gate turns itself on when an independently written
       # corpus appears. Printed here so the waiting state is visible in every run rather than
       # only in a document.
