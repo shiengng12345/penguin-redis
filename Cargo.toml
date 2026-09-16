@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*", "xtask", "xtask/resp-server", "xtask/pty-harness", "xtask/differential", "xtask/plugin-fixtures"]
+members = ["crates/*", "xtask", "xtask/resp-server", "xtask/pty-harness", "xtask/differential", "xtask/plugin-fixtures", "xtask/soak"]
 
 [workspace.package]
 version = "0.0.0"

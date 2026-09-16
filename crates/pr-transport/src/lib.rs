@@ -4,7 +4,9 @@
 //! against, and the [`tls`] layer V-G04 measures. The controlled SSH path arrives with V-G03.
 
 pub mod oneshot;
+pub mod ssh;
 pub mod tls;
 
 pub use oneshot::{CallError, Oneshot, connect_tcp, encode_command};
+pub use ssh::{Bastion, Mode as SshMode, PerNodeTunnels, SshError, Tunnel};
 pub use tls::{TlsConfig, TlsError, TlsStream};

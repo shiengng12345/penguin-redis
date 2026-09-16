@@ -196,6 +196,31 @@ jobs:
           echo -n "ci" | gnome-keyring-daemon --unlock --replace --daemonize > /dev/null 2>&1 || true
           cargo test -p pr-profiles --test credential_store -- --ignored --nocapture
 
+  # ---------------------------------------------------------------- SSH tunnels (V-G03)
+  ssh-tunnels:
+    name: SSH per-node and SOCKS5 against a real jump host
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      - name: bring up the bastion and the cluster behind it
+        run: bash ci/topology/ssh/up.sh
+      # Both §21.5 modes follow MOVED through a real sshd, host key checking refuses an
+      # unknown key, and the tunnel is proved load-bearing by stopping the bastion.
+      - name: both modes, end to end
+        run: cargo test -p pr-transport --test ssh_live -- --ignored --test-threads=1 --nocapture
+      - name: bastion log on failure
+        if: failure()
+        run: docker logs pr-ssh-bastion || true
+      - name: tear down
+        if: always()
+        run: bash ci/topology/ssh/down.sh
+
   # ---------------------------------------------------------------- Safety gate
   safety:
     name: safety (secrets, injection, supply chain)

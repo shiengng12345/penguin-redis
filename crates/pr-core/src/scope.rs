@@ -148,7 +148,39 @@ impl TaskScope {
             fut.await
         });
         self.aborts.push(handle.abort_handle());
+        self.prune_finished();
         handle
+    }
+
+    /// Drop abort handles for tasks that have already finished.
+    ///
+    /// Found by the V-H05 soak on its first real run: a scope keeps an `AbortHandle` per
+    /// spawn so that `shutdown` can stop a task that ignores the token, and nothing removed
+    /// them until shutdown. A session scope that spawns a short task per connection switch
+    /// therefore grew without bound — about 60 KB/s under the soak's load, which is 1.7 GB
+    /// over the eight hours PERF-04 asks for.
+    ///
+    /// Pruned on spawn rather than on a timer, because the moment a new handle arrives is the
+    /// moment the vector is longest and there is no other event to hang it on. The
+    /// `len > 2 * live` guard keeps this amortised: it cannot fire on a scope whose tasks are
+    /// genuinely all still running, and a scope that reaps normally does an O(n) pass once per
+    /// n spawns.
+    fn prune_finished(&mut self) {
+        const FLOOR: usize = 64;
+        let live = self.live.load(Ordering::SeqCst);
+        if self.aborts.len() >= FLOOR && self.aborts.len() > live.saturating_mul(2) {
+            self.aborts.retain(|a| !a.is_finished());
+        }
+    }
+
+    /// How many abort handles the scope is holding.
+    ///
+    /// A leak-detection observable, like [`TaskScopeHandle::live`]: this is the number that
+    /// grew without bound before `prune_finished` existed, so it is worth being able to watch
+    /// rather than inferring from total memory.
+    #[must_use]
+    pub fn tracked_aborts(&self) -> usize {
+        self.aborts.len()
     }
 
     /// Cancel cooperatively and wait, bounded, for tasks to finish.
@@ -323,5 +355,55 @@ mod tests {
         // the counter is per-scope and the previous ones are gone.
         let scope = TaskScope::new("final");
         assert_eq!(scope.handle().live(), 0);
+    }
+
+    /// Regression: a long-lived scope that spawns many short tasks must not grow.
+    ///
+    /// Found by the V-H05 soak, not by a unit test, which is worth recording: the bug needed
+    /// tens of thousands of spawns against one scope to become visible, and every existing
+    /// test spawned a handful and then shut down. A soak is how you find the thing that is
+    /// fine a hundred times and not fine a hundred thousand times.
+    #[tokio::test]
+    async fn a_long_lived_scope_does_not_accumulate_abort_handles() {
+        let mut scope = TaskScope::new("long-lived");
+        for _ in 0..10_000 {
+            let h = scope.spawn(|_| async { 1u8 });
+            let _ = h.await;
+        }
+        settle().await;
+        assert_eq!(scope.handle().live(), 0, "tasks were not reaped");
+        assert!(
+            scope.tracked_aborts() < 256,
+            "the scope is holding {} abort handles after 10,000 short tasks",
+            scope.tracked_aborts()
+        );
+    }
+
+    /// And pruning must not weaken shutdown: a task that ignores the token is still aborted.
+    #[tokio::test]
+    async fn pruning_does_not_lose_a_handle_that_is_still_needed() {
+        let mut scope = TaskScope::new("stubborn");
+        // Enough short tasks to trigger a prune...
+        for _ in 0..200 {
+            let _ = scope.spawn(|_| async { 0u8 }).await;
+        }
+        settle().await;
+        // ...then one that will not stop on its own.
+        let stubborn = scope.spawn(|_| async {
+            tokio::time::sleep(Duration::from_hours(1)).await;
+            0u8
+        });
+        settle().await;
+        assert_eq!(scope.handle().live(), 1);
+
+        let drained = scope.shutdown(50).await;
+        assert!(
+            !drained,
+            "a task that ignores the token cannot drain cleanly"
+        );
+        assert!(
+            stubborn.await.is_err(),
+            "the stubborn task was not aborted, so its handle had been pruned"
+        );
     }
 }

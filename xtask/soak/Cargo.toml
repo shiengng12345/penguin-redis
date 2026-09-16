@@ -1,0 +1,35 @@
+[package]
+name = "soak"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Penguin Redis — V-H05: the 8h soak runner and its growth analysis"
+
+[lints]
+workspace = true
+
+[dependencies]
+bytes = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+pr-core = { path = "../../crates/pr-core" }
+pr-protocol = { path = "../../crates/pr-protocol" }
+pr-transport = { path = "../../crates/pr-transport" }
+pr-terminal = { path = "../../crates/pr-terminal" }
+pr-tui = { path = "../../crates/pr-tui" }
+pr-render = { path = "../../crates/pr-render" }
+pr-results = { path = "../../crates/pr-results" }
+pr-intelligence = { path = "../../crates/pr-intelligence" }
+xtask = { path = ".." }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
+
+[[bin]]
+name = "soak"
+path = "src/main.rs"
+
+[lib]
+name = "soak"
+path = "src/lib.rs"
