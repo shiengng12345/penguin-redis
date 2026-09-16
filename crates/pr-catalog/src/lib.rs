@@ -4,6 +4,7 @@
 //! key extraction; remote introspection may report availability and nothing more (ADR-030).
 
 pub mod compile;
+pub mod embedded;
 pub mod precedence;
 pub mod snapshot;
 pub mod spec;
@@ -11,6 +12,7 @@ pub mod spec;
 pub use compile::{
     DELIBERATELY_UNKNOWN, Merged, OVERRIDES, Override, compile, compile_command, merge,
 };
+pub use embedded::{lookup, merged};
 pub use precedence::{Availability, LocalSpec, RemoteReport, Resolved, resolve};
 pub use snapshot::{LoadError, RawArg, RawCommand, Snapshot, load};
 pub use spec::{

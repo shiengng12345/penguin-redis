@@ -12,6 +12,7 @@
 use portable_pty::{CommandBuilder, NativePtySystem, PtyPair, PtySize, PtySystem};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 use thiserror::Error;
@@ -65,6 +66,20 @@ pub enum Event {
         at_ms: u64,
         /// Bytes, escaped for readability.
         bytes: String,
+    },
+    /// A reply the harness itself sent on the terminal's behalf.
+    ///
+    /// A real terminal answers queries such as Device Status Report; a harness that does not
+    /// is not a terminal, and a program waiting for the answer simply stops. Recorded
+    /// separately from [`Event::Input`] so a golden makes clear which bytes the test sent and
+    /// which the harness did.
+    AutoReply {
+        /// Milliseconds since session start.
+        at_ms: u64,
+        /// Bytes, escaped for readability.
+        bytes: String,
+        /// What was being answered, e.g. `DSR`.
+        query: String,
     },
     /// Terminal was resized.
     Resize {
@@ -120,6 +135,10 @@ impl Recording {
                 Event::Output { bytes, .. } => G {
                     kind: "out",
                     data: bytes.clone(),
+                },
+                Event::AutoReply { bytes, query, .. } => G {
+                    kind: "auto",
+                    data: format!("{query}:{bytes}"),
                 },
                 Event::Resize { cols, rows, .. } => G {
                     kind: "resize",
@@ -198,13 +217,22 @@ pub fn unescape(s: &str) -> Vec<u8> {
 /// A live PTY session running a child process.
 pub struct PtySession {
     pair: PtyPair,
-    writer: Box<dyn Write + Send>,
+    /// Shared with the reader thread, which answers terminal queries on our behalf.
+    writer: Arc<Mutex<Box<dyn Write + Send>>>,
     buf: Arc<Mutex<Vec<u8>>>,
     events: Arc<Mutex<Vec<Event>>>,
     start: Instant,
     cols: u16,
     rows: u16,
+    auto_replies: Arc<AtomicUsize>,
 }
+
+/// Device Status Report — "where is the cursor?".
+///
+/// ConPTY sends this as it starts and **blocks** until the terminal answers. A harness that
+/// ignores it never sees a single byte of the child's output, which is exactly how the first
+/// Windows run of the V-C02 tests failed: four bytes received, `ESC [ 6 n`, and then silence.
+const DSR_CURSOR: &[u8] = b"\x1b[6n";
 
 impl PtySession {
     /// Spawn `cmd` on a PTY of the given size.
@@ -237,11 +265,18 @@ impl PtySession {
         let buf = Arc::new(Mutex::new(Vec::new()));
         let events = Arc::new(Mutex::new(Vec::new()));
         let start = Instant::now();
+        let writer: Arc<Mutex<Box<dyn Write + Send>>> = Arc::new(Mutex::new(writer));
+        let auto_replies = Arc::new(AtomicUsize::new(0));
 
         let b2 = Arc::clone(&buf);
         let e2 = Arc::clone(&events);
+        let w2 = Arc::clone(&writer);
+        let a2 = Arc::clone(&auto_replies);
         std::thread::spawn(move || {
             let mut chunk = [0u8; 4096];
+            // A query can be split across two reads, so the last few bytes of each chunk are
+            // carried forward. Four is the length of the longest sequence answered here.
+            let mut carry: Vec<u8> = Vec::new();
             loop {
                 match reader.read(&mut chunk) {
                     Ok(0) | Err(_) => break,
@@ -256,6 +291,34 @@ impl PtySession {
                                 bytes: escape(&chunk[..n]),
                             });
                         }
+
+                        // Answer terminal queries. A harness that stays silent is not a
+                        // terminal, and a program that waits for the answer simply stops.
+                        let mut scan = std::mem::take(&mut carry);
+                        scan.extend_from_slice(&chunk[..n]);
+                        let queries = scan
+                            .windows(DSR_CURSOR.len())
+                            .filter(|w| *w == DSR_CURSOR)
+                            .count();
+                        for _ in 0..queries {
+                            // Row 1, column 1. Nothing here tracks a real cursor; what the
+                            // asking program needs is a well-formed answer, promptly.
+                            let reply = b"\x1b[1;1R";
+                            if let Ok(mut w) = w2.lock() {
+                                let _ = w.write_all(reply);
+                                let _ = w.flush();
+                            }
+                            a2.fetch_add(1, Ordering::Relaxed);
+                            if let Ok(mut g) = e2.lock() {
+                                g.push(Event::AutoReply {
+                                    at_ms,
+                                    bytes: escape(reply),
+                                    query: "DSR".to_owned(),
+                                });
+                            }
+                        }
+                        let keep = scan.len().saturating_sub(DSR_CURSOR.len() - 1);
+                        carry = scan[keep..].to_vec();
                     }
                 }
             }
@@ -269,6 +332,7 @@ impl PtySession {
             start,
             cols,
             rows,
+            auto_replies,
         })
     }
 
@@ -281,8 +345,14 @@ impl PtySession {
     /// # Errors
     /// Propagates the write error.
     pub fn send(&mut self, bytes: &[u8]) -> Result<(), PtyError> {
-        self.writer.write_all(bytes)?;
-        self.writer.flush()?;
+        {
+            let mut w = self
+                .writer
+                .lock()
+                .unwrap_or_else(std::sync::PoisonError::into_inner);
+            w.write_all(bytes)?;
+            w.flush()?;
+        }
         let at_ms = self.now_ms();
         if let Ok(mut g) = self.events.lock() {
             g.push(Event::Input {
@@ -363,6 +433,15 @@ impl PtySession {
     #[must_use]
     pub fn size(&self) -> (u16, u16) {
         (self.cols, self.rows)
+    }
+
+    /// How many terminal queries the harness has answered on the child's behalf.
+    ///
+    /// Zero on a session where nothing asked; on Windows, ConPTY asks as it starts, so a zero
+    /// here alongside a stalled child is the signature of the failure this exists to prevent.
+    #[must_use]
+    pub fn auto_replies(&self) -> usize {
+        self.auto_replies.load(Ordering::Relaxed)
     }
 
     /// Take the recording.
@@ -466,6 +545,66 @@ mod tests {
         assert!(
             input.contains("\\x1b[201~"),
             "paste end marker recorded: {input}"
+        );
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
+    fn a_cursor_position_query_is_answered() {
+        // The harness has to behave like a terminal. ConPTY asks this as it starts and blocks
+        // until it is answered — an unanswered query means the child's output never arrives,
+        // which is how every V-C02 PTY test failed on the first Windows run.
+        let mut s = PtySession::spawn(
+            sh("printf '\\033[6n'; sleep 0.4; printf 'after-query'"),
+            80,
+            24,
+        )
+        .unwrap();
+        s.wait_for(b"after-query", Duration::from_secs(5)).unwrap();
+        assert_eq!(s.auto_replies(), 1, "the query was answered exactly once");
+
+        // The reply is recorded, and marked as ours rather than as test input.
+        let rec = s.recording();
+        let replies: Vec<&Event> = rec
+            .events
+            .iter()
+            .filter(|e| matches!(e, Event::AutoReply { .. }))
+            .collect();
+        assert_eq!(replies.len(), 1);
+        match replies[0] {
+            Event::AutoReply { query, bytes, .. } => {
+                assert_eq!(query, "DSR");
+                assert!(bytes.contains("1;1R"), "the answer is well formed: {bytes}");
+            }
+            other => panic!("expected an auto reply, got {other:?}"),
+        }
+        let golden = rec.to_golden().unwrap();
+        assert!(golden.contains(r#""kind": "auto""#), "{golden}");
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
+    fn a_session_with_no_queries_sends_no_replies() {
+        let s = PtySession::spawn(sh("printf 'quiet'"), 80, 24).unwrap();
+        s.wait_for(b"quiet", Duration::from_secs(5)).unwrap();
+        assert_eq!(s.auto_replies(), 0, "nothing asked, so nothing was sent");
+    }
+
+    #[test]
+    #[cfg_attr(windows, ignore = "sh is not available; V-C07 covers Windows")]
+    fn a_query_split_across_two_reads_is_still_answered() {
+        // The sequence is four bytes; a read boundary can fall anywhere inside it.
+        let mut s = PtySession::spawn(
+            sh("printf '\\033['; sleep 0.3; printf '6n'; sleep 0.4; printf 'done'"),
+            80,
+            24,
+        )
+        .unwrap();
+        s.wait_for(b"done", Duration::from_secs(5)).unwrap();
+        assert_eq!(
+            s.auto_replies(),
+            1,
+            "a query split across reads must still be recognised"
         );
     }
 
