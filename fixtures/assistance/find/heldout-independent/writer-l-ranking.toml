@@ -1,0 +1,335 @@
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "挂住等一批榜单，哪个先有数据就弹几个",
+  "wait across several ranked sets, then take from the top or bottom side",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "阻塞等到有最高分的成员再取走",
+  "block until a highest scoring entry is available, then remove it",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "没数据就一直等，有了就取分数最低那个",
+  "hang on an empty scored queue until the smallest weight shows up",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "往榜单里塞成员并带上权重",
+  "insert a member with its score into a ranked collection",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "这个榜单一共多少个成员",
+  "how many entries this scored collection currently holds",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "统计权重落在某个区间里的成员个数",
+  "count members whose score sits between two bounds",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "几个榜单做差集，结果直接吐回来",
+  "members in the first ranked set but missing from the rest, returned inline",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "差集算完不返回，写到新的 key 里",
+  "subtract the other scored sets and persist the leftovers to a destination",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给某个成员的分数加个增量",
+  "bump one member score by a delta instead of overwriting",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "多个榜单取交集，直接把成员列出来",
+  "intersect several weighted sets and hand back the surviving members",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "只要交集的数量，不要具体内容",
+  "just the size of the overlap, do not materialize the list",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "带权重的交集算完落盘到目标 key",
+  "intersect with per-set weights and save the merged scores into a key",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "同分情况下按字典区间数一数有多少个",
+  "how many members fall between two string boundaries when scores are equal",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "从一堆榜单里挑第一个非空的弹几个，不等待",
+  "take entries off the first non-empty ranked set, no blocking",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "一次批量查好几个成员的分数",
+  "look up weights for a batch of members in a single round trip",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "把分最高的几个摘下来并返回",
+  "remove and return the highest weighted entries right now",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "取走垫底的那几个，取完就没了",
+  "pull the lowest scoring members out and delete them",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "从榜单里随机抽样几个成员",
+  "sample members at random out of a weighted collection",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "统一的区间查询，按名次按分数按字典都行，可反向",
+  "modern slice query over a ranked set by index, score or lex, either direction",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "老接口，同分下按字典序取一段",
+  "older call that pulls a lexical slice from an all-equal-score set",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "旧写法，按分数上下限从低到高捞成员",
+  "legacy ascending selection between a min and max weight",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "截一段区间但不返回，直接存成另一个有序 key",
+  "materialize a range slice into a second sorted key instead of reading it back",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "这个成员从低分往上数排第几",
+  "zero-based position of a member counting up from the smallest score",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "把指定成员从榜单里踢掉",
+  "drop named members out of the scored collection",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "按字典序区间批量清成员",
+  "wipe every member between two string boundaries",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "只留前一千名，名次靠后的全部删掉",
+  "trim a leaderboard by position so only the top N survive",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "清掉权重低于阈值的过期数据",
+  "purge everything whose score falls inside a given window",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "旧命令，按名次倒着取前几名",
+  "the superseded top-N-by-descending-rank call",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "被取代的老接口，字典序反着取一段",
+  "deprecated reversed lexical slice, high string bound first",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "老写法，从高分往低分捞一个区间",
+  "the old call listing members from max weight down to min",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "从最高分数起，这个成员第几名",
+  "where a member sits when ranking downward from the biggest score",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "用游标分批遍历成员和对应分数",
+  "cursor through member and weight pairs a chunk at a time",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "查单个成员现在多少分",
+  "current weight attached to one member",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "几个榜单合起来，重复成员分数相加后返回",
+  "merge ranked sets, add up duplicate scores, give me the members",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "多路召回加权合并，结果写进新 key",
+  "blend several weighted sets with multipliers and persist the result",
+]
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "把经纬度点写进地理索引",
+  "index a place by its longitude and latitude",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "算两个点之间隔多少公里",
+  "distance between two indexed places in km or miles",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "把存的位置转成可分享的短字符串编码",
+  "standard compact string encoding for stored coordinates",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "反查这些成员的经纬度坐标",
+  "read back the longitude and latitude kept for these members",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "老命令，给坐标和半径找附近的点",
+  "deprecated nearby lookup around a raw coordinate with a radius",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "旧接口，以已存的某个点为圆心找周边",
+  "legacy proximity query centered on an existing indexed place",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "老的以成员为圆心查周边的只读版本，从库能跑",
+  "read-only flavour of the old member-centred proximity call, safe on a replica",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "老的按坐标半径查询，去掉写入选项的只读变体",
+  "the outdated coordinate radius search stripped of its store option",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "现在推荐的范围查询，圆形或矩形框都支持",
+  "current nearby search taking either a circle or a rectangle",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "范围筛完不返回，把命中结果存到另一个 key",
+  "run the box or circle filter and write the hits into a destination key",
+]
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "往基数估算结构里打元素",
+  "feed ids into a probabilistic distinct counter",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "估算去重后的用户数，不要求精确",
+  "approximate unique visitor count without keeping every id",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "把好几天的基数估算结构合成一个",
+  "fold multiple cardinality sketches together into one",
+]

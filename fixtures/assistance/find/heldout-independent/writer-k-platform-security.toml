@@ -1,0 +1,363 @@
+[[case]]
+command = "COPY"
+phrases = [
+  "把一个 key 原样复制一份到新名字下",
+  "duplicate a key under a second name",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "立刻清掉这几个 key，同步阻塞删除",
+  "remove keys right now and free the memory",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "把某个值导出成二进制快照带走",
+  "serialize one key value into a portable blob",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "先确认这个 token 还在不在库里",
+  "tell me if that session entry is still there",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "给会话设个几秒后自动失效",
+  "make this key die after N seconds",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "指定一个秒级时间戳，到点就作废",
+  "expire a key at an absolute unix second",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "查出到期的那个绝对时刻，秒为单位",
+  "read back the unix second a key dies at",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "一次性列出匹配某个模式的全部 key，会卡住服务",
+  "list every key matching a pattern in one shot",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "把 key 整个搬到另一台实例上去",
+  "transfer a key across to another redis server",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "换到同一实例的另一个 db 编号下",
+  "shift a key into a different database index",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "查看某个值内部实现细节的一组子命令入口",
+  "introspection entry point for a stored value internals",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "这个值底层实际用的是哪种编码结构",
+  "what low level layout is backing this value",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "LFU 淘汰策略下这个 key 的访问频率计数是多少",
+  "how hot is this key by the lfu counter",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "这个 key 多久没人碰过了",
+  "how long since anyone last touched this key",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "看看这个值被引用了多少次",
+  "how many references point at this stored value",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "去掉过期设置，让它长期留着别自己消失",
+  "strip the timeout so the key never expires",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "按毫秒设定存活时长，做限流窗口",
+  "set a lifetime in milliseconds for a rate window",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "用毫秒时间戳把失效时刻定死",
+  "expire at an exact millisecond timestamp",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "读出失效时刻，精确到毫秒",
+  "read the absolute expiry instant in milliseconds",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "这把锁还剩多少毫秒就没了",
+  "milliseconds remaining before this entry vanishes",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随便抽一个现有的 key 出来看看",
+  "grab an arbitrary key from the keyspace",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "换个名字，新名字被占了也照样盖过去",
+  "rename a key even when the target already exists",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "改名但目标已经被占了就别动",
+  "rename only when the new name is free",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "拿之前导出的二进制数据把 key 还原回来",
+  "rebuild a key from a serialized payload",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "用游标分批遍历 keyspace，别阻塞线上",
+  "walk the whole keyspace in batches with a cursor",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "对列表或集合排序，还能顺便把结果存下来",
+  "order elements and optionally write the result somewhere",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "只读地排序，可以直接打到从库上",
+  "read only ordering that is safe on a replica",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "碰一下这些 key，刷新它们的空闲计时",
+  "bump last access time without reading the values",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "这个登录态还有几秒失效",
+  "how many seconds left before it expires",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "这个 key 存的到底是什么数据结构",
+  "what kind of value is stored under this name",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "后台异步回收，删大 key 不卡主线程",
+  "delete in the background without blocking the server",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "等写入被足够多副本确认了再返回",
+  "block until enough replicas acknowledge my writes",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "等本地和副本的 AOF 真正落盘再继续",
+  "block until writes are fsynced to the append log",
+]
+
+[[case]]
+command = "DISCARD"
+phrases = [
+  "排好的那批命令不要了，直接丢掉",
+  "throw away the queued commands without running them",
+]
+
+[[case]]
+command = "EXEC"
+phrases = [
+  "把攒起来的命令一口气原子跑完",
+  "fire the whole queued block atomically",
+]
+
+[[case]]
+command = "MULTI"
+phrases = [
+  "开始攒命令，准备当成一个整体提交",
+  "start queueing commands as one atomic unit",
+]
+
+[[case]]
+command = "UNWATCH"
+phrases = [
+  "取消之前对那些 key 的乐观锁监视",
+  "drop all optimistic locking watches I set",
+]
+
+[[case]]
+command = "WATCH"
+phrases = [
+  "盯住这几个 key，被别人改了我这笔就作废",
+  "abort my transaction if these keys change underneath",
+]
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "按通配符模式一次订一批频道",
+  "listen on every channel matching a glob",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "往某个频道推一条吊销通知",
+  "broadcast a message out to channel listeners",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "查看消息推送系统运行状态的入口命令",
+  "introspection entry for the messaging layer state",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "现在有哪些频道是有人在听的",
+  "which channels currently have live listeners",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "统计一共有多少个模式订阅在生效",
+  "count of active pattern based subscriptions",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "指定的几个频道各自有多少订阅者",
+  "how many clients listen on each named channel",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "集群分片下当前活跃的频道有哪些",
+  "active shard scoped channels on this node",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "分片频道各自的订阅者数量统计",
+  "subscriber counts for shard scoped channels",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "把之前按通配符订的那些退掉",
+  "stop following channels chosen by pattern",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "在集群里发消息，只走对应 slot 的节点",
+  "send a message on a shard local channel",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "订阅跟着 slot 走的分片频道",
+  "subscribe to a shard scoped channel in cluster mode",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "订阅指定频道，持续收推送",
+  "start receiving messages from named channels",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "退出分片频道的订阅",
+  "leave a shard scoped channel I joined",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "不再接收这几个频道的消息了",
+  "stop listening on these plain channels",
+]

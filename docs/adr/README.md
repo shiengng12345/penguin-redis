@@ -36,7 +36,7 @@
 | [ADR-031](ADR-031.md) | `pr-protocol` 自研 codec 是唯一 kernel 协议边界；`redis-rs` 降为互操作测试对象 | accepted | V-B01、V-J04 |
 | [ADR-032](ADR-032.md) | TLS 用 rustls + 显式 CA 集合；不存在关闭校验的开关 | accepted | V-G04、V-J04 |
 | [ADR-033](ADR-033.md) | 显式发现的 SCAN 次数上限改为 200，与「20 req/s × 10 s」对齐 | accepted | V-F07、V-J04 |
-| [ADR-034](ADR-034.md) | 用途搜索的 held-out 指标需要一位不是实现者的撰写人；该输入是 Phase 0 出口依赖 | accepted | V-F08、V-J04 |
+| [ADR-034](ADR-034.md) | 用途搜索的 held-out 指标需要一位不是实现者的撰写人；该输入是 Phase 0 出口依赖（已解除） | accepted | V-F08、V-J04 |
 | [ADR-035](ADR-035.md) | Windows Terminal / ConPTY 是一级目标，conhost 是 plain 模式降级目标；`SetConsoleCtrlHandler` 投递层延至 Phase 1 | accepted | V-C07、V-J04 |
 | [ADR-036](ADR-036.md) | 「粘贴绝不自动执行」不依赖终端能力：bracketed paste 与时序启发式并存，`plain-only` 是最后手段 | accepted | V-C03、V-J04 |
 | [ADR-037](ADR-037.md) | 宽度分歧由「每格重置光标」降级绘制承担；`CSI 6 n` 只在 TTY 且用户触发 | accepted | V-C04、V-J04 |

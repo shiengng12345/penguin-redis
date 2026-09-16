@@ -1,0 +1,321 @@
+[[case]]
+command = "APPEND"
+phrases = [
+  "把新的事件 id 拼到已有字符串末尾",
+  "tack extra text onto the end of an existing value",
+]
+
+[[case]]
+command = "DECR"
+phrases = [
+  "计数器减一，退款就扣一笔",
+  "knock one off a running counter",
+]
+
+[[case]]
+command = "DECRBY"
+phrases = [
+  "一次从余量里扣掉指定数量",
+  "subtract a given amount from a tally in one go",
+]
+
+[[case]]
+command = "GET"
+phrases = [
+  "读某个 key 当前存的值",
+  "look up the value stored under one key",
+]
+
+[[case]]
+command = "GETDEL"
+phrases = [
+  "取出这个值之后立刻把 key 删掉",
+  "read a value once and remove it in the same call",
+]
+
+[[case]]
+command = "GETEX"
+phrases = [
+  "读的同时顺手给这个 key 续期",
+  "fetch a value and refresh its TTL together",
+]
+
+[[case]]
+command = "GETRANGE"
+phrases = [
+  "只取字符串中间一段字节",
+  "extract the characters between two positions of a value",
+]
+
+[[case]]
+command = "GETSET"
+phrases = [
+  "写入新值并把旧值拿回来，用来滚动小时桶",
+  "swap in a new value and get back the previous one",
+]
+
+[[case]]
+command = "INCR"
+phrases = [
+  "每来一次请求就给日活计数加一",
+  "bump a counter by one per event",
+]
+
+[[case]]
+command = "INCRBY"
+phrases = [
+  "按指定步长累加 PV 总量",
+  "add a specific integer step to a total",
+]
+
+[[case]]
+command = "INCRBYFLOAT"
+phrases = [
+  "把带小数的金额累加到总额上",
+  "accumulate a decimal amount into a running sum",
+]
+
+[[case]]
+command = "LCS"
+phrases = [
+  "比较两段文本最长的公共部分",
+  "longest shared subsequence between two stored strings",
+]
+
+[[case]]
+command = "MGET"
+phrases = [
+  "一次把好几个指标的值全拉回来",
+  "batch read many keys in one round trip",
+]
+
+[[case]]
+command = "MSET"
+phrases = [
+  "一次性写入多组 key 和值",
+  "write several key value pairs at once",
+]
+
+[[case]]
+command = "MSETNX"
+phrases = [
+  "这批 key 全都不存在时才整批写进去",
+  "set a whole batch only if none of them exist yet",
+]
+
+[[case]]
+command = "PSETEX"
+phrases = [
+  "存个值并用毫秒指定存活时间",
+  "store a value with a millisecond lifetime",
+]
+
+[[case]]
+command = "SET"
+phrases = [
+  "给一个 key 存上某个值",
+  "put a value under a key",
+]
+
+[[case]]
+command = "SETEX"
+phrases = [
+  "写值同时让它几秒后自动过期",
+  "store a value that dies after N seconds",
+]
+
+[[case]]
+command = "SETNX"
+phrases = [
+  "只有 key 还不存在时才写，用来抢锁",
+  "write only when the key is not already there",
+]
+
+[[case]]
+command = "SETRANGE"
+phrases = [
+  "从指定偏移开始覆盖字符串的一部分",
+  "overwrite part of a string starting at an offset",
+]
+
+[[case]]
+command = "STRLEN"
+phrases = [
+  "看看这个值占多少字节",
+  "how long the stored value is in bytes",
+]
+
+[[case]]
+command = "SUBSTR"
+phrases = [
+  "老接口用起止下标截取一段",
+  "legacy alias for slicing a portion of a value",
+]
+
+[[case]]
+command = "SADD"
+phrases = [
+  "把今天的 uid 丢进去重集合",
+  "add a visitor id into a dedup bucket",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "这个桶里去重之后有多少个",
+  "how many distinct members one group holds",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "昨天有今天没有的那批用户，算流失",
+  "members in the first group but not in the rest",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "算完流失用户直接落到一个新 key",
+  "save the subtraction result into a destination key",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "两天都活跃的那部分用户",
+  "members common to several groups",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "只要重合的个数，不要具体成员",
+  "just the size of the overlap, not the ids",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "把留存用户的重合结果存成新的 key",
+  "persist the overlap into another key",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "判断这个 uid 今天来过没有",
+  "check whether one id is inside the bucket",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "把整个小集合都倒出来看看",
+  "dump every member of a small group",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "一次检查一批 uid 在不在里面",
+  "test many ids for membership in one shot",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "把某个成员从这个桶挪到另一个桶",
+  "shift one element between two buckets atomically",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "随机弹出几个并顺便删掉",
+  "take random members out and delete them",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "随机抽样几个但不要动数据",
+  "sample random members without removing anything",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "把某些 uid 从桶里剔掉",
+  "drop specific members from a group",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "分批游标遍历超大集合，别阻塞线上",
+  "walk a huge collection page by page without blocking",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "把多天的去重用户合在一起",
+  "merge several groups into one distinct list",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "七天合并后的周活写到另一个 key",
+  "write the merged distinct list into a new key",
+]
+
+[[case]]
+command = "BITCOUNT"
+phrases = [
+  "数一下有多少位是 1，就是日活",
+  "count how many bits are turned on",
+]
+
+[[case]]
+command = "BITFIELD"
+phrases = [
+  "在一个值里塞多个定长小计数器并更新",
+  "pack several small integer counters inside one value and update them",
+]
+
+[[case]]
+command = "BITFIELD_RO"
+phrases = [
+  "只读地取出那些打包的小整数字段",
+  "read those packed integer fields on a replica, no writes",
+]
+
+[[case]]
+command = "BITOP"
+phrases = [
+  "多天的位图做与或异或算留存",
+  "combine bitmaps with AND OR XOR into a new one",
+]
+
+[[case]]
+command = "BITPOS"
+phrases = [
+  "找第一个为 1 的位在第几个偏移",
+  "locate the first bit set to one or zero",
+]
+
+[[case]]
+command = "GETBIT"
+phrases = [
+  "看第 N 个用户那一位是不是 1",
+  "check the single bit sitting at one offset",
+]
+
+[[case]]
+command = "SETBIT"
+phrases = [
+  "用户签到就把对应偏移那位置成 1",
+  "flip one bit at a given offset to mark a user",
+]

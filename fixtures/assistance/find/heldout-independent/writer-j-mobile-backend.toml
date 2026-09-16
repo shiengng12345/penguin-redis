@@ -1,0 +1,352 @@
+# held-out corpus j — mobile app backend developer, written from memory
+# 50 commands, 2 phrasings each (one Chinese, one English)
+
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "阻塞等着，把任务从一个队列尾部挪到另一个队列头部",
+  "wait for an item then hand it over to another queue",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "同时盯着好几个推送队列，哪个先来消息就取哪个",
+  "block on several lists at once, take from whichever fills first",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "消费者挂在那里等队首来新任务",
+  "hold the connection until the oldest job shows up at the front",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "从队列最后一端等新元素，没有就先别返回",
+  "sleep until something appears at the back end",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "老写法：等队尾元素并塞进备份队列的头部",
+  "legacy reliable queue handoff that waits when empty",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "看时间线第几条到底是什么，不要动它",
+  "peek at the nth entry of a feed without removing it",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "在某条动态前面再插一条进去",
+  "put a new element right before an existing one",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "未读推送到底攒了多少条",
+  "how many items are sitting in the queue",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "把一条消息原子地从这个队列搬到另一个队列",
+  "atomically shift one entry between two queues, choosing both ends",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "从一批队列里挑第一个有数据的，一次取好几条",
+  "take several items from whichever of these queues is not empty",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "取走并删掉最前面那一条",
+  "remove and return the head of the queue",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "查某个 feed id 在时间线里排第几",
+  "find the position of a value inside the list",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "新动态插到时间线最前面",
+  "prepend a fresh item so it shows up first",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "队列已经存在才往前面塞，不然别建",
+  "only add to the front if the key already exists",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "拉时间线第 0 到 19 条做分页",
+  "read a slice of the feed for one page",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "把时间线里某个用户的那几条记录清掉",
+  "delete matching entries from a list by value",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "直接改写第 3 条的内容",
+  "overwrite the element sitting at a given index",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "时间线只保留最新 500 条，老的丢掉",
+  "cut the feed down to the newest N entries",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "从最旧的那一端取出来一条",
+  "pop the last element off the tail",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "旧接口：队尾取一条放到另一个队列头部",
+  "move a tail item onto another list head, old style",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "往队列末尾追加一个任务",
+  "append to the end of the queue",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "只有队列存在的时候才追加到末尾",
+  "append at the back but skip if the key is missing",
+]
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "删掉用户资料里的某几个字段",
+  "drop one or more fields from a profile object",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "判断 profile 里有没有 avatar 这个字段",
+  "check whether a field is present in the object",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "给 session 里单个字段设个几秒后过期",
+  "let a single field expire after N seconds",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "让某个字段在指定的秒级时间戳那一刻失效",
+  "expire a field at a fixed unix second timestamp",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "查字段到期的那个绝对秒时间戳是多少",
+  "read the absolute second at which a field dies",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "读用户 profile 里的昵称",
+  "fetch one field value from a user object",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "把整个用户资料一次都读出来",
+  "pull back the whole user object, fields and values,",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "取出验证码字段并顺手把它删掉",
+  "read a field and remove it in the same call",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "读字段的同时顺便把过期时间续一下",
+  "get a field and refresh its expiry at once",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "点赞数字段加一",
+  "bump a counter field by an integer",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "给余额字段加 0.5 这种小数",
+  "add a decimal amount onto a numeric field",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "看这个 profile 都有哪些字段名",
+  "list only the field names stored",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "这个对象一共有多少个字段",
+  "count how many fields the object holds",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "一次读昵称头像城市这几个字段",
+  "fetch a handful of specific fields at once",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "老写法，一次写进去多个字段",
+  "deprecated way of writing several fields together",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "把字段上的过期去掉，让它一直留着",
+  "remove the ttl from a field so it never expires",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "字段按毫秒过期，比如 300 毫秒后没",
+  "give a field a lifetime measured in milliseconds",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "按毫秒时间戳定点把这个字段干掉",
+  "kill a field at an exact millisecond timestamp",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "查字段过期的那个毫秒时间戳",
+  "when exactly in millis will this field expire",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "这个字段的剩余存活时间，要毫秒精度",
+  "how long in millis until that field is gone",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "随机抽几个字段出来做推荐",
+  "pick random fields out of the object",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "分批遍历大对象的字段，别卡住线上服务",
+  "iterate a huge object in small cursor batches",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "往用户资料里写一个字段",
+  "store a field value on an object",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "写字段的同时直接带上存活时间",
+  "write a field together with its expiry in one shot",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "字段没有才写，已经有了就别覆盖",
+  "set a field only when it is not there yet",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "看某个字段的值有多长",
+  "length in bytes of a field value",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "这个字段还有几秒过期",
+  "seconds remaining on a field before it goes",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "只要所有字段的值，不要字段名",
+  "return just the values, not the field names",
+]
