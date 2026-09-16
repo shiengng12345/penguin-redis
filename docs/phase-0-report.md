@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 28 |
+| PASS | 30 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 34 |
+| IN-PROGRESS | 32 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -68,7 +68,7 @@
 | V-D02 | PASS | `crates/pr-profiles/src/journal.rs` · 12 tests | §4.2 六步顺序 + fsync journal + 启动 reconciliation；崩溃点逐一测试：孤儿 secret 只报告不自动删、悬空 profile 标 credential missing、未完成轮换清理可重放且幂等 |
 | V-D03 | IN-PROGRESS | — | `pr-security::approval` 实现+10 测试通过（含 SEC-10 同摘要不同字节）；待接入 kernel |
 | V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
-| V-D05 | IN-PROGRESS | — | |
+| V-D05 | PASS | `crates/pr-render/tests/safetext_boundary.rs` · 10 tests | 15 个真实终端控制 payload × value/key/列标题/generic renderer/4 主题×4 色深；剥离自有 SGR 后断言无 ESC/BEL/NUL/C1/bidi；Debug 与 Display 同样惰性；转义幂等 |
 | V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
 | V-D07 | PASS | `crates/pr-catalog/src/precedence.rs` · 10 tests | 本地 catalog 是 effects 唯一权威；服务器谎称 write 为 readonly 时分类不变、仅标 `server reports`；未分类命令即使服务器说 readonly 仍算 mutating |
 | V-D08 | IN-PROGRESS | — | |
@@ -97,7 +97,7 @@
 | V-F07 | IN-PROGRESS | — | |
 | V-F08 | IN-PROGRESS | — | |
 | V-F09 | IN-PROGRESS | — | |
-| V-F10 | IN-PROGRESS | — | |
+| V-F10 | PASS | `crates/pr-intelligence/tests/zero_send.rs` · 11 tests | transport spy 计**尝试次数**；分析/候选/接受/焦点/可提交性检查/Guide 组装/换主题/丢弃过期结果/scope 失效，以及完整离线编辑会话 —— 全部 0 条业务命令 |
 
 ## Track G · 连接拓扑
 
@@ -170,3 +170,4 @@
 | 2026-09-16 | V-B03 → PASS（`--pipe` 逐帧策略，BLOCKER #1 验证完成）；384 tests 全绿 |
 | 2026-09-16 | V-F02 → PASS（双解析器等价性 property）；395 tests 全绿 |
 | 2026-09-16 | V-F05 / V-F06 → PASS（异步 broker、observation scope 隔离）；420 tests 全绿 |
+| 2026-09-16 | V-F10 / V-D05 → PASS（零发送不变量、SafeText 显示边界）；441 tests 全绿 |

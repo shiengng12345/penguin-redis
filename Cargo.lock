@@ -528,6 +528,7 @@ version = "0.0.0"
 dependencies = [
  "pr-catalog",
  "pr-core",
+ "pr-render",
  "pr-repl",
  "proptest",
  "thiserror 2.0.20",

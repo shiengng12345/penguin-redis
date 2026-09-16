@@ -21,3 +21,4 @@ unicode-width = "0.2"
 
 [dev-dependencies]
 proptest = { workspace = true }
+bytes = { workspace = true }
