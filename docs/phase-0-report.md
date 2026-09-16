@@ -33,7 +33,7 @@
 | V-A02 | IN-PROGRESS | — | |
 | V-A03 | PASS | `xtask/resp-server/` · `fixtures/protocol/` (316 samples / 12 categories) · 15 tests | RESP2/3 encoder incl. streamed+push+attribute; scripted delivery; 1 GiB streamer; hostile corpus每类≥20 |
 | V-A04 | PASS | `xtask/src/fault.rs` · 8 tests | TCP 代理：客户端/服务端定点切断、blackhole、慢速、分片、单字节损坏、拒连；FS：只读/填充 |
-| V-A05 | IN-PROGRESS | — | CI workflow + 8 个 gate job 已写；**待首次 push 后确认三平台全绿** |
+| V-A05 | IN-PROGRESS | — | **17 job 中 15 绿**（三平台 build+lint/test、5 个 pinned server、4 个 gate 全绿）；仅 cluster/sentinel 两个 topology job 失败，阻塞项为 V-G01/V-G02 的脚本调试 |
 | V-A06 | PASS | `xtask/src/measure.rs` · 8 tests · `cargo run -p xtask -- measure-baseline` | 计数 allocator（live/peak/calls）+ RSS 采样 + 预算表；heap 与 RSS 分列不混计 |
 
 ## Track B · 协议与执行内核
@@ -103,8 +103,8 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-G01 | IN-PROGRESS | — | |
-| V-G02 | IN-PROGRESS | — | |
+| V-G01 | IN-PROGRESS | — | `ci/topology/cluster-up.sh` 已写；**CI 实跑失败**（step exit 1），待调试 |
+| V-G02 | IN-PROGRESS | — | `ci/topology/sentinel-up.sh` 已写；**CI 实跑失败**：`sentinel did not come up`（readiness 轮询超时），待调试 |
 | V-G03 | IN-PROGRESS | — | |
 | V-G04 | IN-PROGRESS | — | |
 | V-G05 | IN-PROGRESS | — | |
@@ -156,4 +156,5 @@
 | 2026-09-16 | V-A01 / V-A04 / V-A06 → PASS（PTY harness、故障注入、资源测量）；111 tests 全绿 |
 | 2026-09-16 | V-B02 → PASS（增量 RESP decoder）；首次 CI 实跑暴露 4 个真实问题并修复；134 tests 全绿 |
 | 2026-09-16 | V-F03 → PASS（quoting + 本地命令 grammar）；第二轮 CI 暴露 5 个问题并修复；Cluster/Sentinel 起停脚本落地；160 tests 全绿 |
-| 2026-09-16 | V-B07 → PASS（prc 参数契约）；177 tests 全绿。**会话暂停点** |
+| 2026-09-16 | V-B07 → PASS（prc 参数契约）；177 tests 全绿 |
+| 2026-09-16 | CI run 35048391825：15/17 绿。cluster/sentinel 脚本首跑失败，已记入 V-G01/V-G02。**会话暂停点** |
