@@ -1,0 +1,76 @@
+# Penguin Redis — compatibility manifest (V-I01, v2.1 §20.4)
+# Every target is pinned by digest. `latest` is forbidden (CI gate: Compatibility).
+# A target is `verified` ONLY after its full test suite has passed in CI on that digest.
+
+schema_version = 1
+generated = "2026-09-16"
+
+[[server]]
+family = "redis"
+line = "7.2"
+version = "7.2.16"
+image = "redis:7.2"
+digest = "sha256:74566c6910d13ae61e7ce73ebd3127438a1fe805b309b097c323142719ec8a5b"
+topologies = ["standalone", "sentinel", "cluster"]
+status = "unknown"   # unknown until CI green
+notes = "pre-Hash-field-TTL; no HSCAN NOVALUES"
+
+[[server]]
+family = "redis"
+line = "7.4"
+version = "7.4.11"
+image = "redis:7.4"
+digest = "sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7"
+topologies = ["standalone", "sentinel", "cluster"]
+status = "unknown"
+notes = "introduces HSCAN NOVALUES and Hash field TTL (HPTTL/HEXPIRE family)"
+
+[[server]]
+family = "redis"
+line = "8.0"
+version = "8.0.6"
+image = "redis:8.0"
+digest = "sha256:ae471bdc20de180beed36e347d170ec0bdf8faa327959ea1f24692f22b05b955"
+topologies = ["standalone", "sentinel", "cluster"]
+status = "unknown"
+notes = "HGETDEL/HGETEX; bundled modules; AGPLv3 added to licensing (see ADR-023)"
+
+[[server]]
+family = "valkey"
+line = "8.0"
+version = "8.0.11"
+image = "valkey/valkey:8.0"
+digest = "sha256:dbb2de90cb7a60c4f3f7e8d73fcaab69a94c557bb08a064108fa5d5b1814086e"
+topologies = ["standalone", "cluster"]
+status = "unknown"
+notes = "BSD-3; forked from Redis 7.2 — COMMAND DOCS differences require fixtures (V-I02)"
+
+[[server]]
+family = "valkey"
+line = "8.1"
+version = "8.1.10"
+image = "valkey/valkey:8.1"
+digest = "sha256:3fbd2e3e4b6e85e046c1e7c215e8f79087bc0357789184305806664e320996f3"
+topologies = ["standalone", "cluster"]
+status = "unknown"
+
+# The single baseline for --compat=redis-cli, quoting corpus (V-F03) and --json differential (V-E04).
+[baseline_cli]
+family = "redis"
+version = "7.4.11"
+source_image = "redis:7.4"
+digest = "sha256:71da9275c5f3fcb97d0fa0c8c5b36cc995327265420f17a04bfd544f458059f7"
+status = "unknown"
+
+[protocols]
+tested = ["RESP2", "RESP3"]
+
+[platforms]
+# A platform is listed per-capability, not as a single tick (v2.1 §35.1).
+"macos-aarch64" = { tui = "unknown", tls = "unknown", ssh = "unknown", credential_store = "unknown", bracketed_paste = "unknown" }
+"linux-x86_64"  = { tui = "unknown", tls = "unknown", ssh = "unknown", credential_store = "unknown", bracketed_paste = "unknown" }
+"windows-x86_64" = { tui = "unknown", tls = "unknown", ssh = "unknown", credential_store = "unknown", bracketed_paste = "unknown" }
+
+[modules]
+# Redis Stack modules — pinned when V-I02/V-F01 need them.
+status = "not-yet-pinned"

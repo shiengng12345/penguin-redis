@@ -1,0 +1,2232 @@
+{
+  "categories": {
+    "attribute": 23,
+    "binary-nul": 22,
+    "deep-nesting": 20,
+    "invalid-type": 22,
+    "malformed-length": 54,
+    "overlong-number": 30,
+    "oversized-declared": 28,
+    "push": 23,
+    "streamed": 32,
+    "terminal-escape": 22,
+    "truncated-crlf": 20,
+    "utf8-boundary": 20
+  },
+  "samples": [
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-0-0.resp",
+      "name": "$-0-0"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-0-1.resp",
+      "name": "*-0-1"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-0-2.resp",
+      "name": "%-0-2"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-0-3.resp",
+      "name": "~-0-3"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-0-4.resp",
+      "name": "!-0-4"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-0-5.resp",
+      "name": "=-0-5"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-1-0.resp",
+      "name": "$-1-0"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-1-1.resp",
+      "name": "*-1-1"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-1-2.resp",
+      "name": "%-1-2"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-1-3.resp",
+      "name": "~-1-3"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-1-4.resp",
+      "name": "!-1-4"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-1-5.resp",
+      "name": "=-1-5"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-2-0.resp",
+      "name": "$-2-0"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-2-1.resp",
+      "name": "*-2-1"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-2-2.resp",
+      "name": "%-2-2"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-2-3.resp",
+      "name": "~-2-3"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-2-4.resp",
+      "name": "!-2-4"
+    },
+    {
+      "bytes": 6,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-2-5.resp",
+      "name": "=-2-5"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-3-0.resp",
+      "name": "$-3-0"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-3-1.resp",
+      "name": "*-3-1"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-3-2.resp",
+      "name": "%-3-2"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-3-3.resp",
+      "name": "~-3-3"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-3-4.resp",
+      "name": "!-3-4"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-3-5.resp",
+      "name": "=-3-5"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-4-0.resp",
+      "name": "$-4-0"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-4-1.resp",
+      "name": "*-4-1"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-4-2.resp",
+      "name": "%-4-2"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-4-3.resp",
+      "name": "~-4-3"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-4-4.resp",
+      "name": "!-4-4"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-4-5.resp",
+      "name": "=-4-5"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-5-0.resp",
+      "name": "$-5-0"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-5-1.resp",
+      "name": "*-5-1"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-5-2.resp",
+      "name": "%-5-2"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-5-3.resp",
+      "name": "~-5-3"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-5-4.resp",
+      "name": "!-5-4"
+    },
+    {
+      "bytes": 5,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-5-5.resp",
+      "name": "=-5-5"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-6-0.resp",
+      "name": "$-6-0"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-6-1.resp",
+      "name": "*-6-1"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-6-2.resp",
+      "name": "%-6-2"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-6-3.resp",
+      "name": "~-6-3"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-6-4.resp",
+      "name": "!-6-4"
+    },
+    {
+      "bytes": 3,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-6-5.resp",
+      "name": "=-6-5"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/$-7-0.resp",
+      "name": "$-7-0"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/*-7-1.resp",
+      "name": "*-7-1"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/%-7-2.resp",
+      "name": "%-7-2"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/~-7-3.resp",
+      "name": "~-7-3"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/!-7-4.resp",
+      "name": "!-7-4"
+    },
+    {
+      "bytes": 7,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/=-7-5.resp",
+      "name": "=-7-5"
+    },
+    {
+      "bytes": 23,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-0.resp",
+      "name": "overflow-0"
+    },
+    {
+      "bytes": 23,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-int-0.resp",
+      "name": "overflow-int-0"
+    },
+    {
+      "bytes": 23,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-1.resp",
+      "name": "overflow-1"
+    },
+    {
+      "bytes": 23,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-int-1.resp",
+      "name": "overflow-int-1"
+    },
+    {
+      "bytes": 22,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-2.resp",
+      "name": "overflow-2"
+    },
+    {
+      "bytes": 22,
+      "category": "malformed-length",
+      "expectation": "protocol-error",
+      "file": "malformed-length/overflow-int-2.resp",
+      "name": "overflow-int-2"
+    },
+    {
+      "bytes": 10,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-0.resp",
+      "name": "bulk-0"
+    },
+    {
+      "bytes": 10,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-0.resp",
+      "name": "array-0"
+    },
+    {
+      "bytes": 10,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-0.resp",
+      "name": "map-0"
+    },
+    {
+      "bytes": 15,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-0.resp",
+      "name": "bulk-truncated-0"
+    },
+    {
+      "bytes": 11,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-1.resp",
+      "name": "bulk-1"
+    },
+    {
+      "bytes": 11,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-1.resp",
+      "name": "array-1"
+    },
+    {
+      "bytes": 11,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-1.resp",
+      "name": "map-1"
+    },
+    {
+      "bytes": 16,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-1.resp",
+      "name": "bulk-truncated-1"
+    },
+    {
+      "bytes": 12,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-2.resp",
+      "name": "bulk-2"
+    },
+    {
+      "bytes": 12,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-2.resp",
+      "name": "array-2"
+    },
+    {
+      "bytes": 12,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-2.resp",
+      "name": "map-2"
+    },
+    {
+      "bytes": 17,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-2.resp",
+      "name": "bulk-truncated-2"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-3.resp",
+      "name": "bulk-3"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-3.resp",
+      "name": "array-3"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-3.resp",
+      "name": "map-3"
+    },
+    {
+      "bytes": 18,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-3.resp",
+      "name": "bulk-truncated-3"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-4.resp",
+      "name": "bulk-4"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-4.resp",
+      "name": "array-4"
+    },
+    {
+      "bytes": 13,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-4.resp",
+      "name": "map-4"
+    },
+    {
+      "bytes": 18,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-4.resp",
+      "name": "bulk-truncated-4"
+    },
+    {
+      "bytes": 16,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-5.resp",
+      "name": "bulk-5"
+    },
+    {
+      "bytes": 16,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-5.resp",
+      "name": "array-5"
+    },
+    {
+      "bytes": 16,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-5.resp",
+      "name": "map-5"
+    },
+    {
+      "bytes": 21,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-5.resp",
+      "name": "bulk-truncated-5"
+    },
+    {
+      "bytes": 22,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/bulk-6.resp",
+      "name": "bulk-6"
+    },
+    {
+      "bytes": 22,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/array-6.resp",
+      "name": "array-6"
+    },
+    {
+      "bytes": 22,
+      "category": "oversized-declared",
+      "expectation": "budget-exceeded",
+      "file": "oversized-declared/map-6.resp",
+      "name": "map-6"
+    },
+    {
+      "bytes": 27,
+      "category": "oversized-declared",
+      "expectation": "incomplete",
+      "file": "oversized-declared/bulk-truncated-6.resp",
+      "name": "bulk-truncated-6"
+    },
+    {
+      "bytes": 68,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/array-16.resp",
+      "name": "array-16"
+    },
+    {
+      "bytes": 132,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/map-16.resp",
+      "name": "map-16"
+    },
+    {
+      "bytes": 132,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/array-32.resp",
+      "name": "array-32"
+    },
+    {
+      "bytes": 260,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/map-32.resp",
+      "name": "map-32"
+    },
+    {
+      "bytes": 260,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/array-64.resp",
+      "name": "array-64"
+    },
+    {
+      "bytes": 516,
+      "category": "deep-nesting",
+      "expectation": "valid",
+      "file": "deep-nesting/map-64.resp",
+      "name": "map-64"
+    },
+    {
+      "bytes": 516,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-128.resp",
+      "name": "array-128"
+    },
+    {
+      "bytes": 1028,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-128.resp",
+      "name": "map-128"
+    },
+    {
+      "bytes": 1028,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-256.resp",
+      "name": "array-256"
+    },
+    {
+      "bytes": 2052,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-256.resp",
+      "name": "map-256"
+    },
+    {
+      "bytes": 2052,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-512.resp",
+      "name": "array-512"
+    },
+    {
+      "bytes": 4100,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-512.resp",
+      "name": "map-512"
+    },
+    {
+      "bytes": 4100,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-1024.resp",
+      "name": "array-1024"
+    },
+    {
+      "bytes": 8196,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-1024.resp",
+      "name": "map-1024"
+    },
+    {
+      "bytes": 16388,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-4096.resp",
+      "name": "array-4096"
+    },
+    {
+      "bytes": 32772,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-4096.resp",
+      "name": "map-4096"
+    },
+    {
+      "bytes": 65540,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-16384.resp",
+      "name": "array-16384"
+    },
+    {
+      "bytes": 131076,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-16384.resp",
+      "name": "map-16384"
+    },
+    {
+      "bytes": 262148,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/array-65536.resp",
+      "name": "array-65536"
+    },
+    {
+      "bytes": 524292,
+      "category": "deep-nesting",
+      "expectation": "budget-exceeded",
+      "file": "deep-nesting/map-65536.resp",
+      "name": "map-65536"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-40.resp",
+      "name": "byte-40"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-26.resp",
+      "name": "byte-26"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-61.resp",
+      "name": "byte-61"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-5a.resp",
+      "name": "byte-5a"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-30.resp",
+      "name": "byte-30"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-00.resp",
+      "name": "byte-00"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-1b.resp",
+      "name": "byte-1b"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-20.resp",
+      "name": "byte-20"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-0a.resp",
+      "name": "byte-0a"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-2f.resp",
+      "name": "byte-2f"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-5c.resp",
+      "name": "byte-5c"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-27.resp",
+      "name": "byte-27"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-22.resp",
+      "name": "byte-22"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-5b.resp",
+      "name": "byte-5b"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-7b.resp",
+      "name": "byte-7b"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-3c.resp",
+      "name": "byte-3c"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-3f.resp",
+      "name": "byte-3f"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-60.resp",
+      "name": "byte-60"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-7f.resp",
+      "name": "byte-7f"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-ff.resp",
+      "name": "byte-ff"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-c3.resp",
+      "name": "byte-c3"
+    },
+    {
+      "bytes": 5,
+      "category": "invalid-type",
+      "expectation": "protocol-error",
+      "file": "invalid-type/byte-e2.resp",
+      "name": "byte-e2"
+    },
+    {
+      "bytes": 4,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/simple-lf.resp",
+      "name": "simple-lf"
+    },
+    {
+      "bytes": 4,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/simple-cr.resp",
+      "name": "simple-cr"
+    },
+    {
+      "bytes": 3,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/simple-none.resp",
+      "name": "simple-none"
+    },
+    {
+      "bytes": 3,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/int-lf.resp",
+      "name": "int-lf"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/bulk-len-lf.resp",
+      "name": "bulk-len-lf"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/bulk-body-lf.resp",
+      "name": "bulk-body-lf"
+    },
+    {
+      "bytes": 7,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/bulk-body-none.resp",
+      "name": "bulk-body-none"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/bulk-body-cr.resp",
+      "name": "bulk-body-cr"
+    },
+    {
+      "bytes": 12,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/bulk-body-wrong-len.resp",
+      "name": "bulk-body-wrong-len"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/array-partial.resp",
+      "name": "array-partial"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "incomplete",
+      "file": "truncated-crlf/map-odd.resp",
+      "name": "map-odd"
+    },
+    {
+      "bytes": 2,
+      "category": "truncated-crlf",
+      "expectation": "protocol-error",
+      "file": "truncated-crlf/null-lf.resp",
+      "name": "null-lf"
+    },
+    {
+      "bytes": 8,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-1.resp",
+      "name": "crlf-in-body-1"
+    },
+    {
+      "bytes": 10,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-2.resp",
+      "name": "crlf-in-body-2"
+    },
+    {
+      "bytes": 12,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-3.resp",
+      "name": "crlf-in-body-3"
+    },
+    {
+      "bytes": 14,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-4.resp",
+      "name": "crlf-in-body-4"
+    },
+    {
+      "bytes": 17,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-5.resp",
+      "name": "crlf-in-body-5"
+    },
+    {
+      "bytes": 19,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-6.resp",
+      "name": "crlf-in-body-6"
+    },
+    {
+      "bytes": 21,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-7.resp",
+      "name": "crlf-in-body-7"
+    },
+    {
+      "bytes": 23,
+      "category": "truncated-crlf",
+      "expectation": "valid",
+      "file": "truncated-crlf/crlf-in-body-8.resp",
+      "name": "crlf-in-body-8"
+    },
+    {
+      "bytes": 12,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-0.resp",
+      "name": "valid-0"
+    },
+    {
+      "bytes": 19,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-1.resp",
+      "name": "valid-1"
+    },
+    {
+      "bytes": 10,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-2.resp",
+      "name": "valid-2"
+    },
+    {
+      "bytes": 25,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-3.resp",
+      "name": "valid-3"
+    },
+    {
+      "bytes": 9,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-4.resp",
+      "name": "valid-4"
+    },
+    {
+      "bytes": 12,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-5.resp",
+      "name": "valid-5"
+    },
+    {
+      "bytes": 12,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-6.resp",
+      "name": "valid-6"
+    },
+    {
+      "bytes": 9,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/valid-7.resp",
+      "name": "valid-7"
+    },
+    {
+      "bytes": 7,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-0.resp",
+      "name": "invalid-0"
+    },
+    {
+      "bytes": 7,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-1.resp",
+      "name": "invalid-1"
+    },
+    {
+      "bytes": 8,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-2.resp",
+      "name": "invalid-2"
+    },
+    {
+      "bytes": 8,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-3.resp",
+      "name": "invalid-3"
+    },
+    {
+      "bytes": 9,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-4.resp",
+      "name": "invalid-4"
+    },
+    {
+      "bytes": 9,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-5.resp",
+      "name": "invalid-5"
+    },
+    {
+      "bytes": 8,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-6.resp",
+      "name": "invalid-6"
+    },
+    {
+      "bytes": 11,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-7.resp",
+      "name": "invalid-7"
+    },
+    {
+      "bytes": 7,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-8.resp",
+      "name": "invalid-8"
+    },
+    {
+      "bytes": 13,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-9.resp",
+      "name": "invalid-9"
+    },
+    {
+      "bytes": 9,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-10.resp",
+      "name": "invalid-10"
+    },
+    {
+      "bytes": 10,
+      "category": "utf8-boundary",
+      "expectation": "valid",
+      "file": "utf8-boundary/invalid-11.resp",
+      "name": "invalid-11"
+    },
+    {
+      "bytes": 22,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-00.resp",
+      "name": "bulk-00"
+    },
+    {
+      "bytes": 23,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-01.resp",
+      "name": "bulk-01"
+    },
+    {
+      "bytes": 34,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-02.resp",
+      "name": "bulk-02"
+    },
+    {
+      "bytes": 10,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-03.resp",
+      "name": "bulk-03"
+    },
+    {
+      "bytes": 9,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-04.resp",
+      "name": "bulk-04"
+    },
+    {
+      "bytes": 14,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-05.resp",
+      "name": "bulk-05"
+    },
+    {
+      "bytes": 19,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-06.resp",
+      "name": "bulk-06"
+    },
+    {
+      "bytes": 8,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-07.resp",
+      "name": "bulk-07"
+    },
+    {
+      "bytes": 12,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-08.resp",
+      "name": "bulk-08"
+    },
+    {
+      "bytes": 13,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-09.resp",
+      "name": "bulk-09"
+    },
+    {
+      "bytes": 9,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-10.resp",
+      "name": "bulk-10"
+    },
+    {
+      "bytes": 11,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-11.resp",
+      "name": "bulk-11"
+    },
+    {
+      "bytes": 24,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-12.resp",
+      "name": "bulk-12"
+    },
+    {
+      "bytes": 9,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-13.resp",
+      "name": "bulk-13"
+    },
+    {
+      "bytes": 9,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-14.resp",
+      "name": "bulk-14"
+    },
+    {
+      "bytes": 7,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-15.resp",
+      "name": "bulk-15"
+    },
+    {
+      "bytes": 10,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-16.resp",
+      "name": "bulk-16"
+    },
+    {
+      "bytes": 10,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-17.resp",
+      "name": "bulk-17"
+    },
+    {
+      "bytes": 14,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-18.resp",
+      "name": "bulk-18"
+    },
+    {
+      "bytes": 25,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/bulk-19.resp",
+      "name": "bulk-19"
+    },
+    {
+      "bytes": 9,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/simple.resp",
+      "name": "simple"
+    },
+    {
+      "bytes": 11,
+      "category": "terminal-escape",
+      "expectation": "valid",
+      "file": "terminal-escape/error.resp",
+      "name": "error"
+    },
+    {
+      "bytes": 9,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-00.resp",
+      "name": "dup-00"
+    },
+    {
+      "bytes": 17,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-01.resp",
+      "name": "dup-01"
+    },
+    {
+      "bytes": 25,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-02.resp",
+      "name": "dup-02"
+    },
+    {
+      "bytes": 33,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-03.resp",
+      "name": "dup-03"
+    },
+    {
+      "bytes": 41,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-04.resp",
+      "name": "dup-04"
+    },
+    {
+      "bytes": 49,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-05.resp",
+      "name": "dup-05"
+    },
+    {
+      "bytes": 57,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-06.resp",
+      "name": "dup-06"
+    },
+    {
+      "bytes": 65,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-07.resp",
+      "name": "dup-07"
+    },
+    {
+      "bytes": 73,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-08.resp",
+      "name": "dup-08"
+    },
+    {
+      "bytes": 81,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-09.resp",
+      "name": "dup-09"
+    },
+    {
+      "bytes": 90,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-10.resp",
+      "name": "dup-10"
+    },
+    {
+      "bytes": 98,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-11.resp",
+      "name": "dup-11"
+    },
+    {
+      "bytes": 106,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-12.resp",
+      "name": "dup-12"
+    },
+    {
+      "bytes": 114,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-13.resp",
+      "name": "dup-13"
+    },
+    {
+      "bytes": 122,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-14.resp",
+      "name": "dup-14"
+    },
+    {
+      "bytes": 130,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-15.resp",
+      "name": "dup-15"
+    },
+    {
+      "bytes": 138,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-16.resp",
+      "name": "dup-16"
+    },
+    {
+      "bytes": 146,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-17.resp",
+      "name": "dup-17"
+    },
+    {
+      "bytes": 154,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-18.resp",
+      "name": "dup-18"
+    },
+    {
+      "bytes": 162,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-19.resp",
+      "name": "dup-19"
+    },
+    {
+      "bytes": 170,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/dup-20.resp",
+      "name": "dup-20"
+    },
+    {
+      "bytes": 20,
+      "category": "attribute",
+      "expectation": "valid",
+      "file": "attribute/nested.resp",
+      "name": "nested"
+    },
+    {
+      "bytes": 12,
+      "category": "attribute",
+      "expectation": "incomplete",
+      "file": "attribute/no-value.resp",
+      "name": "no-value"
+    },
+    {
+      "bytes": 22,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/int-edge-0.resp",
+      "name": "int-edge-0"
+    },
+    {
+      "bytes": 23,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/int-edge-1.resp",
+      "name": "int-edge-1"
+    },
+    {
+      "bytes": 22,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-0.resp",
+      "name": "int-bad-0"
+    },
+    {
+      "bytes": 23,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-1.resp",
+      "name": "int-bad-1"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-2.resp",
+      "name": "int-bad-2"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-3.resp",
+      "name": "int-bad-3"
+    },
+    {
+      "bytes": 9,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-4.resp",
+      "name": "int-bad-4"
+    },
+    {
+      "bytes": 8,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-5.resp",
+      "name": "int-bad-5"
+    },
+    {
+      "bytes": 5,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-6.resp",
+      "name": "int-bad-6"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-7.resp",
+      "name": "int-bad-7"
+    },
+    {
+      "bytes": 5,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-8.resp",
+      "name": "int-bad-8"
+    },
+    {
+      "bytes": 3,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/int-bad-9.resp",
+      "name": "int-bad-9"
+    },
+    {
+      "bytes": 9,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-0.resp",
+      "name": "double-0"
+    },
+    {
+      "bytes": 5,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-1.resp",
+      "name": "double-1"
+    },
+    {
+      "bytes": 4,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-2.resp",
+      "name": "double-2"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-3.resp",
+      "name": "double-3"
+    },
+    {
+      "bytes": 7,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-4.resp",
+      "name": "double-4"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-5.resp",
+      "name": "double-5"
+    },
+    {
+      "bytes": 7,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-6.resp",
+      "name": "double-6"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-7.resp",
+      "name": "double-7"
+    },
+    {
+      "bytes": 40,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-8.resp",
+      "name": "double-8"
+    },
+    {
+      "bytes": 19,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/double-9.resp",
+      "name": "double-9"
+    },
+    {
+      "bytes": 3,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-0.resp",
+      "name": "double-bad-0"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-1.resp",
+      "name": "double-bad-1"
+    },
+    {
+      "bytes": 7,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-2.resp",
+      "name": "double-bad-2"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-3.resp",
+      "name": "double-bad-3"
+    },
+    {
+      "bytes": 5,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-4.resp",
+      "name": "double-bad-4"
+    },
+    {
+      "bytes": 7,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/double-bad-5.resp",
+      "name": "double-bad-5"
+    },
+    {
+      "bytes": 4099,
+      "category": "overlong-number",
+      "expectation": "valid",
+      "file": "overlong-number/bignum-huge.resp",
+      "name": "bignum-huge"
+    },
+    {
+      "bytes": 6,
+      "category": "overlong-number",
+      "expectation": "protocol-error",
+      "file": "overlong-number/bignum-bad.resp",
+      "name": "bignum-bad"
+    },
+    {
+      "bytes": 8,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-00.resp",
+      "name": "mixed-00"
+    },
+    {
+      "bytes": 9,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-01.resp",
+      "name": "mixed-01"
+    },
+    {
+      "bytes": 10,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-02.resp",
+      "name": "mixed-02"
+    },
+    {
+      "bytes": 11,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-03.resp",
+      "name": "mixed-03"
+    },
+    {
+      "bytes": 12,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-04.resp",
+      "name": "mixed-04"
+    },
+    {
+      "bytes": 13,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-05.resp",
+      "name": "mixed-05"
+    },
+    {
+      "bytes": 14,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-06.resp",
+      "name": "mixed-06"
+    },
+    {
+      "bytes": 15,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-07.resp",
+      "name": "mixed-07"
+    },
+    {
+      "bytes": 17,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-08.resp",
+      "name": "mixed-08"
+    },
+    {
+      "bytes": 18,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-09.resp",
+      "name": "mixed-09"
+    },
+    {
+      "bytes": 19,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-10.resp",
+      "name": "mixed-10"
+    },
+    {
+      "bytes": 20,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-11.resp",
+      "name": "mixed-11"
+    },
+    {
+      "bytes": 21,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-12.resp",
+      "name": "mixed-12"
+    },
+    {
+      "bytes": 22,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-13.resp",
+      "name": "mixed-13"
+    },
+    {
+      "bytes": 23,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-14.resp",
+      "name": "mixed-14"
+    },
+    {
+      "bytes": 24,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-15.resp",
+      "name": "mixed-15"
+    },
+    {
+      "bytes": 25,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-16.resp",
+      "name": "mixed-16"
+    },
+    {
+      "bytes": 26,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-17.resp",
+      "name": "mixed-17"
+    },
+    {
+      "bytes": 27,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-18.resp",
+      "name": "mixed-18"
+    },
+    {
+      "bytes": 28,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/mixed-19.resp",
+      "name": "mixed-19"
+    },
+    {
+      "bytes": 264,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/all-bytes.resp",
+      "name": "all-bytes"
+    },
+    {
+      "bytes": 6,
+      "category": "binary-nul",
+      "expectation": "valid",
+      "file": "binary-nul/empty.resp",
+      "name": "empty"
+    },
+    {
+      "bytes": 8,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-00chunks.resp",
+      "name": "bulk-00chunks"
+    },
+    {
+      "bytes": 15,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-01chunks.resp",
+      "name": "bulk-01chunks"
+    },
+    {
+      "bytes": 23,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-02chunks.resp",
+      "name": "bulk-02chunks"
+    },
+    {
+      "bytes": 32,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-03chunks.resp",
+      "name": "bulk-03chunks"
+    },
+    {
+      "bytes": 42,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-04chunks.resp",
+      "name": "bulk-04chunks"
+    },
+    {
+      "bytes": 53,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-05chunks.resp",
+      "name": "bulk-05chunks"
+    },
+    {
+      "bytes": 65,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-06chunks.resp",
+      "name": "bulk-06chunks"
+    },
+    {
+      "bytes": 78,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-07chunks.resp",
+      "name": "bulk-07chunks"
+    },
+    {
+      "bytes": 92,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-08chunks.resp",
+      "name": "bulk-08chunks"
+    },
+    {
+      "bytes": 107,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-09chunks.resp",
+      "name": "bulk-09chunks"
+    },
+    {
+      "bytes": 124,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-10chunks.resp",
+      "name": "bulk-10chunks"
+    },
+    {
+      "bytes": 142,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-11chunks.resp",
+      "name": "bulk-11chunks"
+    },
+    {
+      "bytes": 161,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/bulk-12chunks.resp",
+      "name": "bulk-12chunks"
+    },
+    {
+      "bytes": 7,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/array-0.resp",
+      "name": "array-0"
+    },
+    {
+      "bytes": 7,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/map-0.resp",
+      "name": "map-0"
+    },
+    {
+      "bytes": 7,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/set-0.resp",
+      "name": "set-0"
+    },
+    {
+      "bytes": 11,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/array-1.resp",
+      "name": "array-1"
+    },
+    {
+      "bytes": 15,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/map-1.resp",
+      "name": "map-1"
+    },
+    {
+      "bytes": 11,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/set-1.resp",
+      "name": "set-1"
+    },
+    {
+      "bytes": 15,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/array-2.resp",
+      "name": "array-2"
+    },
+    {
+      "bytes": 23,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/map-2.resp",
+      "name": "map-2"
+    },
+    {
+      "bytes": 15,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/set-2.resp",
+      "name": "set-2"
+    },
+    {
+      "bytes": 27,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/array-5.resp",
+      "name": "array-5"
+    },
+    {
+      "bytes": 47,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/map-5.resp",
+      "name": "map-5"
+    },
+    {
+      "bytes": 27,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/set-5.resp",
+      "name": "set-5"
+    },
+    {
+      "bytes": 247,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/array-50.resp",
+      "name": "array-50"
+    },
+    {
+      "bytes": 447,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/map-50.resp",
+      "name": "map-50"
+    },
+    {
+      "bytes": 247,
+      "category": "streamed",
+      "expectation": "valid",
+      "file": "streamed/set-50.resp",
+      "name": "set-50"
+    },
+    {
+      "bytes": 13,
+      "category": "streamed",
+      "expectation": "incomplete",
+      "file": "streamed/bulk-no-terminator.resp",
+      "name": "bulk-no-terminator"
+    },
+    {
+      "bytes": 8,
+      "category": "streamed",
+      "expectation": "protocol-error",
+      "file": "streamed/bulk-bad-chunk-len.resp",
+      "name": "bulk-bad-chunk-len"
+    },
+    {
+      "bytes": 8,
+      "category": "streamed",
+      "expectation": "incomplete",
+      "file": "streamed/array-no-terminator.resp",
+      "name": "array-no-terminator"
+    },
+    {
+      "bytes": 11,
+      "category": "streamed",
+      "expectation": "protocol-error",
+      "file": "streamed/bad-terminator.resp",
+      "name": "bad-terminator"
+    },
+    {
+      "bytes": 5,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-00.resp",
+      "name": "before-reply-00"
+    },
+    {
+      "bytes": 35,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-01.resp",
+      "name": "before-reply-01"
+    },
+    {
+      "bytes": 65,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-02.resp",
+      "name": "before-reply-02"
+    },
+    {
+      "bytes": 95,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-03.resp",
+      "name": "before-reply-03"
+    },
+    {
+      "bytes": 125,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-04.resp",
+      "name": "before-reply-04"
+    },
+    {
+      "bytes": 155,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-05.resp",
+      "name": "before-reply-05"
+    },
+    {
+      "bytes": 185,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-06.resp",
+      "name": "before-reply-06"
+    },
+    {
+      "bytes": 215,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-07.resp",
+      "name": "before-reply-07"
+    },
+    {
+      "bytes": 245,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-08.resp",
+      "name": "before-reply-08"
+    },
+    {
+      "bytes": 275,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-09.resp",
+      "name": "before-reply-09"
+    },
+    {
+      "bytes": 305,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-10.resp",
+      "name": "before-reply-10"
+    },
+    {
+      "bytes": 336,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-11.resp",
+      "name": "before-reply-11"
+    },
+    {
+      "bytes": 367,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-12.resp",
+      "name": "before-reply-12"
+    },
+    {
+      "bytes": 398,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-13.resp",
+      "name": "before-reply-13"
+    },
+    {
+      "bytes": 429,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-14.resp",
+      "name": "before-reply-14"
+    },
+    {
+      "bytes": 460,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-15.resp",
+      "name": "before-reply-15"
+    },
+    {
+      "bytes": 491,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-16.resp",
+      "name": "before-reply-16"
+    },
+    {
+      "bytes": 522,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-17.resp",
+      "name": "before-reply-17"
+    },
+    {
+      "bytes": 553,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-18.resp",
+      "name": "before-reply-18"
+    },
+    {
+      "bytes": 584,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-19.resp",
+      "name": "before-reply-19"
+    },
+    {
+      "bytes": 615,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/before-reply-20.resp",
+      "name": "before-reply-20"
+    },
+    {
+      "bytes": 33,
+      "category": "push",
+      "expectation": "valid",
+      "file": "push/after-reply.resp",
+      "name": "after-reply"
+    },
+    {
+      "bytes": 12,
+      "category": "push",
+      "expectation": "protocol-error",
+      "file": "push/push-nested-in-array.resp",
+      "name": "push-nested-in-array"
+    }
+  ],
+  "schema": "penguin.fixtures.protocol.v1",
+  "source": "xtask/resp-server hostile::corpus()"
+}

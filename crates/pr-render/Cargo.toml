@@ -1,0 +1,13 @@
+[package]
+name = "pr-render"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Penguin Redis — pr-render"
+
+[lints]
+workspace = true
+
+[dependencies]

@@ -1,0 +1,41 @@
+[workspace]
+resolver = "3"
+members = ["crates/*", "xtask", "xtask/resp-server"]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.97"
+license = "TBD-ADR-023"
+repository = "https://github.com/shiengng12345/penguin-redis"
+
+[workspace.dependencies]
+# Pinned in Cargo.lock; versions fixed at first `cargo build` and reviewed under ADR-023 supply-chain notes.
+bytes = "1"
+thiserror = "2"
+anyhow = "1"
+tokio = { version = "1", default-features = false, features = ["rt-multi-thread", "net", "time", "io-util", "sync", "macros", "process", "signal"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+proptest = "1"
+insta = { version = "1", features = ["yaml"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"   # Penguin-owned schemas ONLY (v2.1 §8.3); never for server business JSON
+toml = "0.9"
+blake3 = "1"
+tracing = "0.1"
+
+[workspace.lints.rust]
+unsafe_code = "deny"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+debug = 1

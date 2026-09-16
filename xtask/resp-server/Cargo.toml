@@ -1,0 +1,21 @@
+[package]
+name = "resp-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Penguin Redis — V-A03 synthetic RESP2/3 server: programmable frames, streamed types, push/attribute, malformed corpora, chunked/delayed delivery"
+
+[lints]
+workspace = true
+
+[dependencies]
+bytes = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

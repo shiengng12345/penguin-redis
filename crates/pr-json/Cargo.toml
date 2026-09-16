@@ -1,0 +1,13 @@
+[package]
+name = "pr-json"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Penguin Redis — pr-json"
+
+[lints]
+workspace = true
+
+[dependencies]

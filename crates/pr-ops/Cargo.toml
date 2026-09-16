@@ -1,0 +1,13 @@
+[package]
+name = "pr-ops"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Penguin Redis — pr-ops"
+
+[lints]
+workspace = true
+
+[dependencies]

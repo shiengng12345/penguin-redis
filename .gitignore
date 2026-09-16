@@ -1,0 +1,5 @@
+/target
+**/*.rs.bk
+/tests/**/recordings/*.raw
+/benches/**/out/
+.DS_Store
