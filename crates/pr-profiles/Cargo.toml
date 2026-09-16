@@ -6,9 +6,23 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-profiles"
+description = "Penguin Redis — pr-profiles: connection profiles and credential references"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+pr-security = { path = "../pr-security" }
+thiserror = { workspace = true }
+serde = { workspace = true }
+toml = { workspace = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", features = ["apple-native"] }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+keyring = { version = "3", features = ["windows-native"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3", features = ["sync-secret-service", "linux-native"] }

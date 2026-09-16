@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 13 |
+| PASS | 15 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 49 |
+| IN-PROGRESS | 47 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -44,7 +44,7 @@
 | V-B02 | PASS | `crates/pr-protocol/` · 23 tests（含 316 样本 corpus 逐字节喂入） | 增量 RESP2/3 解码含 streamed；预算与协议错误分离；词法保真；bare-LF 即时报错 |
 | V-B03 | IN-PROGRESS | — | |
 | V-B04 | IN-PROGRESS | — | `pr-core::outcome` 四维度+退出码映射已实现并测试；待 V-A03 组合矩阵全量 |
-| V-B05 | IN-PROGRESS | — | |
+| V-B05 | PASS | `crates/pr-core/src/session.rs` · 18 tests | HELLO/AUTH/SELECT/RESET/MULTI/WATCH/CLIENT REPLY 状态机；`may_probe()` 在事务内与 reply-suppressed 时拒绝注入；断线返回 `ReconnectLosses` 且不静默恢复 |
 | V-B06 | IN-PROGRESS | — | |
 | V-B07 | PASS | `crates/prc/src/args.rs` · 17 tests | §3.2 顶层语法；§3.3 profile×flag 矩阵逐格用例；`-h` 恒为 host；输出模式互斥不做 last-wins |
 
@@ -64,7 +64,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-D01 | IN-PROGRESS | — | |
+| V-D01 | PASS | `crates/pr-profiles/src/credentials.rs` · 9 tests · 本机 Keychain 实跑 | keyring 3 按平台 feature；`credential:<uuid>` 引用；无可用 store 时 **fail-closed**，回退选项里没有明文文件；keyutils 明确标为非持久 |
 | V-D02 | IN-PROGRESS | — | |
 | V-D03 | IN-PROGRESS | — | `pr-security::approval` 实现+10 测试通过（含 SEC-10 同摘要不同字节）；待接入 kernel |
 | V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
@@ -160,3 +160,4 @@
 | 2026-09-16 | CI run 35048391825：15/17 绿。cluster/sentinel 脚本首跑失败，已记入 V-G01/V-G02 |
 | 2026-09-16 | V-G01 / V-G02 → PASS：两个 topology 根因定位并修复；新增 `pr-routing` slot/hash-tag 实现与 8 个实跑测试；196 tests 全绿 |
 | 2026-09-16 | **CI 17/17 全绿** → V-A05 PASS；SPIKE-001 结论：Reedline 不达标，V-C01 走 ADR-026 回退并实现自有 LineBuffer；216 tests 全绿 |
+| 2026-09-16 | V-B05 / V-D01 → PASS（会话状态机、三平台凭证存储）；244 tests 全绿 |

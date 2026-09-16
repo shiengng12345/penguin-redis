@@ -11,6 +11,7 @@ pub mod outcome;
 pub mod request;
 pub mod safetext;
 pub mod scope;
+pub mod session;
 
 pub use outcome::{
     Delivery, DiagnosticId, EffectsCertainty, ExecutionOutcome, ExitCode, RenderStatus, Reply,
@@ -19,3 +20,4 @@ pub use outcome::{
 pub use request::{CommandRequest, Effects, RequestBudget, RequestOrigin};
 pub use safetext::SafeText;
 pub use scope::{TaskScope, TaskScopeHandle};
+pub use session::{Protocol, ReconnectLosses, ReplyMode, SessionRefusal, SessionState, TxState};
