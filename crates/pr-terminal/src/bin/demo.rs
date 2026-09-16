@@ -18,6 +18,9 @@
 //! | `Ctrl-T` | enter the alternate screen |
 //! | `Esc` | close the menu, or leave the alternate screen |
 //! | `Ctrl-D` on an empty line | quit |
+//!
+//! Bracketed paste is enabled at start-up, so a test can paste a multi-line block and watch
+//! it land in the staging view instead of running.
 
 use std::io::Write as _;
 use std::time::Duration;
@@ -90,6 +93,16 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
                     text: format!("submitted: {line}"),
                     origin: NoticeOrigin::Client,
                 }));
+            }
+            Action::SubmitMany(lines) => {
+                // Still nothing is executed here; the point is that the user's decision
+                // reached the application as a decision rather than as three Enters.
+                for line in lines {
+                    co.handle(Input::Message(pr_terminal::Notice {
+                        text: format!("submitted: {line}"),
+                        origin: NoticeOrigin::Client,
+                    }));
+                }
             }
             Action::Quit => alive = false,
             Action::None => {}

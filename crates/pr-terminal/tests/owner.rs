@@ -435,21 +435,110 @@ fn a_resize_redraws_from_a_known_position() {
 }
 
 #[test]
-fn a_paste_is_one_edit_and_its_newlines_do_not_submit() {
+fn a_multiline_paste_goes_to_review_and_runs_nothing() {
+    // §14.1 / ASSIST-082 / UX-11. Three pasted lines in a terminal that treats newlines as
+    // Enter is three commands the user has not read.
     let _c = claim();
     let mut co = coordinator();
     co.start();
-    let action = co.handle(Input::Paste(b"SET a 1\nSET b 2".to_vec()));
+    let action = co.handle(Input::Paste(b"SET a 1\nFLUSHALL\nSET b 2\n".to_vec()));
+    assert_eq!(action, Action::None, "nothing may run on arrival");
+    let st = co.staging().expect("the paste is under review");
+    assert_eq!(st.lines()[..3], ["SET a 1", "FLUSHALL", "SET b 2"]);
+    assert_eq!(st.decision(), None);
+    assert_eq!(co.text(), "", "and nothing leaked into the edit buffer");
+}
+
+#[test]
+fn a_single_line_paste_goes_into_the_buffer_without_a_modal() {
+    let _c = claim();
+    let mut co = coordinator();
+    co.start();
+    assert_eq!(co.handle(Input::Paste(b"GET mykey".to_vec())), Action::None);
+    assert!(co.staging().is_none(), "one line does not need review");
+    assert_eq!(co.text(), "GET mykey", "it is editable, and unsubmitted");
+}
+
+#[test]
+fn enter_does_nothing_in_the_review_view() {
+    // The key a user presses by reflex is the one that must not run a pasted block.
+    let _c = claim();
+    let mut co = coordinator();
+    co.start();
+    co.handle(Input::Paste(b"FLUSHALL\nFLUSHDB\n".to_vec()));
+    for k in [Key::Enter, Key::Tab, Key::Char('x'), Key::Right] {
+        assert_eq!(
+            co.handle(Input::Key(k)),
+            Action::None,
+            "{k:?} ran something"
+        );
+        assert!(co.staging().is_some(), "{k:?} dismissed the review");
+    }
+}
+
+#[test]
+fn the_three_choices_are_the_only_ways_out() {
+    let _c = claim();
+
+    // [1] one by one.
+    let mut co = coordinator();
+    co.start();
+    co.handle(Input::Paste(b"GET a\nGET b\n".to_vec()));
     assert_eq!(
-        action,
-        Action::None,
-        "a pasted newline must not run the line (§14.1)"
+        co.handle(Input::Key(Key::Char('1'))),
+        Action::SubmitMany(vec!["GET a".into(), "GET b".into()])
     );
-    assert_eq!(co.text(), "SET a 1 SET b 2");
-    assert!(
-        !co.text().contains('\n'),
-        "no newline may survive into the buffer"
+    assert!(co.staging().is_none());
+    drop(co);
+
+    // [2] as a single command.
+    let mut co = coordinator();
+    co.start();
+    co.handle(Input::Paste(b"EVAL \"return 1\"\n0\n".to_vec()));
+    assert_eq!(
+        co.handle(Input::Key(Key::Char('2'))),
+        Action::Submit("EVAL \"return 1\"\n0".into())
     );
+    drop(co);
+
+    // [Esc] cancel.
+    let mut co = coordinator();
+    co.start();
+    co.handle(Input::Paste(b"FLUSHALL\nFLUSHDB\n".to_vec()));
+    assert_eq!(co.handle(Input::Key(Key::Esc)), Action::None);
+    assert!(co.staging().is_none());
+    assert_eq!(co.text(), "", "cancelling leaves nothing behind");
+}
+
+#[test]
+fn a_dangerous_line_can_be_removed_before_anything_runs() {
+    let _c = claim();
+    let mut co = coordinator();
+    co.start();
+    co.handle(Input::Paste(b"GET a\nFLUSHALL\nGET b\n".to_vec()));
+    co.handle(Input::Key(Key::Down)); // focus FLUSHALL
+    assert_eq!(co.staging().unwrap().focused(), 1);
+    co.handle(Input::Key(Key::Backspace));
+    assert_eq!(
+        co.handle(Input::Key(Key::Char('1'))),
+        Action::SubmitMany(vec!["GET a".into(), "GET b".into()])
+    );
+}
+
+#[test]
+fn the_review_view_says_plainly_that_nothing_has_run() {
+    let _c = claim();
+    let mut co = coordinator();
+    co.start();
+    co.sink_mut().clear();
+    co.handle(Input::Paste(b"SET a 1\nSET b 2\n".to_vec()));
+    let seen = visible(co.sink());
+    assert!(seen.contains("nothing has run"), "{seen:?}");
+    assert!(seen.contains("pasted 2 line(s)"), "{seen:?}");
+    assert!(seen.contains("[1] run one by one"), "{seen:?}");
+    assert!(seen.contains("[2] run as one command"), "{seen:?}");
+    assert!(seen.contains("[Esc] cancel"), "{seen:?}");
+    assert!(seen.contains("SET a 1") && seen.contains("SET b 2"));
 }
 
 #[test]

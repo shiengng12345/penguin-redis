@@ -21,6 +21,7 @@ use crate::paint::{
     DISABLE_BRACKETED_PASTE, ENABLE_BRACKETED_PASTE, ENTER_ALTERNATE, HIDE_CURSOR, LEAVE_ALTERNATE,
     Painter, SHOW_CURSOR, Sink,
 };
+use crate::paste::{Choice, Staging, needs_staging};
 use pr_render::WidthPolicy;
 use pr_repl::LineBuffer;
 
@@ -91,6 +92,11 @@ pub enum Action {
     None,
     /// The user submitted this line.
     Submit(String),
+    /// The user released a staged paste as several commands, in order (§14.1).
+    ///
+    /// Separate from [`Action::Submit`] so a caller cannot run a pasted block by accident:
+    /// handling it means deciding, explicitly, what to do with more than one command.
+    SubmitMany(Vec<String>),
     /// The user asked to leave.
     Quit,
 }
@@ -116,6 +122,8 @@ pub struct Coordinator<S: Sink> {
     prompt: String,
     buffer: LineBuffer,
     menu: Option<Menu>,
+    /// Pasted content held for review. Nothing in it executes until the user chooses.
+    staging: Option<Staging>,
     surface: Surface,
     tui: Tui,
     /// The REPL draft saved when the alternate screen went up.
@@ -149,6 +157,7 @@ impl<S: Sink> Coordinator<S> {
             prompt: "penguin> ".to_owned(),
             buffer: LineBuffer::new(),
             menu: None,
+            staging: None,
             surface: Surface::Repl,
             tui: Tui::default(),
             stash: None,
@@ -209,6 +218,12 @@ impl<S: Sink> Coordinator<S> {
     #[must_use]
     pub fn tui_help_open(&self) -> bool {
         self.tui.help
+    }
+
+    /// The paste under review, if any.
+    #[must_use]
+    pub fn staging(&self) -> Option<&Staging> {
+        self.staging.as_ref()
     }
 
     /// The dropdown, if one is open.
@@ -310,14 +325,22 @@ impl<S: Sink> Coordinator<S> {
             Input::Interrupt => Action::Quit,
             Input::Paste(bytes) => {
                 if self.surface == Surface::Repl {
-                    // One paste is one edit. Newlines are kept as text: turning them into
-                    // submissions is what runs three commands the user has not read (§14.1).
-                    let text = String::from_utf8_lossy(&bytes).replace(['\n', '\r'], " ");
-                    let _ = self.buffer.insert(&text);
+                    if needs_staging(&bytes) {
+                        // §14.1: multi-line, or more than a person can be expected to have
+                        // read. It goes to review; nothing is executed.
+                        self.staging = Some(Staging::new(&bytes));
+                        self.menu = None;
+                    } else {
+                        // A single line goes into the edit buffer — unsubmitted, but not
+                        // worth a modal for.
+                        let text = String::from_utf8_lossy(&bytes).into_owned();
+                        let _ = self.buffer.insert(&text);
+                    }
                     self.repaint();
                 }
                 Action::None
             }
+            Input::Key(k) if self.staging.is_some() => self.staging_key(k),
             Input::Key(k) => match self.surface {
                 Surface::Repl => self.repl_key(k),
                 Surface::Alternate => {
@@ -394,6 +417,55 @@ impl<S: Sink> Coordinator<S> {
             // Tab with nothing focused, an unbound Ctrl chord, a function key: the REPL
             // surface has no meaning for these, and inventing one is worse than ignoring it.
             Key::Tab | Key::Ctrl(_) | Key::Function(_) => Action::None,
+        };
+        self.repaint();
+        action
+    }
+
+    /// Keys while a paste is under review (§14.1).
+    ///
+    /// The three choices are spelled out rather than bound to Enter, because Enter is the key
+    /// the user presses without thinking and this is the moment not to.
+    fn staging_key(&mut self, k: Key) -> Action {
+        let Some(st) = self.staging.as_mut() else {
+            return Action::None;
+        };
+        let action = match k {
+            Key::Down => {
+                let next = st.focused() + 1;
+                st.focus(next);
+                Action::None
+            }
+            Key::Up => {
+                let prev = st.focused().saturating_sub(1);
+                st.focus(prev);
+                Action::None
+            }
+            Key::Backspace => {
+                st.delete();
+                if st.is_empty() {
+                    self.staging = None;
+                }
+                Action::None
+            }
+            Key::Char('1') => {
+                let out = st.decide(Choice::OneByOne);
+                self.staging = None;
+                Action::SubmitMany(out)
+            }
+            Key::Char('2') => {
+                let out = st.decide(Choice::SingleCommand);
+                self.staging = None;
+                out.into_iter().next().map_or(Action::None, Action::Submit)
+            }
+            Key::Esc | Key::Ctrl('c') => {
+                st.decide(Choice::Cancel);
+                self.staging = None;
+                Action::None
+            }
+            // Deliberately inert, Enter included: §14.1 forbids an automatic execution, and
+            // the key most likely to be pressed by reflex is the one that must do nothing.
+            _ => Action::None,
         };
         self.repaint();
         action
@@ -545,6 +617,20 @@ impl<S: Sink> Coordinator<S> {
         let before_w = self.width.str_width(&text[..cursor]);
         let cursor_col = prompt_w + before_w;
 
+        let staging_lines: Vec<String> = self.staging.as_ref().map_or_else(Vec::new, |st| {
+            let mut out = vec![format!(
+                "-- pasted {} line(s), nothing has run --",
+                st.lines().iter().filter(|l| !l.trim().is_empty()).count()
+            )];
+            for (i, l) in st.lines().iter().enumerate() {
+                let marker = if st.focused() == i { "> " } else { "  " };
+                let (shown, _) = self.width.truncate(l, cols.saturating_sub(2));
+                out.push(format!("{marker}{shown}"));
+            }
+            out.push("[1] run one by one  [2] run as one command  [Esc] cancel".to_owned());
+            out
+        });
+
         let menu_lines: Vec<String> = self.menu.as_ref().map_or_else(Vec::new, |m| {
             m.items
                 .iter()
@@ -561,12 +647,17 @@ impl<S: Sink> Coordinator<S> {
         let prompt = self.prompt.clone();
         let mut p = Painter::new(&self.owner, &mut self.sink);
         p.up(up).erase_block().text(&prompt).text(&text);
+        for line in &staging_lines {
+            p.newline().text(line);
+        }
         for line in &menu_lines {
             p.newline().text(line);
         }
         // Come back to the edit position. The menu sits below, so the cursor returns to the
         // prompt row rather than staying wherever the last menu row ended.
-        p.up(menu_lines.len()).raw(b"\r").right(cursor_col % cols);
+        p.up(menu_lines.len() + staging_lines.len())
+            .raw(b"\r")
+            .right(cursor_col % cols);
         p.done();
 
         self.frames += 1;

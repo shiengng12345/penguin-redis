@@ -256,6 +256,85 @@ fn a_resize_is_handled_by_the_same_owner() {
 }
 
 #[test]
+fn assist_082_a_bracketed_paste_reaches_the_review_view_and_runs_nothing() {
+    // The whole point, on a real terminal: three lines arrive as one bracketed paste and the
+    // user is shown them instead of having them executed.
+    let mut p = demo_started();
+    p.wait_for_screen(PROMPT, T).unwrap();
+
+    p.send_bracketed_paste(b"SET a 1\nFLUSHALL\nSET b 2\n")
+        .unwrap();
+    p.wait_for_screen("nothing has run", T)
+        .expect("the paste went to review");
+
+    let s = p.screen();
+    assert!(s.shows("SET a 1"), "{}", s.text());
+    assert!(s.shows("FLUSHALL"));
+    assert!(s.shows("[1] run one by one"), "{}", s.text());
+    assert!(
+        !s.seen("submitted:"),
+        "something was executed on arrival\n{}",
+        s.history()
+    );
+
+    // The dangerous line can be taken out before anything is sent.
+    p.send(b"\x1b[B").unwrap(); // Down: focus FLUSHALL
+    std::thread::sleep(Duration::from_millis(200));
+    p.send(b"\x7f").unwrap(); // Backspace: delete it
+    std::thread::sleep(Duration::from_millis(200));
+    p.send(b"1").unwrap(); // run one by one
+
+    p.wait_for_screen("submitted: SET b 2", T)
+        .expect("the user's choice reached the application");
+    let s = p.screen();
+    assert!(s.seen("submitted: SET a 1"));
+    assert!(
+        !s.seen("submitted: FLUSHALL"),
+        "the deleted line was sent anyway\n{}",
+        s.history()
+    );
+
+    quit(&mut p);
+}
+
+#[test]
+fn assist_082_cancelling_a_paste_sends_nothing() {
+    let mut p = demo_started();
+    p.wait_for_screen(PROMPT, T).unwrap();
+    p.send_bracketed_paste(b"FLUSHALL\nSHUTDOWN\n").unwrap();
+    p.wait_for_screen("nothing has run", T).unwrap();
+
+    p.send(ESC).unwrap();
+    std::thread::sleep(Duration::from_millis(300));
+    p.send(b"PING").unwrap();
+    p.wait_for_screen("PING", T)
+        .expect("editing resumes after cancelling");
+
+    let s = p.screen();
+    assert!(!s.seen("submitted:"), "{}", s.history());
+    assert!(
+        !s.shows("nothing has run"),
+        "the review view is gone\n{}",
+        s.text()
+    );
+
+    quit(&mut p);
+}
+
+#[test]
+fn a_single_line_bracketed_paste_just_lands_in_the_buffer() {
+    let mut p = demo_started();
+    p.wait_for_screen(PROMPT, T).unwrap();
+    p.send_bracketed_paste(b"HGETALL player:10001").unwrap();
+    p.wait_for_screen("HGETALL player:10001", T)
+        .expect("one line needs no review");
+    let s = p.screen();
+    assert!(!s.shows("nothing has run"), "{}", s.text());
+    assert!(!s.seen("submitted:"), "and it was not executed either");
+    quit(&mut p);
+}
+
+#[test]
 fn the_harness_answers_the_terminal_queries_the_child_makes() {
     // On Windows ConPTY asks for the cursor position as it starts and blocks until answered.
     // A zero here alongside a working session would mean the responder had become dead code
