@@ -55,6 +55,9 @@ cargo run --release -p soak -- --hours 8 --out soak-metrics.jsonl --redis 127.0.
 
 `.github/workflows/ci.yml` 的 `soak` job，`schedule`（每天 03:00 UTC）与手动触发，不在 PR 上跑。
 
-§32.1 要的是八小时；**GitHub 托管 runner 六小时会杀掉任何 job**，所以 CI 跑的是平台允许的最长
-窗口（5h30m），八小时那一份证据来自一台跑得动的机器（上面那一节，JSONL 一并存档）。
+§32.1 要的是八小时；**GitHub 托管 runner 六小时会杀掉任何 job**，而且 release build 要先跑完，
+所以 CI 跑五小时，八小时那一份证据来自一台跑得动的机器（上面那一节，JSONL 一并存档）。
 分析、阈值、退出码两边完全一样，不一样的只有窗口长度——这一点写下来，而不是抹掉。
+
+`workflow_dispatch` 带一个 `hours` 输入，所以这个 job 本身可以用十分钟验一次。
+**一个五小时的 job，如果它的第一次运行同时也是它的第一次测试，那就是一种花五小时找错别字的方法。**

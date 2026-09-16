@@ -1,19 +1,27 @@
 name: Soak
 
 # V-H05 / PERF-04 (v2.1 §32.1 Soak). Its own workflow for two reasons: it runs for five and a
-# half hours, and `ci.yml` cancels superseded runs — which would kill this one the moment
+# hours, and `ci.yml` cancels superseded runs — which would kill this one the moment
 # anybody pushed.
 #
-# §32.1 asks for eight hours. A GitHub-hosted runner kills any job at six, so this runs the
-# longest window the platform allows and the full eight-hour evidence comes from a machine that
-# can host it (`benches/soak/README.md` records it, with its JSONL). The analysis, its
+# §32.1 asks for eight hours. A GitHub-hosted runner kills any job at six, and a release build
+# has to happen first, so this runs five and the full eight-hour evidence comes from a machine
+# that can host it (`benches/soak/README.md` records it, with its JSONL). The analysis, its
 # thresholds and its exit code are the same in both places — what differs is the length of the
 # window, and that difference is written down rather than rounded off.
+#
+# `workflow_dispatch` takes an `hours` input so the job itself can be checked in ten minutes.
+# A five-hour job whose first run is also its first test is a five-hour way to find a typo.
 
 on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
+    inputs:
+      hours:
+        description: "How long to soak. Short values are for checking the job itself works."
+        required: false
+        default: "5"
 
 concurrency:
   group: soak
@@ -27,7 +35,7 @@ env:
 
 jobs:
   soak:
-    name: soak (5h30m, the longest a hosted runner allows)
+    name: soak (5h, inside the 6h a hosted runner allows)
     runs-on: ubuntu-latest
     timeout-minutes: 350
     steps:
@@ -53,9 +61,12 @@ jobs:
           done
           docker exec soak-redis redis-cli ping | grep -q PONG
       - name: soak
+        # Five hours, not five and a half. The job is capped at 350 minutes and a release build
+        # of the workspace on a cold cache is not free; a soak that gets killed at the end
+        # produces a JSONL nobody can draw a line through, which is worse than a shorter one.
         run: |
           cargo run --release -p soak -- \
-            --hours 5.5 --out soak-metrics.jsonl --redis 127.0.0.1:6379
+            --hours "${{ inputs.hours || '5' }}" --out soak-metrics.jsonl --redis 127.0.0.1:6379
       - name: keep the samples
         if: always()
         uses: actions/upload-artifact@v4
