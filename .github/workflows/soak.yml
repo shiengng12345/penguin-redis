@@ -9,16 +9,23 @@ name: Soak
 # thresholds and its exit code are the same in both places — what differs is the length of the
 # window, and that difference is written down rather than rounded off.
 #
-# `workflow_dispatch` takes an `hours` input so the job itself can be checked in ten minutes.
-# A five-hour job whose first run is also its first test is a five-hour way to find a typo.
+# `workflow_dispatch` takes a `smoke` input so the job itself can be checked in a few minutes.
+# A five-hour job whose first run is also its first test is a five-hour way to find a typo —
+# and a short run under the real criterion is a guaranteed red build, which is a notification
+# about nothing. `--smoke` asks the smaller question out loud instead.
 
 on:
   schedule:
     - cron: "0 3 * * *"
   workflow_dispatch:
     inputs:
+      smoke:
+        description: "Check that the job's plumbing works (a few minutes). Says nothing about steadiness."
+        type: boolean
+        required: false
+        default: false
       hours:
-        description: "How long to soak. Short values are for checking the job itself works."
+        description: "How long to soak. Ignored when smoke is set."
         required: false
         default: "5"
 
@@ -63,9 +70,18 @@ jobs:
         # Five hours, not five and a half. The job is capped at 350 minutes and a release build
         # of the workspace on a cold cache is not free; a soak that gets killed at the end
         # produces a JSONL nobody can draw a line through, which is worse than a shorter one.
+        #
+        # `smoke` runs for three minutes and asks the smaller question — does the job work —
+        # because the growth analysis correctly refuses to call three minutes steady, and a
+        # deliberate red build sends a notification about nothing.
         run: |
-          cargo run --release -p soak -- \
-            --hours "${{ inputs.hours || '5' }}" --out soak-metrics.jsonl --redis 127.0.0.1:6379
+          if [ "${{ inputs.smoke }}" = "true" ]; then
+            cargo run --release -p soak -- \
+              --hours 0.05 --smoke --out soak-metrics.jsonl --redis 127.0.0.1:6379
+          else
+            cargo run --release -p soak -- \
+              --hours "${{ inputs.hours || '5' }}" --out soak-metrics.jsonl --redis 127.0.0.1:6379
+          fi
       - name: keep the samples
         if: always()
         uses: actions/upload-artifact@v4

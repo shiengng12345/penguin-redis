@@ -40,6 +40,17 @@ struct Args {
     out: std::path::PathBuf,
     redis: Option<String>,
     sample_every: Duration,
+    /// Check that the *runner* works, not that the system is steady.
+    ///
+    /// A short run cannot answer §32.1's question and the analysis correctly refuses to call it
+    /// a pass — which makes a deliberate three-minute run a guaranteed red build and a
+    /// guaranteed notification email. That is noise about nothing: the thing being checked is
+    /// whether the job's plumbing works at all.
+    ///
+    /// So `--smoke` asks a smaller question and says so: did samples get written, and did the
+    /// workloads actually do something? It never claims the system is leak-free, and the
+    /// scheduled run does not use it.
+    smoke: bool,
 }
 
 fn parse_args() -> Args {
@@ -47,12 +58,14 @@ fn parse_args() -> Args {
     let mut out = std::path::PathBuf::from("soak-metrics.jsonl");
     let mut redis = None;
     let mut sample_every = Duration::from_secs(10);
+    let mut smoke = false;
     let mut it = std::env::args().skip(1);
     while let Some(a) = it.next() {
         match a.as_str() {
             "--hours" => hours = it.next().and_then(|v| v.parse().ok()).unwrap_or(8.0),
             "--out" => out = it.next().map_or(out, std::path::PathBuf::from),
             "--redis" => redis = it.next(),
+            "--smoke" => smoke = true,
             "--sample-seconds" => {
                 sample_every = it
                     .next()
@@ -70,6 +83,7 @@ fn parse_args() -> Args {
         out,
         redis,
         sample_every,
+        smoke,
     }
 }
 
@@ -203,6 +217,28 @@ fn main() {
     // Require 90% of the requested window: a run that was cut short must not report a pass.
     let report = soak::report(&samples, args.hours * 0.9);
     print_report(&report);
+
+    if args.smoke {
+        // A different, smaller claim, stated as such: the runner works. Nothing here says the
+        // system is steady, and the scheduled run does not pass `--smoke`.
+        let moved = samples.len() >= 2 && commands > 0 && tui_cycles > 0;
+        if moved {
+            eprintln!(
+                "soak: smoke ok -- {} samples written, {commands} commands, {tui_cycles} TUI \
+                 cycles. This says the job runs; it does NOT say the system is steady.",
+                samples.len()
+            );
+        } else {
+            eprintln!(
+                "soak: smoke FAILED -- {} samples, {commands} commands, {tui_cycles} TUI cycles; \
+                 the runner produced nothing to analyse",
+                samples.len()
+            );
+            std::process::exit(1);
+        }
+        return;
+    }
+
     if report.ok() {
         eprintln!("soak: steady");
     } else {

@@ -82,6 +82,15 @@ pub struct Fit {
 #[must_use]
 pub fn analyse(points: &[(f64, f64)], noise_multiple: f64, min_hours: f64) -> Fit {
     let n = points.len();
+    // The span is computed before the too-short exit, and reported with it. Returning
+    // `hours: 0.0` for every short run made the diagnostic useless: a three-minute smoke run
+    // and a run that died at hour seven printed the same line, `n=18 over 0.00h`, and the
+    // second of those is the one somebody needs to tell apart from success.
+    let hours = if n >= 2 {
+        (points[n - 1].0 - points[0].0) / 3600.0
+    } else {
+        0.0
+    };
     if n < 30 {
         return Fit {
             per_hour: 0.0,
@@ -89,11 +98,10 @@ pub fn analyse(points: &[(f64, f64)], noise_multiple: f64, min_hours: f64) -> Fi
             residual_sd: 0.0,
             total_change: 0.0,
             samples: n,
-            hours: 0.0,
+            hours,
             verdict: Verdict::TooShort,
         };
     }
-    let hours = (points[n - 1].0 - points[0].0) / 3600.0;
 
     let mean_x = points.iter().map(|p| p.0).sum::<f64>() / n as f64;
     let mean_y = points.iter().map(|p| p.1).sum::<f64>() / n as f64;

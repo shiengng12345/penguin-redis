@@ -95,7 +95,20 @@ fn a_short_run_is_never_a_pass() {
     assert_eq!(fit.verdict, Verdict::TooShort);
 
     let few = series(10, 10.0, |_| 50_000_000.0);
-    assert_eq!(analyse(&few, 3.0, 0.0).verdict, Verdict::TooShort);
+    let short = analyse(&few, 3.0, 0.0);
+    assert_eq!(short.verdict, Verdict::TooShort);
+
+    // And it has to say *how* short. A three-minute smoke run and a run that died at hour
+    // seven both used to print `n=18 over 0.00h`, and the second is the one somebody has to be
+    // able to tell apart from a success.
+    assert_eq!(short.samples, 10);
+    assert!(
+        (short.hours - 90.0 / 3600.0).abs() < 1e-9,
+        "a too-short fit must still report its span, got {}h",
+        short.hours
+    );
+    let one = analyse(&series(1, 10.0, |_| 1.0), 3.0, 0.0);
+    assert!(one.hours.abs() < f64::EPSILON, "one sample spans nothing");
 }
 
 #[test]
