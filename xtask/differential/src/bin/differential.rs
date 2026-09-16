@@ -252,7 +252,12 @@ fn prc_binary() -> Result<PathBuf, String> {
     }
     let root = repo_root();
     for profile in ["debug", "release"] {
-        let p = root.join("target").join(profile).join("prc");
+        // `EXE_SUFFIX` because the binary is `prc.exe` on Windows (see the same note in
+        // `crates/pr-mcp/tests/bootstrap.rs`).
+        let p = root
+            .join("target")
+            .join(profile)
+            .join(format!("prc{}", std::env::consts::EXE_SUFFIX));
         if p.exists() {
             return Ok(p);
         }

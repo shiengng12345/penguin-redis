@@ -25,7 +25,13 @@ fn prc() -> PathBuf {
         .and_then(Path::parent)
         .expect("repo root");
     for profile in ["debug", "release"] {
-        let p = root.join("target").join(profile).join("prc");
+        // `EXE_SUFFIX`, not a bare "prc": on Windows the binary is `prc.exe`, so the bare name
+        // exists nowhere and every test in this file panicked with "prc is not built" on a
+        // platform where it had in fact just been built.
+        let p = root
+            .join("target")
+            .join(profile)
+            .join(format!("prc{}", std::env::consts::EXE_SUFFIX));
         if p.exists() {
             return p;
         }
