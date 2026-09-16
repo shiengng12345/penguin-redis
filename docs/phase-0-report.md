@@ -29,7 +29,7 @@
 
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
-| V-A01 | PASS | `xtask/pty-harness/` · 8 tests · portable-pty 0.9 | 统一 Unix PTY + Windows ConPTY；send/resize/bracketed-paste/wait_for；录制可回放且 golden 确定性 |
+| V-A01 | PASS | `xtask/pty-harness/` · 28 tests · portable-pty 0.9 |统一 Unix PTY + Windows ConPTY；send/resize/bracketed-paste/wait_for；录制可回放且 golden 确定性；**DSR 应答器**：`ConPTY` 启动发 `ESC[6n` 并阻塞等待终端回复，不应答则子进程输出一个字节都发不出（V-C02 第一次真跑 Windows 时暴露，此前 harness 的 Windows 路径全被 `#[ignore]`）；**屏幕模型** `Screen`：`ConPTY` 转发的是自身缓冲区的差量而非子进程写的字节，所以「等待连续子串」在 Windows 上不成立，测试改为断言渲染后的屏幕与 scrollback，`unhandled()` 暴露模型跳过的序列数 |
 | V-A02 | IN-PROGRESS | — | |
 | V-A03 | PASS | `xtask/resp-server/` · `fixtures/protocol/` (316 samples / 12 categories) · 15 tests | RESP2/3 encoder incl. streamed+push+attribute; scripted delivery; 1 GiB streamer; hostile corpus每类≥20 |
 | V-A04 | PASS | `xtask/src/fault.rs` · 8 tests | TCP 代理：客户端/服务端定点切断、blackhole、慢速、分片、单字节损坏、拒连；FS：只读/填充 |
@@ -175,3 +175,4 @@
 | 2026-09-16 | V-C02 → PASS（单一 terminal owner）；引入 crossterm（ADR-022 指定）作 raw mode 与事件源；真实 PTY 上跑 ASSIST-062 / UX-12 / 场景 H；524 tests 全绿 |
 | 2026-09-16 | V-B06 → PASS（push 帧与 one-shot 输出契约）；PTY harness 补 DSR 应答器——Windows CI 显示 ConPTY 启动发 `ESC[6n` 并阻塞等待，harness 不应答导致子进程输出永远发不出（V-A01 的 Windows 路径此前全被 `#[ignore]`，V-C02 是第一次真跑）；catalog 嵌入二进制并 fail-closed；558 tests |
 | 2026-09-16 | V-H01 → PASS（启动与空闲基线）；`prc` 链接全依赖图，`pr-tui` 接入 Ratatui，RSS 测量补 Windows 路径；三项预算余量 95 ms / 25 MiB / 53 MiB 并记入 `benches/baseline/` |
+| 2026-09-16 | PTY harness 补屏幕模型（`Screen`，14 tests）与 DSR 应答器；Windows 上 crossterm 的 `KeyEventKind::Release` 导致每个字符输入两次，translate 搬进 `pr-terminal::bridge` 并加 8 个测试；`tasklist` RSS 解析被千位分隔符截断（48 MB 读成 120 KB）已修；603 tests |

@@ -12,6 +12,10 @@
 use portable_pty::{CommandBuilder, NativePtySystem, PtyPair, PtySize, PtySystem};
 use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
+pub mod screen;
+
+pub use screen::Screen;
+
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
@@ -433,6 +437,44 @@ impl PtySession {
     #[must_use]
     pub fn size(&self) -> (u16, u16) {
         (self.cols, self.rows)
+    }
+
+    /// The screen as a terminal would have rendered it.
+    ///
+    /// Built fresh from everything received so far. Asserting on this rather than on the raw
+    /// stream is what makes a PTY test mean the same thing on every platform: `ConPTY` emits a
+    /// diff of its own screen buffer, so the bytes a program wrote and the bytes a test reads
+    /// are simply not the same sequence.
+    #[must_use]
+    pub fn screen(&self) -> Screen {
+        let mut s = Screen::new(self.cols, self.rows);
+        s.feed(&self.output());
+        s
+    }
+
+    /// Block until the rendered screen — or its scrollback — shows `needle`.
+    ///
+    /// # Errors
+    /// [`PtyError::Timeout`] carrying what the screen did say, which is the thing worth
+    /// reading when this fails.
+    pub fn wait_for_screen(&self, needle: &str, timeout: Duration) -> Result<(), PtyError> {
+        let deadline = Instant::now() + timeout;
+        loop {
+            let screen = self.screen();
+            if screen.seen(needle) {
+                return Ok(());
+            }
+            if Instant::now() >= deadline {
+                let buf = self.buf.lock().map(|g| g.clone()).unwrap_or_default();
+                return Err(PtyError::Timeout {
+                    waited: timeout,
+                    needle: needle.to_owned(),
+                    received: buf.len(),
+                    got: screen.history(),
+                });
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
     }
 
     /// How many terminal queries the harness has answered on the child's behalf.

@@ -58,8 +58,16 @@ pub fn rss_of(pid: u32) -> Option<u64> {
             .output()
             .ok()?;
         let text = String::from_utf8_lossy(&out.stdout);
-        let last = text.lines().find(|l| l.contains(&pid.to_string()))?;
-        let field = last.rsplit(',').next()?.trim().trim_matches('"');
+        let row = text.lines().find(|l| l.contains(&pid.to_string()))?;
+        // The row is quoted CSV and the memory figure carries thousands separators:
+        //
+        //     "prc.exe","1234","Console","1","48,120 K"
+        //
+        // Splitting on commas therefore lands inside the number — it reads `120 K` and
+        // reports 120 KB for a process using 48 MB. Splitting on the quoted-field boundary
+        // keeps the field whole. Windows CI found this by watching RSS *fall* after a 48 MiB
+        // allocation.
+        let field = row.trim().trim_matches('"').split("\",\"").last()?;
         let digits: String = field.chars().filter(char::is_ascii_digit).collect();
         let kb: u64 = digits.parse().ok()?;
         Some(kb * 1024)
@@ -94,6 +102,17 @@ mod tests {
         let r = rss_bytes().expect("this platform reports RSS");
         assert!(r > 512 * 1024, "implausibly small: {r}");
         assert!(r < 4 * 1024 * 1024 * 1024, "implausibly large: {r}");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn the_tasklist_row_is_parsed_past_the_thousands_separator() {
+        // Regression for the CI failure "48 MiB of touched pages did not show up:
+        // 716800 -> 12288": both numbers were the last comma group of the real figure.
+        let row = "\"prc.exe\",\"1234\",\"Console\",\"1\",\"48,120 K\"";
+        let field = row.trim().trim_matches('"').split("\",\"").last().unwrap();
+        let digits: String = field.chars().filter(char::is_ascii_digit).collect();
+        assert_eq!(digits, "48120", "the separator must not truncate the value");
     }
 
     #[test]
