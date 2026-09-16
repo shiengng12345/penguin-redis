@@ -6,9 +6,15 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 publish = false
-description = "Penguin Redis — pr-application"
+description = "Penguin Redis — pr-application: shared use cases for CLI, TUI, MCP and pipe"
 
 [lints]
 workspace = true
 
 [dependencies]
+pr-core = { path = "../pr-core" }
+pr-catalog = { path = "../pr-catalog" }
+pr-protocol = { path = "../pr-protocol" }
+pr-security = { path = "../pr-security" }
+bytes = { workspace = true }
+thiserror = { workspace = true }

@@ -489,6 +489,14 @@ dependencies = [
 [[package]]
 name = "pr-application"
 version = "0.0.0"
+dependencies = [
+ "bytes",
+ "pr-catalog",
+ "pr-core",
+ "pr-protocol",
+ "pr-security",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "pr-automation"
