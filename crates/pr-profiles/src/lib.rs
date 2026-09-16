@@ -4,8 +4,10 @@
 //! secret; it holds a `credential:<uuid>` that resolves in the OS store (§4.3, ADR-010).
 
 pub mod credentials;
+pub mod journal;
 
 pub use credentials::{
     CredentialError, CredentialStore, HeadlessFallback, PlatformStore, SERVICE, SecretRef,
     StoreKind, UnavailableStore, headless_options,
 };
+pub use journal::{Entry, Journal, JournalError, Reconciliation, State};
