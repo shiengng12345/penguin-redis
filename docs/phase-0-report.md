@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 42 |
+| PASS | 43 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 20 |
+| IN-PROGRESS | 19 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -66,7 +66,7 @@
 |---|---|---|---|
 | V-D01 | PASS | `crates/pr-profiles/src/credentials.rs` · 9 tests · 本机 Keychain 实跑 | keyring 3 按平台 feature；`credential:<uuid>` 引用；无可用 store 时 **fail-closed**，回退选项里没有明文文件；keyutils 明确标为非持久 |
 | V-D02 | PASS | `crates/pr-profiles/src/journal.rs` · 12 tests | §4.2 六步顺序 + fsync journal + 启动 reconciliation；崩溃点逐一测试：孤儿 secret 只报告不自动删、悬空 profile 标 credential missing、未完成轮换清理可重放且幂等 |
-| V-D03 | IN-PROGRESS | — | `pr-security::approval` 实现+10 测试通过（含 SEC-10 同摘要不同字节）；待接入 kernel |
+| V-D03 | PASS | `crates/pr-security/tests/approval.rs` 13 tests · `crates/pr-security/src/approval.rs` `preview()` / `escape_bytes()` | SEC-10 说的是：**两条 argv 显示摘要相同，一个令牌只能执行其中一条**。这不是假想——客户端让命令可读的每一种手段（Unicode 规范化、转义、截断、掩码）都是多对一函数，绑在可读形式上的令牌就授权了所有归约到它的东西。测试建了「在合理摘要下会碰撞」的对照集：单参数含空格 vs 两个参数、空尾参数、预组合 vs 分解重音、零宽空格、被截断的同前缀 key、掩码后的不同密码、尾随空格、转义换行 vs 真换行——9 对里 8 对在摘要下完全一致，而哈希与 `preview()` 全部不同。**两个方向都测**：一个会碰撞的 preview 会让字节绑定去保护一个没人能正确做出的决定。preview 显示每个参数的字节长度并把非可打印 ASCII 转义（零宽空格显示为 `\xe2\x80\x8b` 而不是隐形），且不可被恶意参数驱动终端——审批者是在终端里读它的。失效测试覆盖 profile / TrustIdentity / DB / 三个 epoch 各自单独变化、过期、额度耗尽 |
 | V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
 | V-D05 | PASS | `crates/pr-render/tests/safetext_boundary.rs` · 10 tests | 15 个真实终端控制 payload × value/key/列标题/generic renderer/4 主题×4 色深；剥离自有 SGR 后断言无 ESC/BEL/NUL/C1/bidi；Debug 与 Display 同样惰性；转义幂等 |
 | V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
@@ -183,3 +183,4 @@
 | 2026-09-16 | V-C07 → PASS（SPIKE-003 Windows ConPTY）；WIN-01 / WIN-02 通过；Ctrl+C / Ctrl+Break 语义层完成；719 tests |
 | 2026-09-16 | V-I02 → PASS（Valkey vs Redis 差异清单）；新增 `Node` 签名渲染与 `xtask catalog-diff`；730 tests |
 | 2026-09-16 | V-H03 → PASS（订阅风暴 ring buffer / PERF-02）；`benches/pubsub/` 基线入库 |
+| 2026-09-16 | V-D03 → PASS（审批令牌字节哈希 / SEC-10）；新增 `:approval show --bytes` 的 preview 与转义；755 tests |
