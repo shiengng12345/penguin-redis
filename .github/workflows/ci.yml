@@ -385,6 +385,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: no DEFERRED or SKIPPED states
         run: ./ci/check-phase0-report.sh
+      # V-J01 / V-J04: every ADR accepted, every ADR carrying a recorded result, every spike
+      # naming one. An ADR with an empty result section is a decision with no evidence that it
+      # survived contact with the code.
+      - name: ADR ledger is complete
+        run: ./ci/check-adr-ledger.sh
       # V-F08 / ADR-034: §16.4's held-out gate turns itself on when an independently written
       # corpus appears. Printed here so the waiting state is visible in every run rather than
       # only in a document.
