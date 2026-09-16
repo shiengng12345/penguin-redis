@@ -31,7 +31,11 @@ def recount() -> int:
 
 
 def apply_summary(lines: list[str]) -> None:
-    row = re.compile(r"^\| (V-[A-J]\d\d) \| ([A-Z-]+(?:\([^)]*\))?) \|")
+    # `[^|]+` for the state, not `[A-Z-]+(\(...\))?`: a row recorded as `PASS（history 路径）`
+    # matched neither branch and was silently left out of the summary, so the totals read 62
+    # when there are 63 items. The shape of a state is now enforced by
+    # `ci/check-phase0-report.sh`; this only has to count rows, and it must count all of them.
+    row = re.compile(r"^\| (V-[A-J]\d\d) \| ([^|]+?) \|")
     counts = {"PASS": 0, "FALLBACK-ADOPTED": 0, "IN-PROGRESS": 0, "BLOCKED": 0}
     for l in lines:
         m = row.match(l)

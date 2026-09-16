@@ -6,12 +6,15 @@
 
 pub mod approval;
 pub mod contract;
+pub mod secrets;
 pub mod trust;
+pub mod uri;
 
 pub use approval::{
     ApprovalRefusal, ApprovalToken, Epochs, ExecutionContext, Issuer, escape_bytes, plan_hash,
     preview, request_hash,
 };
+pub use secrets::{REDACTED, SecretSet, scrub, scrub_str};
 pub use trust::{
     Advisory, AuthIdentity, DiscoveryBounds, Endpoint, KnownNodes, RebindVerdict, RedirectDecision,
     RotationVerdict, RotationWindow, ServerIdentity, TlsIdentity, TrustIdentity,

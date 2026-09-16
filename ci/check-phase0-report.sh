@@ -17,6 +17,27 @@ fail=0
 # documentation about the rules, not claims about an item.
 rows() { grep -E '^\| (V-[A-J][0-9]{2}|P0-META-[0-9]{2}) \|' "$REPORT"; }
 
+# 0. The status column is a state, not a sentence.
+#
+# `PASS（history 路径）` counted as PASS for weeks: the summary regex stops at the ASCII-only
+# `[A-Z-]+`, so a full-width parenthetical after it was invisible to every check while being
+# perfectly visible to a reader — and what it said was that one of ten required paths had been
+# audited. A qualified pass is not one of §2.4's two terminal states. If the scope needs
+# saying, it goes in the note column, where it does not look like a verdict.
+while IFS= read -r line; do
+  id=$(printf '%s' "$line" | sed -nE 's/^\| ([A-Z0-9-]+) \|.*/\1/p')
+  state=$(printf '%s' "$line" | sed -nE 's/^\| [A-Z0-9-]+ \| ([^|]*) \|.*/\1/p' | sed 's/[[:space:]]*$//')
+  case "$state" in
+    PASS|IN-PROGRESS) ;;
+    FALLBACK-ADOPTED\(ADR-[0-9][0-9][0-9]\)|BLOCKED\(ADR-[0-9][0-9][0-9]\)) ;;
+    *)
+      echo "::error::$id has status '$state'. The only states are PASS, IN-PROGRESS, \
+FALLBACK-ADOPTED(ADR-xxx) and BLOCKED(ADR-xxx); anything else belongs in the note column."
+      fail=1
+      ;;
+  esac
+done < <(rows)
+
 # 1. Forbidden states, at any time.
 if rows | grep -nE '\b(DEFERRED|SKIPPED|TODO|WONTFIX|N/?A)\b'; then
   echo "::error::$REPORT contains a forbidden state. Phase 0 items are PASS or FALLBACK-ADOPTED(ADR-xxx)."
