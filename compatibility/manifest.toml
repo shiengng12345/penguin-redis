@@ -74,3 +74,77 @@ tested = ["RESP2", "RESP3"]
 [modules]
 # Redis Stack modules — pinned when V-I02/V-F01 need them.
 status = "not-yet-pinned"
+
+# ---------------------------------------------------------------- JSON projection (V-E04)
+#
+# v2.1 §18.3 requires `--json` to be diffed against a pinned `redis-cli --json`, and any
+# difference recorded here rather than argued about. These were measured, not assumed: each
+# `baseline` value below is what redis-cli 8.0.6 actually printed for a reply produced by
+# `DEBUG PROTOCOL <type>` on that same server.
+#
+# `governs = "18.3"` means §18.3's table is the authority and we differ deliberately.
+# `governs = "baseline"` would mean we match redis-cli even where the table could be read
+# otherwise — there are none of those yet.
+
+[json_projection]
+baseline_tool = "redis-cli"
+baseline_version = "8.0.6"
+baseline_image = "redis@sha256:ae471bdc20de180beed36e347d170ec0bdf8faa327959ea1f24692f22b05b955"
+measured = "2026-09-16"
+method = "DEBUG PROTOCOL <type> with --enable-debug-command, compared reply by reply"
+
+[[json_projection.difference]]
+case = "error reply"
+baseline = 'error:"ERR unknown command ..."'
+penguin = '{"error":"ERR unknown command ..."}'
+governs = "18.3"
+reason = "The baseline's output is not valid JSON at all — a bare `error:` prefix followed by a JSON string. A `jq` filter cannot read it, which defeats the purpose of --json. §18.3 specifies an object."
+
+[[json_projection.difference]]
+case = "error reply exit code"
+baseline = "0 without -e, 1 with -e"
+penguin = "4"
+governs = "18.3"
+reason = "§22.2 numbers the exit codes so a script can distinguish a Redis error (4) from a connection failure (3) from a policy refusal (5). Returning 0 for a failed command means a shell `&&` chain continues after an error."
+
+[[json_projection.difference]]
+case = "RESP3 big number"
+baseline = "Unknown reply type: 13"
+penguin = '"3492890328409238509324850943850943825024385"'
+governs = "18.3"
+reason = "The baseline cannot parse a RESP3 big number at all; it prints a diagnostic and gives up. §18.3 projects it as a JSON string, which is the only form that keeps every digit — a JSON number would be read as a float by most parsers."
+
+[[json_projection.difference]]
+case = "RESP3 attribute"
+baseline = 'Error: Protocol error, got "|" as reply type byte'
+penguin = "the decorated value, with the attribute discarded and counted on stderr"
+governs = "18.3"
+reason = "The baseline cannot parse an attribute and drops the connection. §18.3 discards it and says so, which keeps the reply usable."
+
+[[json_projection.difference]]
+case = "RESP3 map with non-string keys"
+baseline = '{"0":false,"1":true,"2":false}'
+penguin = "[[0,false],[1,true],[2,false]]"
+governs = "18.3"
+reason = "The baseline coerces integer keys into JSON object keys, which makes the integer 1 and the string \"1\" the same key. §18.3 uses an array of pairs so the key types survive."
+
+[[json_projection.difference]]
+case = "bulk string that is not valid UTF-8"
+baseline = '"\\xff\\xfe\\x80"'
+penguin = '{"$bytes":"//6A"}'
+governs = "18.3"
+reason = "§18.3 says to follow the baseline where consistent, otherwise use $bytes. The baseline's form is a JSON string containing redis-cli's own escape text: twelve characters where the value is three bytes, so `jq` sees a length and a content that are both wrong. Recovering the bytes requires knowing redis-cli's escaping rules. This is the deliberate divergence, and the reason it is recorded here rather than decided silently."
+
+# Cases where the projection matches the baseline exactly, recorded so a regression shows up
+# as a change rather than as an unexamined difference.
+[[json_projection.agreement]]
+cases = [
+  "simple and bulk strings (valid UTF-8)",
+  "integers",
+  "finite doubles",
+  "true / false / null",
+  "arrays",
+  "sets (arrival order)",
+  "verbatim strings (content only, format dropped)",
+  "RESP3 maps with unique string keys",
+]

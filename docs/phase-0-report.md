@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 45 |
+| PASS | 46 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 16 |
+| IN-PROGRESS | 15 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -81,7 +81,7 @@
 | V-E01 | PASS | `crates/pr-json/` · 17 tests · `docs/spikes/SPIKE-004.md` | occurrence DOM；重复成员保留+`#n` 寻址；数字词法逐字节保留；歧义路径拒绝；span 局部重写 |
 | V-E02 | PASS | `crates/pr-render/src/{table,width}.rs` · 43 tests | 每 field 横线、表头双线、JSON 在 cell 内不加内部横线；宽度采样后冻结；窄屏改纵向块不隐藏列；宽字符/ZWJ/组合字符帧对齐；SEC-05 控制字节不外泄 |
 | V-E03 | PASS | `crates/pr-results/src/store.rs` · 14 tests | 64 MiB/16 MiB 预算、oldest-first 淘汰；`Evicted`/`TooLarge`/`Unknown`/`ScopeExpired` 四种原因分开报；**§8.2 顺序**：已知长度且未开始输出才可询问，非 TTY 永不询问 |
-| V-E04 | IN-PROGRESS | — | |
+| V-E04 | PASS | `crates/pr-application/src/json_projection.rs` · `crates/pr-application/tests/json_projection.rs` 29 tests（§18.3 表格逐行）· `compatibility/manifest.toml` 的 `[json_projection]` 段（6 处实测差异 + 8 处一致） | `--json` 与 `typed-json` 是**两种不同的投影**，§18.1 给了它们不同的任务：前者是官方 CLI 的形状给 `jq` 用，后者是带版本的无损结构给工具用。无损与眼熟互相拉扯，§18.3 选了眼熟——**但把每一处损失都说出来**。14 行逐行有用例，全部用真实 wire bytes 过真解码器。差异不是推测的，是**实测的**：用 `DEBUG PROTOCOL <type>` 在同一台 pinned 服务器上造出每种回复，与 redis-cli 8.0.6 `--json` 逐条对比，6 处差异写进 manifest 并逐条写明「哪个权威说了算 + 为什么」。其中 baseline 输了 5 处：错误回复它输出 `error:"..."`（**根本不是合法 JSON**，`jq` 读不了）、错误退出码给 0（shell 的 `&&` 链会继续往下跑）、RESP3 big number 直接打印 `Unknown reply type: 13` 解析不了、RESP3 attribute 报协议错误并断开、map 的整数 key 被强制转成字符串 key（于是整数 `1` 和字符串 `"1"` 变成同一个 key）。第 6 处是刻意分歧：无效 UTF-8 时 baseline 给 `"\xff\xfe\x80"`——一个 12 字符的 JSON 字符串装 3 个字节，`jq` 看到的长度和内容都是错的，要还原还得懂 redis-cli 的转义规则；我们给 `{"$bytes":"//6A"}` 并在 stderr 提示。这一处正是 V-E04 要求「记录而非默默决定」的那类。另有一条贯穿全模块的性质测试：**无损的行必须安静，有损的行必须出声**——静默的损失正是脚本算错答案而没人发现的方式。PIPE-02：同一条 `HGETALL` 在 `-2` 下是扁平数组、`-3` 下是对象，`--json` 不得抹平；RESP2 偶数数组**不**自动 map 化 |
 | V-E05 | PASS | `crates/pr-render/src/generic.rs` · 16 tests | 未知/模块结果走 generic RESP tree：double 保留词法、map 保序且保留重复 key、非 UTF-8 转义并报字节数、attribute 不丢弃、深度有界；任意 shape 不 panic（CMD-10/12、SEC-07） |
 
 ## Track F · 智能输入引擎
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | V-E04 → PASS（JSON projection v1）；与 pinned `redis-cli --json` 实测 6 处差异入 manifest，其中 5 处是 baseline 的缺陷（错误回复不是合法 JSON、big number/attribute 解析不了、整数 key 被强转）；824 tests |
 | 2026-09-16 | V-I03 → PASS（catalog 再分发结论 + `prc` 许可）；快照移除上游散文（343 KB → 286 KB），`license` 由占位符改为 `MIT OR Apache-2.0`；795 tests |
 | 2026-09-16 | V-I04 → PASS（`redis-cli` 特殊模式 inventory）；双向校验抓到未分类 flag 与两个 §28.4 未覆盖的模式；`ci/mark-phase0.py` 改为从文件读证据与备注（反引号曾被 shell 命令替换吃掉） |
 | 2026-09-16 | V-I04 → PASS（redis-cli 特殊模式 inventory）；双向校验抓到未分类 flag 与两个 §28.4 未覆盖的模式 |
