@@ -45,4 +45,17 @@ PY
   rm -rf "$tmp"
 done
 
+# V-I02: the divergence list is generated, not written by hand.
+echo "regenerating the Redis/Valkey difference list"
+tmpdiff="$(mktemp -d)"
+cargo run -q -p xtask -- catalog-diff "$tmpdiff" >/dev/null
+if diff -r fixtures/catalog/valkey-diff "$tmpdiff" >/dev/null; then
+  echo "OK   fixtures/catalog/valkey-diff is current"
+else
+  echo "FAIL fixtures/catalog/valkey-diff is stale; re-run: cargo run -p xtask -- catalog-diff" >&2
+  diff -r fixtures/catalog/valkey-diff "$tmpdiff" | head -40 >&2 || true
+  FAIL=1
+fi
+rm -rf "$tmpdiff"
+
 exit "$FAIL"

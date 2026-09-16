@@ -5,6 +5,7 @@
 //! xtask budgets            # print the budget table from v2.1
 //! xtask catalog-stamp <f>  # V-F01: fingerprint a pinned catalog snapshot
 //! xtask catalog-verify <f> # V-F01: check a snapshot against its fingerprint
+//! xtask catalog-diff [dir] # V-I02: write the Redis/Valkey difference list
 //! ```
 
 pub mod catalog;
@@ -57,6 +58,21 @@ fn main() {
         Some("budgets") => {
             print_budgets();
             0
+        }
+        Some("catalog-diff") => {
+            let dir = args
+                .get(2)
+                .map_or("fixtures/catalog/valkey-diff", String::as_str);
+            match catalog::write_diff(std::path::Path::new(dir)) {
+                Ok(msg) => {
+                    println!("{msg}");
+                    0
+                }
+                Err(e) => {
+                    eprintln!("{e}");
+                    1
+                }
+            }
         }
         Some(verb @ ("catalog-stamp" | "catalog-verify")) => {
             let files = &args[2..];

@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 40 |
+| PASS | 41 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 22 |
+| IN-PROGRESS | 21 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -125,7 +125,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-I01 | PASS | `compatibility/manifest.toml` · CI job `manifest-pinned` | 5 服务器 target 全部 digest 固定；无 `latest`；gate 脚本强制 |
-| V-I02 | IN-PROGRESS | — | |
+| V-I02 | PASS | `fixtures/catalog/valkey-diff/`（`diff.md` + `summary.txt`）· `crates/pr-catalog/src/diff.rs` 10 tests · `tests/grammar_table.rs` 2 tests · `xtask catalog-diff` · `ci/check-catalog-snapshots.sh` 门禁 | 分歧是**记录**下来的，不是抹平的：呈现并集等于告诉 Valkey 用户 `HEXPIRE` 存在，呈现交集等于对 Redis 用户隐藏它——两者都在回答用户没问的问题。四类差异按「忽略了会坏什么」分节：缺失命令（建议会被服务器拒绝）、参数差异（建议形状不对）、`since` 差异（把选项推给太老的服务器）、**效果差异（在错误的分类上做策略判断）**——最后一类是这项属于 Phase 0 而非文档任务的原因。实测 577 vs 379，362 条完全一致，Redis-only 207（含 183 个捆绑模块 + HEXPIRE 族 + 向量集），Valkey-only 9，参数差异 8 条（`SET IFEQ`、`BGSAVE CANCEL`、`CLIENT KILL PRIMARY`、`CLIENT LIST` 多出 6 个过滤器、`CLUSTER SETSLOT TIMEOUT`…），**效果差异 0**。fixture 由 CI 重新生成并 diff，改手写的内容会被拦下 |
 | V-I03 | IN-PROGRESS | — | |
 | V-I04 | IN-PROGRESS | — | |
 
@@ -181,3 +181,4 @@
 | 2026-09-16 | V-C03 → PASS（bracketed paste 与时序启发式）；paste-staging 接入 coordinator，`Action::SubmitMany` 让「一次粘贴多条命令」必须被显式处理；687 tests |
 | 2026-09-16 | V-C05 → PASS（按键可达性）；§14.2 表格入代码 + `PR_KEYPROBE` 键位探针；700 tests |
 | 2026-09-16 | V-C07 → PASS（SPIKE-003 Windows ConPTY）；WIN-01 / WIN-02 通过；Ctrl+C / Ctrl+Break 语义层完成；719 tests |
+| 2026-09-16 | V-I02 → PASS（Valkey vs Redis 差异清单）；新增 `Node` 签名渲染与 `xtask catalog-diff`；730 tests |
