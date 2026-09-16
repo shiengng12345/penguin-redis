@@ -212,6 +212,23 @@ jobs:
         if: failure()
         run: cat tests/differential/report/*.json || true
 
+  # ---------------------------------------------------------------- Large values (V-H02)
+  large-values:
+    name: 1 GiB synthetic blob + real 512 MB Redis string
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: "1.97.1"
+      - uses: Swatinem/rust-cache@v2
+      - name: Linux build dependencies
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      # The synthetic 1 GiB case runs in the ordinary test job too. This one adds the real
+      # server at its stock 512 MB limit, which needs Docker and half a gigabyte.
+      - name: real Redis at its documented string limit
+        run: cargo test -p pr-protocol --test large_values -- --ignored --nocapture
+
   # ---------------------------------------------------------------- Manifest gate
   manifest-pinned:
     name: compatibility manifest is digest-pinned

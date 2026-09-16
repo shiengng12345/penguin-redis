@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 48 |
+| PASS | 49 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 12 |
+| IN-PROGRESS | 11 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -114,7 +114,7 @@
 | ID | 状态 | 证据 | 备注 |
 |---|---|---|---|
 | V-H01 | PASS | `crates/prc/tests/budgets.rs` 8 tests（CI 三平台跑）· `benches/baseline/README.md` · `crates/pr-core/src/mem.rs` 4 tests | `prc` 刻意链接整条依赖图（tokio / rusqlite bundled / keyring / crossterm / ratatui / blake3 / serde_json / 内嵌 catalog 586 条命令）——只链一半无法回答「依赖有没有先把预算吃掉」。release 实测：`--help` p95 **4.86 ms**（预算 100 ms，余 95 ms）、idle REPL **5.0 MiB**（预算 30，余 25）、idle TUI **6.5 MiB**（预算 60，余 53）、binary 1.6 MiB。CI 断言跑 debug build（更大更慢，通过即保守成立）。`--help` 便宜是**结构性**的而非计时侥幸：catalog 懒编译，测试断言 `--help` 不打印 catalog provenance 而 `--version` 打印。RSS 测量补齐 Windows（`tasklist`）——此前 `rss_bytes()` 在 Windows 返回 `None`，预算根本无从检查。**未链接**：TLS 栈与 `redis-rs`（`pr-transport` 仍为空），上述 headroom 就是它们要装得下的空间，落地后必须重测 |
-| V-H02 | IN-PROGRESS | — | |
+| V-H02 | PASS | `benches/protocol/README.md`（两来源分开报告）、`crates/pr-protocol/tests/large_values.rs`（synthetic 1 GiB 常驻 + 真 Redis 512 MB 的 `--ignored` CI job）、`crates/pr-protocol/src/stream.rs`（流式解码）、`crates/pr-protocol/tests/stream_equivalence.rs`（10 tests） | | 来源 | 声明长度 | 交付字节 | 读取块 | **峰值持有** | RSS 变化 | |---|---:|---:|---:|---:|---:| | synthetic RESP server | 1 GiB | 1 GiB | 64 KiB | **65 536 B** | +0.22 MiB | | 真 Redis 7.4.11（原装上限） | 512 MB | 512 MB | 64 KiB | **65 536 B** | +0.30 MiB | **两个来源必须分开报**，§24.7 写明了理由：1 GiB 不可能来自一台原装 Redis（字符串上限 512 MB，R52），把 `proto-max-bulk-len` 调大去造一个，测的就是没人在跑的部署。synthetic 回答「过了 1 GiB 还是不是增量的」，真 Redis 回答「面对真服务器、在它自己的文档上限上还是不是」。合并两个数只会让人看不出问的是哪个问题。512 MB 字符串用 `SETRANGE vh02:big 536870911 x` 造，服务器保持原装配置。 **量的是峰值持有，不是耗时**——§24.3 的预算讲的是内存，一个「很快」的解码器如果是因为把整个 GiB 缓下来才快，正是这个测试要抓的失败。值大了 16 倍（512 MB→1 GiB），持有量一个字节都没动，恰好一个读取块。 为此 `pr-protocol` 新增流式 API。§24.3 封顶 16 MiB 的**持有**，§24.4 说流式是超出它的正当出口：同一份 17 MiB bulk，`Decoder` 返回 `Err(Budget("bulk"))`，`Streamer` 开始交付——这不是两套语义，是一套语义的两半。§31.2 禁止两个暗中不同的解码器，所以这句话被做成可检验的：`stream_equivalence.rs` 把 **316 个 fixture 全部**同时喂给两个 API，要求值一致、**错误也一致**（「继续读」与「断连」是相反的反应），允许的差异**只有一种**且必须从线上字节验证确实超过 16 MiB——正好 4 条，数字已冻结，其余 312 条完全一致。而且整套语料跑第二遍，`stream_above=0` 强迫**每一个** `$`/`!`/`=` 走流式路径：一个谁也没跨过的阈值证明不了任何事。另有逐字节投喂测试，在每一个字节边界（含 CRLF 内部、长度内部）切开仍然一致。 **这个等价测试抓到了一个真 bug，在既有的值解码器里**：`~?`（streamed set）被解成 `Value::Array`——streamed 分支只区分 map 与非 map，把 tag 丢了。后果不止是枚举变体错：streamed push（`>?`）同样变成 `Array`，而 `is_push()` 正是 §19.3 用来阻止 push 占用下一条命令回复槽的那个方法。按 §32.5 先加复现用例再改实现。 |
 | V-H03 | PASS | `crates/pr-results/src/subscription.rs` 12 tests · `benches/pubsub/README.md` | §24.3 一句话里有三个决定，各防一种失败：**ring** 而非增长列表（100k msg/s 撑爆任何列表，OOM 会连用户正在看的一起丢）；**两个**上限而非一个（10,000 × 2 KB = 20 MiB，10,000 × 8 B = 80 KB，任一上限单独都不够）；**淘汰计数恒显**（Pub/Sub 是 at-most-once，重连不补发 R17，看不到的就是不知道的）。实测：100k × 256 B → 保留 10,000 条 / 3.64 MB，淘汰 90,000（entry 上限先到）；100k × 4 KB（到达 400 MB）→ ≤16 MiB，byte 上限先到。关键性质 `received == retained + dropped` 在 20,000 条变长消息风暴后断言，计数对不上的淘汰数比没有更糟——它看起来像信息。超过整个缓冲区的单条消息**拒收而非清空缓冲区去装它**，并单独计为 `oversized`。channel/pattern 名字计入字节预算。吞吐 14.9 ms debug / 4.4 ms release 记录 100k 条 |
 | V-H04 | PASS | `crates/pr-core/tests/task_soak.rs` 10 tests · `crates/prc/tests/tui_cycle.rs` 3 tests · `crates/pr-core/src/scope.rs` 8 unit tests | 测试抓到 `TaskScope::spawn` 的**真实设计缺陷**：原实现用 `select!` 让 token 与用户 future 竞速，取消时直接 drop future——协作式清理从来跑不到（16 个任务只有 11 个执行了 cleanup），且 `shutdown` 对永不退出的任务也返回 `drained = true`，这个返回值等于谎话。改为不竞速：token 只是信号，有界等待给清理时间，超时才 `abort`，`shutdown` 的 `true` 现在真的表示「每个任务自己走完了」（§24.5 写 journal 前要的正是这个区分）。覆盖：无视 token 的任务、panic 的任务、阻塞线程的任务、飞行中被 drop 的 scope、嵌套 scope 互不影响、每 scope 独立计数。PERF-03：1000 次 TUI 开关（真 coordinator + 真 Ratatui frame），warmup 后前 450 次 +32 KB、后 450 次 **+0 B**，终端 token 每轮都归还 |
 | V-H05 | IN-PROGRESS | — | |
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-protocol --test large_values` → synthetic 1 GiB 通过（42.5 s）；`-- --ignored` → 真 Redis 512 MB 通过（27.4 s）；`cargo test -p pr-protocol` → 64 + 10 + 2 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 886 passed / 0 failed。 |
 | 2026-09-16 | `cargo run -p differential` → 5 cases, all layers agree（报告已提交，二次运行逐字节一致）；`cargo test -p differential -- --ignored` → 4 passed（含 2 个 negative control）；`cargo test -p differential` → 14 passed（8 纯函数 + 6 报告一致性）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 873 passed / 0 failed。V-H01 基线已按前次备注重测并记入 `benches/baseline/README.md`。 |
 | 2026-09-16 | `cargo test -p pr-protocol --test spike_002_redis_rs` → 19 passed；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 851 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-security --test threat_model` → 8 passed；`cargo clippy --workspace --all-targets -- -D warnings` → 干净；`cargo test --workspace` → 832 passed / 0 failed。 |

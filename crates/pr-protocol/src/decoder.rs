@@ -142,7 +142,7 @@ fn scan_line(b: &[u8], from: usize) -> LineScan {
 }
 
 /// Read one CRLF-terminated line's contents.
-fn line<'a>(b: &'a [u8], pos: &mut usize) -> Result<Option<&'a [u8]>, DecodeError> {
+pub(crate) fn line<'a>(b: &'a [u8], pos: &mut usize) -> Result<Option<&'a [u8]>, DecodeError> {
     let cr = match scan_line(b, *pos) {
         LineScan::Cr(i) => i,
         // Detected as soon as the LF arrives: no unbounded buffering on LF-framed junk.
@@ -160,7 +160,7 @@ fn line<'a>(b: &'a [u8], pos: &mut usize) -> Result<Option<&'a [u8]>, DecodeErro
     Ok(Some(s))
 }
 
-fn parse_i64(s: &[u8]) -> Result<i64, DecodeError> {
+pub(crate) fn parse_i64(s: &[u8]) -> Result<i64, DecodeError> {
     if s.is_empty() {
         return Err(DecodeError::Protocol("empty integer"));
     }
@@ -173,7 +173,11 @@ fn parse_i64(s: &[u8]) -> Result<i64, DecodeError> {
         .map_err(|_| DecodeError::Protocol("integer out of range"))
 }
 
-fn parse_len(s: &[u8], budget: &Budget, what: &'static str) -> Result<Option<usize>, DecodeError> {
+pub(crate) fn parse_len(
+    s: &[u8],
+    budget: &Budget,
+    what: &'static str,
+) -> Result<Option<usize>, DecodeError> {
     let n = parse_i64(s)?;
     if n == -1 {
         return Ok(None); // null form
@@ -213,7 +217,7 @@ fn validate_bignum(s: &[u8]) -> Result<(), DecodeError> {
 }
 
 #[allow(clippy::too_many_lines)]
-fn parse_value(
+pub(crate) fn parse_value(
     b: &[u8],
     pos: &mut usize,
     depth: usize,
@@ -375,10 +379,15 @@ fn parse_value(
                         return Err(DecodeError::Budget("elements"));
                     }
                 }
-                if is_map {
-                    Value::Map(pairs)
-                } else {
-                    Value::Array(items)
+                // The tag still decides the type. Collapsing `~?` and `>?` into an array
+                // would lose the set/array distinction ADR-005 protects, and — worse — would
+                // make a streamed push answer a command: `is_push()` is what keeps a push out
+                // of the reply slot (§19.3), and an `Array` is not a push.
+                match (is_map, tag) {
+                    (true, _) => Value::Map(pairs),
+                    (false, b'~') => Value::Set(items),
+                    (false, b'>') => Value::Push(items),
+                    (false, _) => Value::Array(items),
                 }
             } else {
                 let Some(n) = parse_len(hdr, budget, "elements")? else {

@@ -4,6 +4,7 @@
 //! (ADR-008): no other crate parses wire bytes.
 
 pub mod decoder;
+pub mod stream;
 pub mod value;
 
 pub use decoder::{Budget, DecodeError, Decoder, Step};
@@ -412,5 +413,42 @@ mod tests {
             }
         }
         assert!(checked > 300, "expected the full corpus, saw {checked}");
+    }
+
+    /// Regression: a streamed set decoded as an array (found by the V-H02 equivalence test).
+    ///
+    /// §32.5 says a serious fix gets a reproducing fixture before the implementation changes.
+    /// The corpus fixture `streamed/set-0.resp` is what caught it; this is the minimised case,
+    /// kept because the consequence is worse than a wrong enum variant: a streamed **push**
+    /// decoded as an `Array` has `is_push() == false`, and §19.3 relies on exactly that method
+    /// to keep a push out of the reply slot of the next command.
+    #[test]
+    fn a_streamed_aggregate_keeps_the_type_its_tag_declared() {
+        type Check = fn(&Value) -> bool;
+        let cases: &[(&[u8], Check)] = &[
+            (b"*?\r\n:1\r\n.\r\n", |v| matches!(v, Value::Array(_))),
+            (b"~?\r\n:1\r\n.\r\n", |v| matches!(v, Value::Set(_))),
+            (b">?\r\n+message\r\n.\r\n", Value::is_push),
+            (b"%?\r\n+k\r\n:1\r\n.\r\n", |v| matches!(v, Value::Map(_))),
+        ];
+        for (bytes, ok) in cases {
+            let mut d = Decoder::with_defaults();
+            d.feed(bytes);
+            let Ok(Step::Value(v)) = d.decode() else {
+                panic!("{:?} did not decode", String::from_utf8_lossy(bytes));
+            };
+            assert!(ok(&v), "{:?} became {v:?}", String::from_utf8_lossy(bytes));
+        }
+    }
+
+    #[test]
+    fn a_streamed_push_never_answers_a_command() {
+        // The consequence, stated as the thing that would actually go wrong.
+        let mut d = Decoder::with_defaults();
+        d.feed(b">?\r\n+message\r\n+chan\r\n.\r\n");
+        let Ok(Step::Value(v)) = d.decode() else {
+            panic!("did not decode");
+        };
+        assert!(v.is_push(), "a streamed push must still route out-of-band");
     }
 }
