@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 51 |
+| PASS | 52 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 9 |
+| IN-PROGRESS | 8 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -72,7 +72,7 @@
 | V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
 | V-D07 | PASS | `crates/pr-catalog/src/precedence.rs` · 10 tests | 本地 catalog 是 effects 唯一权威；服务器谎称 write 为 readonly 时分类不变、仅标 `server reports`；未分类命令即使服务器说 readonly 仍算 mutating |
 | V-D08 | PASS | `crates/pr-mcp/src/{stdio,tools,policy}.rs`、`crates/pr-mcp/tests/bootstrap.rs`（9 tests，PTY-less）、`crates/pr-mcp/tests/approval_boundary.rs`（17 tests）、`crates/pr-mcp/src/stdio.rs` 内 3 个单元测试；`prc --mcp-stdio` 在 `crates/prc/src/main.rs` 中于**参数契约之前**分叉 | **stdout 无杂字节。** 空会话时 stdout 是**零字节**——不是「banner 很短」，是一个字节都没有；同时 stderr 上确实有日志（否则这条测试对一个什么都不记的二进制也会通过）。stdout 上除换行外没有任何控制字节。最强的一条是 `the_bootstrap_does_not_print_what_the_ordinary_start_up_prints`：拿 `prc --version` 的**真实输出**逐行去 stdout 里找，比我自己想得出来的字符串清单更严。 这些是 PTY-less 测试，而这正是测试本身：MCP host 用管道两端起 `prc` 子进程，任何只在终端上才正常的东西——banner、进度行、凭证提示、raw mode——要么产出 host 解析不了的字节，要么永远阻塞。两种失败看起来都是「MCP server 不工作」，而且都不指向原因。缺凭证返回 JSON-RPC 错误并断言耗时 < 5 s：**管道上的提示不是提示，是一个永不返回的进程**，而且 host 无从看见为什么。错误信息里还写了怎么修（`prc @<profile>` 在终端里跑一次）。 `--mcp-stdio` 在 `main` 里于参数契约、catalog、任何可能打印的东西**之前**分叉。共用普通启动路径再去抑制输出的做法，离「一个 `println!` 毁掉所有 MCP host」只差一行。 **写类请求无人签令牌被拒。** 工具表是封闭的，逐条断言而不是断言下界——`redis.execute` / `redis.raw` / `redis.eval` / `shell` 都解析不出工具。策略只能覆盖 `reads_data`；`writes_data` / `consumes` / `admin` / `destructive` / `unknown` 逐个具名拒绝。`blocks` 也拒——不在 §29.4 的四项里，但一条被 agent 挂住的阻塞命令会占住连接想多久占多久，这是应当由人做的资源决定；拒绝是保守方向，代价是一次批准而不是数据。 几条容易漏的，各自单独立测：(1) **`execute_approved_plan` 的每一次调用都要人签令牌，包括计划里只有读的时候**——计划才是被批准的单位，不是它的步骤；这条写成一个无条件的独立方法而不是分支，因为分支会招来「除非计划是只读的」。(2) **`unknown` 拒绝而非当作大概没事**——本地 catalog 无法背书的命令，正是一个写操作唯一可能溜过只读策略的地方，所以它有自己的拒绝理由和自己的消息。(3) **policy 签发的令牌不是绕过策略检查的捷径**——否则一条规则可以给自己签一张写令牌。(4) **key patterns 用 Redis 自己的 glob 语义**，不是借一个通用 glob crate：否则 profile 里写 `user:*` 的人授权的集合和他以为的不是同一个；`[a-c]`、`[^e]`、`h?llo`、转义字面量都有用例。(5) **key 是数据不是模式**——一个字面叫 `*` 的 key 不能当通配符用。(6) **空 key_patterns 授权「什么都不能」**，不是「无限制」——大多数配置系统把空列表读成后者，那意味着一条写了一半的规则悄悄覆盖了整个 keyspace。(7) **MGET 里只要有一个 key 不在列表内，整条请求被拒**——一个请求是一个单位，部分覆盖就是覆盖。(8) 规则的 **version 进审计行**：一个只能追溯到「那条策略」的批准，在策略被编辑的那一刻就追溯不到任何东西了。 Phase 0 交付的是边界，不是执行：通过授权检查后返回 `NOT_IMPLEMENTED`（-32003）。`APPROVAL_REQUIRED`（-32001）与 `INVALID_PARAMS` 刻意分开——请求本身格式正确也被理解了，缺的是一个人的决定；换参数重试的 agent 在做错的事，去问用户的 agent 在做对的事。 |
-| V-D09 | IN-PROGRESS | — | |
+| V-D09 | PASS | `crates/pr-render/src/plugin.rs`（宿主）、`crates/pr-render/tests/plugin_isolation.rs`（17 tests）、`xtask/plugin-fixtures/`（故意失灵的插件）、`tests/plugins/README.md` | §30.4 推翻了 v2.0：**不存在「进程内加载原生动态库」的级别，因为 Rust 的 panic/abort/OOM 无法在同进程内可靠隔离**。所以隔离能力就是 OS 进程边界。一个会正常工作的插件证明不了隔离，因此 fixture 按「真实插件迟早会怎样坏」和「恶意插件会怎样选」来写。 **每一次失败都断言同样两件事**：宿主还活着且还能渲染；**用户已经拿到的结果没有变**——渲染偏好绝不能弄丢用户已有的数据（有一条测试先取一个成功渲染，跑完四种失败后再逐字节比对）。 矩阵：`panic` → `Crashed`；`abort` → `Crashed(killed by signal 6 (SIGABRT))`（跳过 unwind，只处理 panic 的宿主会漏）；`hang` → 300 ms 预算内被杀而不是等；`flood`（每次 64 KiB 无限产出）→ 截断且**宿主 RSS 增长 < 64 MiB**（读到流尾的朴素宿主死在这里的是宿主不是插件）；`oom` → 死的是插件；`garbage` / `wrong-shape` → `Malformed` 且理由具名；`output-then-fail`（输出完好然后非零退出）→ **不采信输出**；未授权的名字 → **根本不拉起**。另有跑 50 次崩溃再确认还能拉起的测试——漏掉 `wait` 会每次调用留一个僵尸，症状很久以后才以「fork 不了」出现。 几个刻意选择：**截断是失败不是「短一点的成功」**（半张渲染不是渲染，显示它就是 §24.4 禁止的静默截断）；**环境是构建出来的不是继承来的**（先继承再删已知坏名字对每个没人想到的变量都 fail open，而凭证路径正是那一类；canary 用父进程确实有的 `CARGO_MANIFEST_DIR` 与 `PATH`，并先断言父进程有它们，否则这条测试会因为什么都没检查而通过）；**被渲染的数据永不进 argv**（授权项固定参数，数据走 stdin）；**输入在独立线程里写**（内联写会和「先把输出管道写满再读输入」的插件死锁，`flood` 干的正是这件事）；**exit status 要说人话**（`exit status: 134` 无信息，`killed by signal 6 (SIGABRT)` 才是另一场对话）。 **写测试时发现一件事**：插件在 JSON 字符串里写裸 ESC，产出的不是合法 JSON。宿主必须拒绝而**不是修复**——修复意味着开出一条 JSON 层从未检查过的、通往终端的通路。这一条单列为 `escapes-raw`，与「合法 JSON、内容恶意」的 `escapes-json` 分开；后者才是 §23.6 真正说的那件事（经 SafeText 中和，`before`/`after` 仍在——中和不是删除），前者由解析器挡住。 `cargo` 不会构建依赖的**二进制**（只构建 lib），而 `plugin-fixtures` 没有 lib。为了不让干净 checkout 上的 `cargo test` 死在「文件不存在」上，第一个调用者自己触发 `cargo build -p plugin-fixtures`，用 `OnceLock` 保证 50 个并行测试只触发一次构建。 |
 
 ## Track E · 数据模型
 
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-render --test plugin_isolation` → 17 passed（10.9 s，含真实 OOM 与 flood）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 950 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-mcp` → 3 + 9 + 17 = 29 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 933 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-transport` → 11 + 3 passed；`cargo test -p prc --bins` → 41 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo deny check` → advisories ok, bans ok, licenses ok, sources ok；`cargo test --workspace` → 904 passed / 0 failed；`ci/check-differential.sh` 仍然逐字节可复现。 |
 | 2026-09-16 | `cargo test -p pr-protocol --test large_values` → synthetic 1 GiB 通过（42.5 s）；`-- --ignored` → 真 Redis 512 MB 通过（27.4 s）；`cargo test -p pr-protocol` → 64 + 10 + 2 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 886 passed / 0 failed。 |

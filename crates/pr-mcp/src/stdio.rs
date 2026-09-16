@@ -106,7 +106,7 @@ fn handle<B: Backend>(line: &str, backend: &B) -> Option<String> {
         Ok(v) => v,
         Err(e) => {
             return Some(error(
-                serde_json::Value::Null,
+                &serde_json::Value::Null,
                 code::PARSE_ERROR,
                 &e.to_string(),
             ));
@@ -114,7 +114,7 @@ fn handle<B: Backend>(line: &str, backend: &B) -> Option<String> {
     };
     let id = v.get("id").cloned().unwrap_or(serde_json::Value::Null);
     let Some(method) = v.get("method").and_then(|m| m.as_str()) else {
-        return Some(error(id, code::INVALID_REQUEST, "no method"));
+        return Some(error(&id, code::INVALID_REQUEST, "no method"));
     };
     // A notification has no id and takes no response, per JSON-RPC. Answering one would put a
     // frame on stdout that the host is not expecting.
@@ -141,8 +141,8 @@ fn handle<B: Backend>(line: &str, backend: &B) -> Option<String> {
         return None;
     }
     Some(match result {
-        Ok(r) => ok(id, r),
-        Err((c, m)) => error(id, c, &m),
+        Ok(r) => ok(&id, &r),
+        Err((c, m)) => error(&id, c, &m),
     })
 }
 
@@ -155,13 +155,13 @@ fn call<B: Backend>(
     let params = v.get("params");
     let name = params.and_then(|p| p.get("name")).and_then(|n| n.as_str());
     let Some(name) = name else {
-        return (!is_notification).then(|| error(id, code::INVALID_PARAMS, "no tool name"));
+        return (!is_notification).then(|| error(&id, code::INVALID_PARAMS, "no tool name"));
     };
     let Some(tool) = Tool::parse(name) else {
         // The closed list, enforced. There is no arbitrary-command tool to fall through to.
         return (!is_notification).then(|| {
             error(
-                id,
+                &id,
                 code::METHOD_NOT_FOUND,
                 &format!(
                     "{name} is not a tool; Penguin exposes a closed list and no \
@@ -187,7 +187,12 @@ fn call<B: Backend>(
             crate::tools::ToolRefusal::PlanNeedsHumanToken.message(),
         )),
         _ => {
-            if !backend.credential_available(profile) {
+            if backend.credential_available(profile) {
+                Err((
+                    code::NOT_IMPLEMENTED,
+                    format!("{name} is not implemented in Phase 0"),
+                ))
+            } else {
                 // Never a prompt. A prompt on a pipe is a process that never returns.
                 Err((
                     code::CREDENTIAL_UNAVAILABLE,
@@ -195,11 +200,6 @@ fn call<B: Backend>(
                         "no credential is available for {profile:?} and this path never prompts; \
                          run `prc @{profile}` once in a terminal to store one"
                     ),
-                ))
-            } else {
-                Err((
-                    code::NOT_IMPLEMENTED,
-                    format!("{name} is not implemented in Phase 0"),
                 ))
             }
         }
@@ -209,16 +209,16 @@ fn call<B: Backend>(
         return None;
     }
     Some(match result {
-        Ok(r) => ok(id, r),
-        Err((c, m)) => error(id, c, &m),
+        Ok(r) => ok(&id, &r),
+        Err((c, m)) => error(&id, c, &m),
     })
 }
 
-fn ok(id: serde_json::Value, result: serde_json::Value) -> String {
+fn ok(id: &serde_json::Value, result: &serde_json::Value) -> String {
     serde_json::json!({ "jsonrpc": "2.0", "id": id, "result": result }).to_string()
 }
 
-fn error(id: serde_json::Value, code: i64, message: &str) -> String {
+fn error(id: &serde_json::Value, code: i64, message: &str) -> String {
     serde_json::json!({
         "jsonrpc": "2.0",
         "id": id,

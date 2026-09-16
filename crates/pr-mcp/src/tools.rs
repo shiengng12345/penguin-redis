@@ -173,6 +173,24 @@ impl ToolRefusal {
     }
 }
 
+/// What one tool call is asking to do.
+///
+/// A struct rather than eight parameters, because a call site with eight positional arguments
+/// is a call site where two of them eventually get swapped and the compiler says nothing.
+#[derive(Clone, Copy, Debug)]
+pub struct Call<'a> {
+    /// The tool being called.
+    pub tool: Tool,
+    /// The request it would issue, if any.
+    pub request: Option<&'a CommandRequest>,
+    /// Key arguments the catalog extracted.
+    pub keys: &'a [Vec<u8>],
+    /// Estimated result size, for the policy's budget.
+    pub estimated_bytes: usize,
+    /// Calls already made in the rate window.
+    pub calls_in_last_hour: u32,
+}
+
 /// Decide whether one tool call may proceed.
 ///
 /// This is the whole of V-D08's "写类请求无人签令牌被拒" criterion, in one place so there is
@@ -181,15 +199,18 @@ impl ToolRefusal {
 /// # Errors
 /// The specific [`ToolRefusal`].
 pub fn authorise(
-    tool: Tool,
-    req: Option<&CommandRequest>,
-    keys: &[Vec<u8>],
-    estimated_bytes: usize,
-    calls_in_last_hour: u32,
+    call: Call<'_>,
     rule: Option<&PolicyRule>,
     token: Option<&ApprovalToken>,
     ctx: &ExecutionContext,
 ) -> Result<Authorisation, ToolRefusal> {
+    let Call {
+        tool,
+        request: req,
+        keys,
+        estimated_bytes,
+        calls_in_last_hour,
+    } = call;
     // `execute_approved_plan` first, and unconditionally. Putting it anywhere else would make
     // it look like a case among cases, and someone would eventually add "unless the plan is
     // read-only" — which §29.4 rules out in the same sentence that creates the tool.
@@ -212,14 +233,14 @@ pub fn authorise(
         return Ok(Authorisation::NotRequired);
     };
 
-    // A human token, when present, decides. It is the strongest thing on offer.
-    if let Some(t) = token {
-        if matches!(t.issued_by, Issuer::Human) {
-            t.authorise(req, ctx).map_err(ToolRefusal::TokenRefused)?;
-            return Ok(Authorisation::ByHuman);
-        }
-        // A policy-issued token is not a shortcut past the policy check: it has to pass the
-        // same boundary the policy would have applied, below.
+    // A human token, when present, decides. It is the strongest thing on offer. A
+    // policy-issued one is not a shortcut past the policy check: it falls through to the same
+    // boundary the policy would have applied, below.
+    if let Some(t) = token
+        && matches!(t.issued_by, Issuer::Human)
+    {
+        t.authorise(req, ctx).map_err(ToolRefusal::TokenRefused)?;
+        return Ok(Authorisation::ByHuman);
     }
 
     if !tool.policy_may_reach() {

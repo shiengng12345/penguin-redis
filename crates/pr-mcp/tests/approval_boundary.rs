@@ -16,7 +16,7 @@
 use bytes::Bytes;
 use pr_core::{CommandRequest, Effects, RequestOrigin};
 use pr_mcp::policy::{PolicyRefusal, PolicyRule, glob_match};
-use pr_mcp::tools::{Authorisation, Tool, ToolRefusal, authorise};
+use pr_mcp::tools::{Authorisation, Call, Tool, ToolRefusal, authorise};
 use pr_security::approval::{ApprovalToken, Epochs, ExecutionContext, Issuer};
 use pr_security::trust::{AuthIdentity, Endpoint, ServerIdentity, TlsIdentity, TrustIdentity};
 
@@ -97,11 +97,13 @@ fn a_read_of_a_listed_key_within_budget_is_covered_by_the_policy() {
     let id = identity();
     let r = req(&["GET", "player:10001"], Effects::read());
     let got = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"player:10001".to_vec()],
-        1024,
-        3,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"player:10001".to_vec()],
+            estimated_bytes: 1024,
+            calls_in_last_hour: 3,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -124,11 +126,13 @@ fn a_write_is_refused_and_the_message_says_a_person_must_approve_it() {
     let id = identity();
     let r = req(&["SET", "player:10001", "x"], Effects::write());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"player:10001".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"player:10001".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -202,11 +206,13 @@ fn every_effect_outside_reads_data_is_refused_by_name() {
     for (effects, _expected) in cases {
         let r = req(&["CMD", "player:1"], *effects);
         let err = authorise(
-            Tool::RedisRead,
-            Some(&r),
-            &[b"player:1".to_vec()],
-            16,
-            0,
+            Call {
+                tool: Tool::RedisRead,
+                request: Some(&r),
+                keys: &[b"player:1".to_vec()],
+                estimated_bytes: 16,
+                calls_in_last_hour: 0,
+            },
             Some(&rule()),
             None,
             &ctx(&id),
@@ -232,11 +238,13 @@ fn an_unclassified_command_is_refused_rather_than_assumed_harmless() {
     let id = identity();
     let r = req(&["SOMEMODULE.DOTHING", "player:1"], Effects::unknown());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"player:1".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"player:1".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -260,11 +268,13 @@ fn a_key_the_profile_does_not_list_is_refused_even_for_a_read() {
     let id = identity();
     let r = req(&["GET", "session:abc"], Effects::read());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"session:abc".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"session:abc".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -285,11 +295,13 @@ fn one_unlisted_key_among_listed_ones_refuses_the_whole_request() {
     let id = identity();
     let r = req(&["MGET", "player:1", "session:abc"], Effects::read());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"player:1".to_vec(), b"session:abc".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"player:1".to_vec(), b"session:abc".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -313,11 +325,13 @@ fn a_rule_with_no_key_patterns_authorises_nothing() {
     r0.key_patterns.clear();
     let r = req(&["GET", "player:1"], Effects::read());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"player:1".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"player:1".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&r0),
         None,
         &ctx(&id),
@@ -338,11 +352,13 @@ fn the_result_budget_and_the_hourly_rate_are_both_enforced() {
     let keys = [b"player:1".to_vec()];
 
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &keys,
-        64 * 1024 + 1,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &keys,
+            estimated_bytes: 64 * 1024 + 1,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -357,11 +373,13 @@ fn the_result_budget_and_the_hourly_rate_are_both_enforced() {
 
     // And the rate limit, which is what stops one approved read becoming a keyspace dump.
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &keys,
-        16,
-        100,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &keys,
+            estimated_bytes: 16,
+            calls_in_last_hour: 100,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -393,11 +411,13 @@ fn every_execute_approved_plan_call_needs_a_human_token_even_for_a_read_only_pla
     let harmless = req(&["GET", "player:1"], Effects::read());
 
     let err = authorise(
-        Tool::RedisExecuteApprovedPlan,
-        Some(&harmless),
-        &[b"player:1".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisExecuteApprovedPlan,
+            request: Some(&harmless),
+            keys: &[b"player:1".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -409,11 +429,13 @@ fn every_execute_approved_plan_call_needs_a_human_token_even_for_a_read_only_pla
     // And a policy-issued token for the same read is still not enough.
     let t = policy_token(&id, &harmless);
     let err = authorise(
-        Tool::RedisExecuteApprovedPlan,
-        Some(&harmless),
-        &[b"player:1".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisExecuteApprovedPlan,
+            request: Some(&harmless),
+            keys: &[b"player:1".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         Some(&t),
         &ctx(&id),
@@ -425,11 +447,13 @@ fn every_execute_approved_plan_call_needs_a_human_token_even_for_a_read_only_pla
     let t = human_token(&id, &harmless);
     assert_eq!(
         authorise(
-            Tool::RedisExecuteApprovedPlan,
-            Some(&harmless),
-            &[b"player:1".to_vec()],
-            16,
-            0,
+            Call {
+                tool: Tool::RedisExecuteApprovedPlan,
+                request: Some(&harmless),
+                keys: &[b"player:1".to_vec()],
+                estimated_bytes: 16,
+                calls_in_last_hour: 0,
+            },
             Some(&rule()),
             Some(&t),
             &ctx(&id),
@@ -449,11 +473,13 @@ fn a_token_for_one_plan_does_not_authorise_another() {
     let t = human_token(&id, &approved);
 
     let err = authorise(
-        Tool::RedisExecuteApprovedPlan,
-        Some(&substituted),
-        &[b"player:2".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisExecuteApprovedPlan,
+            request: Some(&substituted),
+            keys: &[b"player:2".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         None,
         Some(&t),
         &ctx(&id),
@@ -473,11 +499,13 @@ fn a_policy_issued_token_is_not_a_shortcut_past_the_policy_check() {
     let write = req(&["SET", "player:1", "x"], Effects::write());
     let t = policy_token(&id, &write);
     let err = authorise(
-        Tool::RedisRead,
-        Some(&write),
-        &[b"player:1".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&write),
+            keys: &[b"player:1".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         Some(&t),
         &ctx(&id),
@@ -576,11 +604,13 @@ fn a_pattern_cannot_be_widened_by_a_key_that_contains_a_metacharacter() {
     let id = identity();
     let r = req(&["GET", "*"], Effects::read());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[b"*".to_vec()],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[b"*".to_vec()],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),
@@ -601,11 +631,13 @@ fn a_request_that_names_no_key_is_not_covered_by_a_key_pattern_rule() {
     let id = identity();
     let r = req(&["DBSIZE"], Effects::read());
     let err = authorise(
-        Tool::RedisRead,
-        Some(&r),
-        &[],
-        16,
-        0,
+        Call {
+            tool: Tool::RedisRead,
+            request: Some(&r),
+            keys: &[],
+            estimated_bytes: 16,
+            calls_in_last_hour: 0,
+        },
         Some(&rule()),
         None,
         &ctx(&id),

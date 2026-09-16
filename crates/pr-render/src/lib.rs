@@ -4,11 +4,13 @@
 //! it renders what it is given and asks the application for anything more.
 
 pub mod generic;
+pub mod plugin;
 pub mod table;
 pub mod theme;
 pub mod width;
 
 pub use generic::{MAX_RENDER_DEPTH, render as render_generic};
+pub use plugin::{Grant, Limits, PluginFailure, PluginHost, Rendering};
 pub use table::{Align, Cell, Column, DrawMode, Layout, Rendered, SAMPLE_ROWS, Table};
 pub use theme::{ColorDepth, Rgb, Styled, Theme, ThemeKind, Token};
 pub use width::{AmbiguousWidth, WidthPolicy};

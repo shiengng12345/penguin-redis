@@ -227,12 +227,13 @@ fn glob_bytes(p: &[u8], k: &[u8]) -> bool {
                 pi += 1;
                 ki += 1;
             }
-            Some(b'[') => match class(p, pi, k[ki]) {
-                Some((next, true)) => {
+            Some(b'[') => {
+                if let Some((next, true)) = class(p, pi, k[ki]) {
                     pi = next;
                     ki += 1;
-                }
-                Some((_, false)) | None => {
+                } else {
+                    // Either the class did not match, or it was unterminated. Both fall back
+                    // to the last `*`, if there was one.
                     if star == usize::MAX {
                         return false;
                     }
@@ -240,7 +241,7 @@ fn glob_bytes(p: &[u8], k: &[u8]) -> bool {
                     ki = star_k;
                     pi = star + 1;
                 }
-            },
+            }
             Some(b'\\') if pi + 1 < p.len() && p[pi + 1] == k[ki] => {
                 pi += 2;
                 ki += 1;

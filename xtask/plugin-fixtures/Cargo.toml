@@ -1,0 +1,16 @@
+[package]
+name = "plugin-fixtures"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Penguin Redis — V-D09 fixtures: L2 renderer plugins that misbehave on purpose"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "misbehaving-plugin"
+path = "src/main.rs"

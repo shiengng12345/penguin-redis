@@ -15,6 +15,7 @@ workspace = true
 pr-core = { path = "../pr-core" }
 pr-json = { path = "../pr-json" }
 pr-protocol = { path = "../pr-protocol" }
+serde_json = { workspace = true }   # Penguin-owned plugin schema (§18.4), not server JSON
 bytes = { workspace = true }
 thiserror = { workspace = true }
 unicode-width = { workspace = true }
