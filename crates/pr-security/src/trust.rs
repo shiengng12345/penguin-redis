@@ -103,6 +103,30 @@ pub struct TrustIdentity {
     pub auth_identity: AuthIdentity,
 }
 
+/// Something worth saying that is not worth refusing.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Advisory {
+    /// The set of Sentinels changed while the master name did not.
+    ///
+    /// Not a different service, so the credential stands. Worth saying because a Sentinel set
+    /// that changed without anyone doing it deliberately is a configuration drift, and
+    /// noticing it here is cheaper than noticing it during a failover.
+    SentinelSetChanged,
+}
+
+impl Advisory {
+    /// The line to show the user.
+    #[must_use]
+    pub fn message(self) -> &'static str {
+        match self {
+            Self::SentinelSetChanged => {
+                "the Sentinel set has changed; the master is the same, so the credential still \
+                 applies"
+            }
+        }
+    }
+}
+
 /// Why a credential must be re-bound (or why it need not be).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum RebindVerdict {
@@ -110,6 +134,13 @@ pub enum RebindVerdict {
     NoChange,
     /// Only the address moved — DNS, port mapping, failover to a known node. Keep binding.
     AddressOnly,
+    /// Something changed that the user should be told about but which does not invalidate the
+    /// credential — §21.3's "警告不阻断".
+    ///
+    /// Today this is the Sentinel set growing or shrinking. It is a distinct verdict rather
+    /// than `NoChange` because a caller cannot warn about something it was told was nothing:
+    /// the spec asks for a warning, so the type has to be able to carry one.
+    AdvisoryChange(Advisory),
     /// TLS identity changed — re-bind required.
     TlsIdentityChanged,
     /// The logical service changed — re-bind required.
@@ -122,7 +153,23 @@ impl RebindVerdict {
     /// Whether the credential must be re-confirmed before use.
     #[must_use]
     pub fn requires_rebind(self) -> bool {
-        !matches!(self, Self::NoChange | Self::AddressOnly)
+        !matches!(
+            self,
+            Self::NoChange | Self::AddressOnly | Self::AdvisoryChange(_)
+        )
+    }
+
+    /// The advisory to show the user, if this verdict carries one.
+    ///
+    /// Separate from [`RebindVerdict::requires_rebind`] on purpose: "tell the user" and "stop
+    /// and ask" are different obligations, and collapsing them is how a warning becomes either
+    /// a prompt nobody reads or a silence nobody notices.
+    #[must_use]
+    pub fn advisory(self) -> Option<Advisory> {
+        match self {
+            Self::AdvisoryChange(a) => Some(a),
+            _ => None,
+        }
     }
 }
 
@@ -255,7 +302,177 @@ impl TrustIdentity {
         if self.endpoint != previous.endpoint {
             return RebindVerdict::AddressOnly;
         }
+        // §21.3: the Sentinel set changing warns rather than blocks. Reported *after* the
+        // address check so that a failover, which is the common case, keeps its own clearer
+        // verdict.
+        if let (
+            ServerIdentity::Sentinel {
+                sentinel_set_hash: a,
+                ..
+            },
+            ServerIdentity::Sentinel {
+                sentinel_set_hash: b,
+                ..
+            },
+        ) = (&self.server_identity, &previous.server_identity)
+            && a != b
+        {
+            return RebindVerdict::AdvisoryChange(Advisory::SentinelSetChanged);
+        }
         RebindVerdict::NoChange
+    }
+}
+
+/// A certificate or CA rotation, mid-flight (v2.1 §21.3).
+///
+/// §21.3 configures rotation as "accept both for N days". That window is not a convenience: a
+/// fleet does not swap certificates atomically, so during a rollout some nodes present the old
+/// identity and some the new. Without a window the client would demand re-binding on every
+/// second connection, which trains the user to confirm re-binds without reading them — which
+/// is the failure the binding exists to prevent.
+///
+/// The window is bounded and one-directional: the *previous* identity expires, the current one
+/// does not. A rotation that never finishes is a rotation nobody completed.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct RotationWindow {
+    /// The identity being rotated to.
+    pub current: TlsIdentity,
+    /// The identity being rotated from, if a rotation is in progress.
+    pub previous: Option<TlsIdentity>,
+    /// When the previous identity stops being accepted, ms since the Unix epoch.
+    pub previous_until_ms: u64,
+}
+
+/// What a presented TLS identity means during a rotation.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RotationVerdict {
+    /// Matches the identity being rotated to.
+    Current,
+    /// Matches the one being rotated from, and the window is still open.
+    ///
+    /// Accepted, and worth telling the user about: a node still on the old certificate is a
+    /// node the rollout has not reached.
+    PreviousWithinWindow,
+    /// Matches the previous identity, but the window has closed. Re-bind.
+    PreviousExpired,
+    /// Matches neither.
+    Unknown,
+}
+
+impl RotationVerdict {
+    /// Whether the connection may proceed on the existing credential binding.
+    #[must_use]
+    pub fn accepts(self) -> bool {
+        matches!(self, Self::Current | Self::PreviousWithinWindow)
+    }
+}
+
+impl RotationWindow {
+    /// A profile with no rotation in progress.
+    #[must_use]
+    pub fn settled(current: TlsIdentity) -> Self {
+        Self {
+            current,
+            previous: None,
+            previous_until_ms: 0,
+        }
+    }
+
+    /// Judge the identity a server just presented.
+    #[must_use]
+    pub fn judge(&self, presented: &TlsIdentity, now_ms: u64) -> RotationVerdict {
+        if *presented == self.current {
+            return RotationVerdict::Current;
+        }
+        match &self.previous {
+            Some(p) if p == presented && now_ms < self.previous_until_ms => {
+                RotationVerdict::PreviousWithinWindow
+            }
+            Some(p) if p == presented => RotationVerdict::PreviousExpired,
+            _ => RotationVerdict::Unknown,
+        }
+    }
+}
+
+/// What to do about a redirect to a node the profile has not seen (v2.1 §21.3).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RedirectDecision {
+    /// Already a known node. Follow it.
+    Known,
+    /// New, but inside the profile's declared bounds. Follow it and record it.
+    WithinBounds,
+    /// Outside the declared bounds. **Stop and ask.**
+    ///
+    /// Following a `MOVED` to an arbitrary host and authenticating there is how a compromised
+    /// or misconfigured cluster collects a password: the server chooses the address, and the
+    /// client would be trusting it because it asked nicely.
+    ConfirmationRequired,
+}
+
+/// The nodes a profile has accepted.
+#[derive(Clone, Debug, Default)]
+pub struct KnownNodes {
+    nodes: Vec<(String, u16)>,
+}
+
+impl KnownNodes {
+    /// Start from the nodes already recorded in the profile.
+    #[must_use]
+    pub fn new(nodes: Vec<(String, u16)>) -> Self {
+        Self { nodes }
+    }
+
+    /// Whether this address has been accepted before.
+    #[must_use]
+    pub fn contains(&self, host: &str, port: u16) -> bool {
+        self.nodes.iter().any(|(h, p)| h == host && *p == port)
+    }
+
+    /// Decide what a redirect to this address means.
+    #[must_use]
+    pub fn decide(&self, bounds: &DiscoveryBounds, host: &str, port: u16) -> RedirectDecision {
+        if self.contains(host, port) {
+            RedirectDecision::Known
+        } else if bounds.permits(host, port) {
+            RedirectDecision::WithinBounds
+        } else {
+            RedirectDecision::ConfirmationRequired
+        }
+    }
+
+    /// Record a node that a decision allows without asking.
+    ///
+    /// Takes the decision rather than a bare address, so recording an out-of-bounds node is
+    /// impossible without going through [`KnownNodes::accept_confirmed`] — the type makes the
+    /// dangerous path the longer one. Returns whether the node may be used.
+    pub fn accept(&mut self, decision: RedirectDecision, host: &str, port: u16) -> bool {
+        match decision {
+            RedirectDecision::Known => true,
+            RedirectDecision::WithinBounds => {
+                self.nodes.push((host.to_owned(), port));
+                true
+            }
+            RedirectDecision::ConfirmationRequired => false,
+        }
+    }
+
+    /// Record a node after the user confirmed it explicitly (§21.3).
+    pub fn accept_confirmed(&mut self, host: &str, port: u16) {
+        if !self.contains(host, port) {
+            self.nodes.push((host.to_owned(), port));
+        }
+    }
+
+    /// How many nodes are recorded.
+    #[must_use]
+    pub fn len(&self) -> usize {
+        self.nodes.len()
+    }
+
+    /// Whether none are recorded.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.nodes.is_empty()
     }
 }
 
@@ -371,9 +588,10 @@ mod tests {
         };
         assert_eq!(
             same_master.compare(&a),
-            RebindVerdict::NoChange,
-            "adding a sentinel warns, not rebinds"
+            RebindVerdict::AdvisoryChange(Advisory::SentinelSetChanged),
+            "adding a sentinel warns, not rebinds — and a warning has to be sayable"
         );
+        assert!(!same_master.compare(&a).requires_rebind());
 
         let mut other_master = a.clone();
         other_master.server_identity = ServerIdentity::Sentinel {

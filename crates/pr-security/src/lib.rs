@@ -12,6 +12,6 @@ pub use approval::{
     preview, request_hash,
 };
 pub use trust::{
-    AuthIdentity, DiscoveryBounds, Endpoint, RebindVerdict, ServerIdentity, TlsIdentity,
-    TrustIdentity,
+    Advisory, AuthIdentity, DiscoveryBounds, Endpoint, KnownNodes, RebindVerdict, RedirectDecision,
+    RotationVerdict, RotationWindow, ServerIdentity, TlsIdentity, TrustIdentity,
 };

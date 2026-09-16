@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 42 |
+| PASS | 43 |
 | FALLBACK-ADOPTED | 1 |
-| IN-PROGRESS | 19 |
+| IN-PROGRESS | 18 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -67,7 +67,7 @@
 | V-D01 | PASS | `crates/pr-profiles/src/credentials.rs` · 9 tests · 本机 Keychain 实跑 | keyring 3 按平台 feature；`credential:<uuid>` 引用；无可用 store 时 **fail-closed**，回退选项里没有明文文件；keyutils 明确标为非持久 |
 | V-D02 | PASS | `crates/pr-profiles/src/journal.rs` · 12 tests | §4.2 六步顺序 + fsync journal + 启动 reconciliation；崩溃点逐一测试：孤儿 secret 只报告不自动删、悬空 profile 标 credential missing、未完成轮换清理可重放且幂等 |
 | V-D03 | PASS | `crates/pr-security/tests/approval.rs` 13 tests · `crates/pr-security/src/approval.rs` `preview()` / `escape_bytes()` | SEC-10 说的是：**两条 argv 显示摘要相同，一个令牌只能执行其中一条**。这不是假想——客户端让命令可读的每一种手段（Unicode 规范化、转义、截断、掩码）都是多对一函数，绑在可读形式上的令牌就授权了所有归约到它的东西。测试建了「在合理摘要下会碰撞」的对照集：单参数含空格 vs 两个参数、空尾参数、预组合 vs 分解重音、零宽空格、被截断的同前缀 key、掩码后的不同密码、尾随空格、转义换行 vs 真换行——9 对里 8 对在摘要下完全一致，而哈希与 `preview()` 全部不同。**两个方向都测**：一个会碰撞的 preview 会让字节绑定去保护一个没人能正确做出的决定。preview 显示每个参数的字节长度并把非可打印 ASCII 转义（零宽空格显示为 `\xe2\x80\x8b` 而不是隐形），且不可被恶意参数驱动终端——审批者是在终端里读它的。失效测试覆盖 profile / TrustIdentity / DB / 三个 epoch 各自单独变化、过期、额度耗尽 |
-| V-D04 | IN-PROGRESS | — | `pr-security::trust` 实现+10 测试通过；待 Cluster/Sentinel fixture (V-G01/G02) |
+| V-D04 | PASS | `crates/pr-security/tests/trust_binding.rs` 20 tests · `crates/pr-security/src/trust.rs` `RotationWindow` / `KnownNodes` / `RedirectDecision` / `Advisory` | §21.3 的核心决定是：凭证绑 `(tls_identity, server_identity)`，**不**绑 endpoint。因为地址会因为与信任无关的原因移动（DNS、端口映射、Sentinel failover 到已登记节点），每次地址变化都重问会训练用户不读就确认——那时确认什么也保护不了，比没有更糟。证书轮换给出「新旧同时接受 N 天」的窗口：机群不会原子换证，滚动期间有的节点报旧身份有的报新的。窗口**单向且有界**——旧身份会过期，新身份不会；一场永远不结束的轮换就是没人做完的轮换。窗口只放宽**恰好一个**身份，不是「轮换期间什么都收」。边界外重定向必停：`MOVED` 到任意主机再去认证，正是被攻陷或配错的集群收集密码的方式——地址是**服务器**选的。`KnownNodes::accept` 收 decision 而非裸地址，越界节点不经 `accept_confirmed` 根本无法记录，类型让危险路径更长。近似域名（`evil-redis-prod.internal`、`redis-prod.internal.evil.com` 等 4 例）全部判为需确认。**测试找到一个真缺口**：§21.3 要求 sentinel 集合变化「警告不阻断」，但 `compare()` 返回 `NoChange`，调用方无从得知——既有测试的注释写着 warns，代码却警告不出来。新增 `AdvisoryChange(Advisory)`，并把「告知」与「停下来问」分成两个方法 |
 | V-D05 | PASS | `crates/pr-render/tests/safetext_boundary.rs` · 10 tests | 15 个真实终端控制 payload × value/key/列标题/generic renderer/4 主题×4 色深；剥离自有 SGR 后断言无 ESC/BEL/NUL/C1/bidi；Debug 与 Display 同样惰性；转义幂等 |
 | V-D06 | PASS（history 路径） | `crates/pr-repl/src/history.rs` 泄漏测试 · `pr-profiles` journal/凭证测试 | 按环境分级脱敏（dev 留名 / staging 哈希 / prod 全占位）；AUTH·HELLO·CONFIG·ACL·MIGRATE 无视环境一律脱敏；**直接 grep SQLite 文件断言密码与 PII 不落盘**；搜索只能看到脱敏后文本 |
 | V-D07 | PASS | `crates/pr-catalog/src/precedence.rs` · 10 tests | 本地 catalog 是 effects 唯一权威；服务器谎称 write 为 readonly 时分类不变、仅标 `server reports`；未分类命令即使服务器说 readonly 仍算 mutating |
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | V-D04 → PASS（TrustIdentity 绑定 / 证书轮换窗口 / 边界外重定向）；补上 §21.3 要求但实现缺失的 sentinel 集合变更警告 |
 | 2026-09-16 | 建立报告；workspace 骨架；环境记录 |
 | 2026-09-16 | V-A03 / V-I01 / V-J01 → PASS；pr-core + pr-security 契约冻结；CI workflow 与 4 个 gate 脚本落地 |
 | 2026-09-16 | V-E01 → PASS（pr-json occurrence DOM，SPIKE-004）；workspace 85 tests 全绿 |
