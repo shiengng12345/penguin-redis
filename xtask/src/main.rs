@@ -8,11 +8,8 @@
 //! xtask catalog-diff [dir] # V-I02: write the Redis/Valkey difference list
 //! ```
 
-pub mod catalog;
-pub mod fault;
-pub mod measure;
-
-use measure::{Budget, CountingAllocator, Sample, budgets, rss_bytes};
+use xtask::catalog;
+use xtask::measure::{Budget, CountingAllocator, Sample, budgets, rss_bytes};
 
 #[global_allocator]
 static ALLOC: CountingAllocator = CountingAllocator::new();

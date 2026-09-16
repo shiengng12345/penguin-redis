@@ -24,3 +24,5 @@ pr-render = { path = "../pr-render" }
 pr-protocol = { path = "../pr-protocol" }
 pr-transport = { path = "../pr-transport" }
 bytes = { workspace = true }
+# V-F09 measures the heap with the same instrument `xtask measure-baseline` uses.
+xtask = { path = "../../xtask" }

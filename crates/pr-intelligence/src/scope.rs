@@ -59,6 +59,15 @@ impl ObservationScope {
         }
     }
 
+    /// What one copy of this scope costs to hold.
+    ///
+    /// Counted because 5,000 copies of it is not a rounding error: at V-F09's measurement it
+    /// was 1.2 MiB, more than half of the observed-name store's whole budget.
+    #[must_use]
+    pub fn byte_cost(&self) -> usize {
+        std::mem::size_of::<Self>() + self.profile_uuid.len() + self.service_identity.len()
+    }
+
     /// Whether a name observed in `other` may be offered while in `self`.
     #[must_use]
     pub fn accepts(&self, other: &Self) -> bool {
@@ -116,23 +125,74 @@ pub struct Observation {
 }
 
 /// A bounded store of observed names.
+///
+/// §12.5: 「已观察 key 名缓存 | **5,000 个或 2 MiB，先到者为准**」. Both halves, because either
+/// alone is the wrong limit: 5,000 names of 400 bytes is 2 MiB, and 5,000 names of 40 KiB is
+/// 200 MB. V-F09 found this store enforcing only the entry count.
 #[derive(Debug, Default)]
 pub struct ObservationStore {
     items: Vec<Observation>,
+    bytes: usize,
     max_items: usize,
+    max_bytes: usize,
+    evicted: u64,
+}
+
+/// §12.5's byte half of the observed-name budget.
+pub const MAX_OBSERVED_BYTES: usize = 2 * 1024 * 1024;
+
+/// What one observation costs to hold.
+///
+/// The name and the parent key are the variable part; the scope is three owned strings plus a
+/// `u32`, and it is counted because 5,000 copies of it is not a rounding error — it was 1.2 MiB
+/// in V-F09's measurement, which is more than half of this store's whole budget.
+fn observation_cost(o: &Observation) -> usize {
+    o.name.len() + o.parent_key.as_ref().map_or(0, Vec::len) + o.scope.byte_cost()
 }
 
 impl ObservationStore {
-    /// A store holding at most `max_items` names (§12.5: 5,000 by default).
+    /// A store holding at most `max_items` names, or [`MAX_OBSERVED_BYTES`], whichever first.
     #[must_use]
     pub fn new(max_items: usize) -> Self {
+        Self::with_budget(max_items, MAX_OBSERVED_BYTES)
+    }
+
+    /// A store with both limits given explicitly.
+    #[must_use]
+    pub fn with_budget(max_items: usize, max_bytes: usize) -> Self {
         Self {
             items: Vec::new(),
+            bytes: 0,
             max_items,
+            max_bytes,
+            evicted: 0,
         }
     }
 
-    /// Record a name, evicting the oldest when full.
+    /// Bytes currently held, **including the container's own overhead**.
+    ///
+    /// The `Vec`'s reserved capacity counts, not only what is in use: V-F09 measured a cache
+    /// costing 2.5x its stated budget, and all of the difference was bookkeeping the budget
+    /// did not count. Reserved-but-unused capacity is resident memory whether or not the
+    /// cache admits to it.
+    #[must_use]
+    pub fn bytes(&self) -> usize {
+        self.bytes + self.items.capacity() * std::mem::size_of::<Observation>()
+    }
+
+    /// How many names were dropped to stay inside the budget.
+    ///
+    /// Exposed rather than hidden: a cache that silently forgets looks, from the outside,
+    /// exactly like a server that lost the key.
+    #[must_use]
+    pub fn evicted(&self) -> u64 {
+        self.evicted
+    }
+
+    /// Record a name, evicting oldest-first until both limits hold.
+    ///
+    /// A single name larger than the whole byte budget is refused rather than emptying the
+    /// store to make room for it: 「超长名字受单项限制，仍可手输」.
     pub fn record(&mut self, o: Observation) {
         if let Some(existing) = self
             .items
@@ -142,9 +202,19 @@ impl ObservationStore {
             existing.origin = o.origin;
             return;
         }
-        if self.items.len() >= self.max_items && !self.items.is_empty() {
-            self.items.remove(0);
+        let cost = observation_cost(&o);
+        if cost > self.max_bytes {
+            self.evicted += 1;
+            return;
         }
+        while !self.items.is_empty()
+            && (self.items.len() + 1 > self.max_items || self.bytes() + cost > self.max_bytes)
+        {
+            let gone = self.items.remove(0);
+            self.bytes -= observation_cost(&gone);
+            self.evicted += 1;
+        }
+        self.bytes += cost;
         self.items.push(o);
     }
 

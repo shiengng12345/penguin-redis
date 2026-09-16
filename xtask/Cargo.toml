@@ -8,6 +8,14 @@ repository.workspace = true
 publish = false
 description = "Penguin Redis — xtask: V-A06 measurement and V-A04 fault injection harnesses"
 
+[lib]
+name = "xtask"
+path = "src/lib.rs"
+
+[[bin]]
+name = "xtask"
+path = "src/main.rs"
+
 [lints]
 workspace = true
 

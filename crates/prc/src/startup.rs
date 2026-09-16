@@ -167,6 +167,13 @@ pub enum Probe {
     Tui,
     /// The compiled catalog alone, to attribute its share.
     Catalog,
+    /// Catalog loaded, assistance **off** — the baseline for V-F09's difference.
+    AssistanceOff,
+    /// Catalog loaded, assistance **on** and every §12.5 sub-budget filled to its limit.
+    ///
+    /// Saturated rather than idle on purpose: an empty working set would measure the cost of
+    /// having the feature, and §12.5's 12 MiB is a cap on what it may grow to.
+    AssistanceOn,
 }
 
 impl Probe {
@@ -177,6 +184,8 @@ impl Probe {
             "repl" => Some(Self::Repl),
             "tui" => Some(Self::Tui),
             "catalog" => Some(Self::Catalog),
+            "assistance-off" => Some(Self::AssistanceOff),
+            "assistance-on" => Some(Self::AssistanceOn),
             _ => None,
         }
     }
@@ -188,6 +197,8 @@ impl Probe {
             Self::Repl => "repl",
             Self::Tui => "tui",
             Self::Catalog => "catalog",
+            Self::AssistanceOff => "assistance-off",
+            Self::AssistanceOn => "assistance-on",
         }
     }
 }
@@ -201,6 +212,36 @@ impl Probe {
 /// A string describing what could not be initialised.
 pub fn run_probe(probe: Probe) -> Result<String, String> {
     let rss = match probe {
+        // V-F09's two halves. Both load the catalog first, so the catalog is on *both* sides
+        // of the difference and cancels — §24.7 requires the read-only catalog to be excluded
+        // from the heap increment and reported separately.
+        Probe::AssistanceOff => {
+            let catalog = pr_catalog::embedded::merged();
+            let rss = pr_core::mem::rss_bytes();
+            format_probe(
+                probe,
+                rss,
+                &format!("commands={} assistance=off", catalog.commands.len()),
+            )
+        }
+        Probe::AssistanceOn => {
+            let catalog = pr_catalog::embedded::merged();
+            let scope = pr_intelligence::ObservationScope::new("probe", "service", 0);
+            let mut ws = pr_intelligence::WorkingSet::new();
+            ws.saturate(&scope);
+            let rss = pr_core::mem::rss_bytes();
+            let detail = format!(
+                "commands={} assistance=on keys={} fields={}B accounted={}B",
+                catalog.commands.len(),
+                ws.keys.len(),
+                ws.fields.bytes(),
+                ws.accounted_bytes()
+            );
+            // Kept alive across the sample: a probe that lets the thing being measured drop
+            // before sampling measures nothing at all.
+            drop(ws);
+            format_probe(probe, rss, &detail)
+        }
         Probe::Catalog => {
             let n = pr_catalog::embedded::merged().commands.len();
             let rss = pr_core::mem::rss_bytes();

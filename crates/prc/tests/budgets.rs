@@ -240,7 +240,7 @@ fn win_02_binary_output_reaches_a_pipe_byte_for_byte() {
 #[test]
 fn every_probe_reports_the_whole_catalog() {
     // If a probe quietly measured an empty catalog, its RSS would pass any budget.
-    for name in ["catalog", "repl", "tui"] {
+    for name in ["catalog", "repl", "tui", "assistance-off", "assistance-on"] {
         let (stdout, _, _) = run(&[], &[("PR_PHASE0_PROBE", name)]);
         let n: usize = stdout
             .split("commands=")
@@ -253,4 +253,99 @@ fn every_probe_reports_the_whole_catalog() {
             .unwrap();
         assert!(n > 500, "{name} probe saw only {n} commands");
     }
+}
+
+// ---------------------------------------------------------------------------------------------
+// V-F09 — the assistance heap increment, as an RSS difference (v2.1 §12.5, §24.7)
+// ---------------------------------------------------------------------------------------------
+
+#[test]
+fn f09_the_assistance_increment_is_measured_as_an_rss_difference() {
+    // §12.5 names this measurement literally: 「按「开/关提示」的 RSS 差测量」. Two child
+    // processes, each loading the catalog, differing only in whether assistance holds a
+    // working set — saturated to every sub-budget's stated limit, which is the worst case
+    // that is still inside the budget.
+    //
+    // The heap is weighed separately, with a counting allocator, in
+    // `crates/pr-intelligence/tests/working_set_heap.rs`. Two instruments because they fail
+    // differently: a leak shows in the allocator and may not show in RSS, and allocator
+    // overhead shows in RSS and not in the allocator.
+    let off = probe_rss("assistance-off");
+    let on = probe_rss("assistance-on");
+    assert!(
+        on >= off,
+        "assistance-on ({on} B) measured smaller than assistance-off ({off} B), which means \
+         the measurement is noise rather than a difference"
+    );
+    let delta = on - off;
+    println!(
+        "V-F09 RSS difference: off={off} B, on={on} B, increment={delta} B ({} KiB), \
+         budget {} KiB",
+        delta / 1024,
+        pr_intelligence::working_set::limits::HEAP_INCREMENT / 1024,
+    );
+    assert!(
+        delta <= pr_intelligence::working_set::limits::HEAP_INCREMENT as u64,
+        "the assistance increment is {delta} B, over §12.5's {} B cap",
+        pr_intelligence::working_set::limits::HEAP_INCREMENT
+    );
+}
+
+#[test]
+fn f09_the_catalog_is_on_both_sides_of_the_difference_and_therefore_cancels() {
+    // §24.7: 「不含大结果 store、不含**只读 mmap catalog**」. The catalog is excluded by
+    // construction rather than by subtraction — both probes load it before sampling — and
+    // this checks that construction rather than trusting it.
+    let (off, _, _) = run(&[], &[("PR_PHASE0_PROBE", "assistance-off")]);
+    let (on, _, _) = run(&[], &[("PR_PHASE0_PROBE", "assistance-on")]);
+    for (name, out) in [("off", &off), ("on", &on)] {
+        let n: usize = out
+            .split("commands=")
+            .nth(1)
+            .unwrap_or_else(|| panic!("no command count in the {name} probe: {out:?}"))
+            .split_whitespace()
+            .next()
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert!(n > 500, "the {name} probe saw only {n} commands");
+    }
+    // And the catalog's own share is reported separately, which is what "单独报告" asks for.
+    let catalog = probe_rss("catalog");
+    let off_rss = probe_rss("assistance-off");
+    println!("V-F09 catalog share reported separately: {catalog} B (assistance-off: {off_rss} B)");
+    assert!(catalog > 0);
+}
+
+#[test]
+fn f09_the_assistance_probe_really_holds_a_saturated_working_set() {
+    // Without this, a probe that quietly built nothing would report a tiny increment and pass.
+    // The same class of mistake `every_probe_reports_the_whole_catalog` exists to catch.
+    let (out, _, _) = run(&[], &[("PR_PHASE0_PROBE", "assistance-on")]);
+    let keys: usize = out
+        .split("keys=")
+        .nth(1)
+        .unwrap_or_else(|| panic!("no key count in {out:?}"))
+        .split_whitespace()
+        .next()
+        .unwrap()
+        .parse()
+        .unwrap();
+    assert!(keys >= 1000, "the probe held only {keys} observed names");
+    let accounted: usize = out
+        .split("accounted=")
+        .nth(1)
+        .unwrap()
+        .trim_end_matches(|c: char| !c.is_ascii_digit())
+        .split('B')
+        .next()
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
+    assert!(
+        accounted >= 8 * 1024 * 1024,
+        "the probe accounted for only {accounted} B, so it is not saturated"
+    );
+    assert!(out.contains("assistance=on"));
 }

@@ -8,9 +8,9 @@
 
 | 状态 | 数量 |
 |---|---|
-| PASS | 53 |
+| PASS | 54 |
 | FALLBACK-ADOPTED | 2 |
-| IN-PROGRESS | 7 |
+| IN-PROGRESS | 6 |
 | BLOCKED | 0 |
 
 ## 环境记录
@@ -96,7 +96,7 @@
 | V-F06 | PASS | `crates/pr-intelligence/src/scope.rs` · 14 tests | 六元组 scope（profile UUID + 服务身份 + DB + auth/policy/**topology** epoch）；逐项验证任一变化都不泄漏；field 绑定 parent key；schema hint 不主张存在性 |
 | V-F07 | PASS | `crates/pr-intelligence/src/discovery.rs`、`crates/pr-intelligence/tests/discovery.rs`（19 tests，常驻）、`crates/pr-intelligence/tests/discovery_live.rs`（5 tests，10⁶ key + 真实 ACL）、`tests/assistance-network/discovery/README.md`、[ADR-033](adr/ADR-033.md) | **实测（10⁶ key + 10 个稀疏 `player:*` needle，`DEBUG POPULATE` + 按名散开的 needle）** | 预算 | 停在哪 | 用时 | SCAN 次数 | 命中 | |---|---|---:|---:|---:| | §12.5 原始（50 次） | **SCAN 次数** | 2.58 s（10 s 预算） | 50 | 2 / 10 | | ADR-033 调整后（200 次） | **时间** | 10.0 s | 189~190 | 1~2 / 10 | | 走到底 | cursor 归零 | 0.39 s | 1000 | **10 / 10** | 原始默认**不是空的**，「稀疏前缀有结果并报告完成度」满足。但它在 10 秒里只用掉 2.58 秒就停了——**卡住它的是 SCAN 次数，不是用户实际感受到的那个限制**。50×20 req/s = 2.5 s，而 10 s×20 req/s = **200**：两个默认值描述的不是同一个停止点，其中一个在另一个的四分之一处悄悄先赢了。按 V-F07 回退条款「调高默认值（不是删功能）并记 ADR」→ ADR-033 把 `max_scans` 改为 200。**速率与时长都不变**，对服务器的压力上限没有任何变化。这条关系写成不变量测试而不是一个数字：以后改了速率或时长而没改次数，会在那里失败。 **needle 命中数不是断言对象。** 走到 19% 时 10 个 needle 的期望命中约 2 个，一次跑出 1 个不是回归。断言的是确定量：SCAN 次数 > 50、用满时间预算、每个命中确实以 `player:` 开头、时间预算真的封住运行。§32.5 说 flaky 测试要定位而不是靠重跑掩盖——第一版我写了 `matched >= 2`，那是在断言一枚硬币，实测里它确实红了一次，已改掉。 **没有任何礼貌的预算能在 10⁶ key 上找全**：走完整表需要 1000 次 SCAN，20 req/s 下是 50 秒。这是 SCAN 本身的性质（R08：COUNT 是提示、无二级索引、无快照）。所以保障不是「找得全」而是**说清楚没找全**，并由类型表达：只有 cursor 归零的 `Completeness::Exhausted` 的 `is_conclusive()` 为真。 **两种匹配模式对着真服务器验**：`player:[` 在字面前缀下发 `player:\[*` 并命中 `player:[1]`，在 glob 下原样发送且不命中——两边结果不同，这就是「不存在无声变成另一个匹配条件的路径」的可验证含义。转义是**逐字节**的：key 是字节，未必是 UTF-8。预览同时显示原字节与转义结果（只显示一边就会藏起关键的那一边，而藏的是哪一边取决于犯的是哪种错）。 **空结果永远不说「key 不存在」**（§12.4 明文禁止）：客户端预算说明不了服务器上有什么，被告知「不存在」的用户会停止寻找。有命中时同样报覆盖度——看到三条就以为是全部、因为没人说可能还有更多的用户，是被遗漏误导的。 **SCAN 的真实保证逐条兑现**：空页 + 非零 cursor **不结束扫描**（在这里停下就会对存在的 key 报找不到）；重复元素显示一次计数一次但 `keys_seen` 如实记录；没有任何地方从 cursor 值推算百分比。 **NOPERM 冷却对着真实 ACL 验**，不是模拟的错误——要测的是「服务器真发过来时我们认得出」。作用域是 (profile, database)，与 ACL 规则的作用域一致；全局冷却会连累一个本来允许扫描的 profile。**人可以手动清掉**：冷却是用来阻止自动重试撞 ACL 墙的，不是用来跟一个刚改好权限的人争论。 速率限制返回 `Step::Wait` 而不是失败：运行仍在其它预算之内，只是还不能问。 |
 | V-F08 | IN-PROGRESS | — | |
-| V-F09 | IN-PROGRESS | — | |
+| V-F09 | PASS | `benches/assistance/README.md`、`crates/pr-intelligence/src/working_set.rs`、`crates/pr-intelligence/tests/working_set_heap.rs`（3 tests，独立二进制）、`crates/pr-intelligence/tests/working_set_budget.rs`（4 tests）、`crates/prc/tests/budgets.rs` 的三个 `f09_*`（RSS 差） | | 量法 | 数值 | 预算 | 余量 | |---|---:|---:|---:| | **RSS 差**（§12.5 字面要求：开/关提示两个子进程） | **8.53 MiB** | 12 MiB | 3.47 MiB | | **堆**（计数 allocator，饱和工作集） | **8.84 MiB** | 12 MiB | 3.16 MiB | | 缓存自报 | 9.71 MiB | — | — | | 空工作集 | **0 B** | — | — | | catalog 单独报告 | 5.06 MiB | — | 不计入增量 | 两个量法互相印证（8.53 / 8.84）才让任何一个可信。**用两个仪器是因为它们失效方式不同**：进程内泄漏出现在 allocator 上而可能不出现在 RSS 上；allocator 自身开销出现在 RSS 上而不出现在 allocator 上。catalog **在差值两边自动抵消**（§24.7 要求排除），是按构造排除的而不是靠减法，并有测试检查这个构造（两个探针都必须看到 586 条命令）。 测的是**饱和后**的工作集：每个 §12.5 子项填到它自己声明的上限——仍在预算之内的最坏情况。空工作集成本 **0 B**：12 MiB 是「能长到多大」的上限，不是启动预留。子项也逐个称重而不只看总数——一个通过的总数可以掩盖一项超 2.5 倍、由另一项只用一半来补，而超的那一项正是用户 keyspace 形状与 fixture 假设不同时会长起来的那一项。 **测量本身有两个 bug，都是真的，都修了。** 第一个：**并行测试下的全局 allocator 计数是无意义的**。第一版量出 22.9 MiB 而实际是 8.8 MiB——同一二进制里另一个测试当时正握着 8 MB fixture，Rust 默认并行跑测试而计数器是进程全局的。修法：称重测试单独一个二进制 + mutex 串行化。**一个量错了的预算检查比没有检查更糟**，因为它看起来像证据。空工作集那条则改成确定性的结构断言——对全局计数器做小 delta 断言，是预算检查变成 flaky 测试然后被人删掉的那条路。 第二个：**`BoundedNames` 与 `ObservationStore` 都只数了存进去的字节，没数容器自己的开销**。实测一个声称 2 MiB 的 field 缓存实际占 5.2 MiB，差额全是预算没数的记账——每条 48 字节的 `(Vec, Vec)`，加上一个容量已翻倍到超出在用量的 `Vec`。**一个不数容器开销的预算不是预算**：预留但未使用的容量是常驻内存，进程要为它付钱，无论缓存承不承认。修完后自报值变成**保守的**（9.71 ≥ 实测 8.84），这是预算该有的方向，并有断言守住这个不等号。 **§12.5 的两项限额，两半都执行。** 已观察 key 名缓存「5,000 个**或** 2 MiB，先到者为准」——V-F09 发现只执行了条目数那一半，5,000 个 40 KiB 的名字会在 2 MiB 预算里握住 200 MB；两半现在都执行，各有一条测试证明它会先到。单条超过整个预算的名字被**拒绝**而不是清空缓存腾地方（为 3 MiB 的名字腾出 2 MiB 缓存意味着丢光一切并且仍然装不下）。field 缓存是「2 MiB 总预算」不是每 key 2 MiB，有 100 key × 1,000 field 的测试守住。驱逐数对外暴露——默默遗忘的缓存从外面看和一台丢了 key 的服务器一模一样。 **没有超出，所以没有调整预算，也就没有 ADR**（回退条款是「超出 → 先定位；预算调整必须带证据与 ADR」）。上面两个是**记账正确性修复**，不是预算调整：它们让实际占用向下走，不是让上限向上走。 顺带把 `xtask` 加了 lib target，让产品测试与 `xtask measure-baseline` 用**同一个** allocator 仪器——两个今天一致、明天漂移的计数器，正是预算悄悄不再被执行的方式。 |
 | V-F10 | PASS | `crates/pr-intelligence/tests/zero_send.rs` · 11 tests | transport spy 计**尝试次数**；分析/候选/接受/焦点/可提交性检查/Guide 组装/换主题/丢弃过期结果/scope 失效，以及完整离线编辑会话 —— 全部 0 条业务命令 |
 
 ## Track G · 连接拓扑
@@ -150,6 +150,7 @@
 
 | 日期 | 变更 |
 |---|---|
+| 2026-09-16 | `cargo test -p pr-intelligence --test working_set_heap` → 3 passed；`--test working_set_budget` → 4 passed；`cargo test -p prc --test budgets` → 12 passed（含 3 个 `f09_*`）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 979 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-intelligence --test discovery` → 19 passed（无需服务器）；`--test discovery_live -- --ignored` → 5 passed（26 s，含 10⁶ key 与真实 NOPERM）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 969 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-render --test plugin_isolation` → 17 passed（10.9 s，含真实 OOM 与 flood）；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 950 passed / 0 failed。 |
 | 2026-09-16 | `cargo test -p pr-mcp` → 3 + 9 + 17 = 29 passed；`cargo clippy --workspace --all-targets -- -D warnings` 与 `cargo fmt --all --check` 干净；`cargo test --workspace` → 933 passed / 0 failed。 |
