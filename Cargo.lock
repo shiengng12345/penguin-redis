@@ -870,6 +870,7 @@ dependencies = [
 name = "pr-results"
 version = "0.0.0"
 dependencies = [
+ "bytes",
  "pr-core",
  "thiserror 2.0.20",
 ]

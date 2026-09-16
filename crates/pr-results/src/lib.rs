@@ -4,7 +4,9 @@
 //! still be printed in full, it simply cannot be inspected afterwards (§24.3, ADR-009).
 
 pub mod store;
+pub mod subscription;
 
 pub use store::{
     Budget, OutputContext, OversizeAction, ResultStore, Retained, Unavailable, oversize_action,
 };
+pub use subscription::{Dropped, MAX_BYTES, MAX_ENTRIES, Message, Subscription};

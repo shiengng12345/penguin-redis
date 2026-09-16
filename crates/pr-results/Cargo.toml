@@ -13,4 +13,5 @@ workspace = true
 
 [dependencies]
 pr-core = { path = "../pr-core" }
+bytes = { workspace = true }
 thiserror = { workspace = true }
