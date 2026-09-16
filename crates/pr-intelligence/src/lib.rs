@@ -7,11 +7,14 @@
 pub mod analyser;
 pub mod broker;
 pub mod discovery;
+pub mod find;
 pub mod scope;
+pub mod vocabulary;
 pub mod working_set;
 
 pub use analyser::{Analysis, QuoteMode, Span, analyse, submittable};
 pub use broker::{Accepted, Broker, Candidate, Dropped, Stamp};
 pub use discovery::{Budget, Completeness, Cooldown, Discovery, MatchMode, Outcome, Step};
+pub use find::{Finder, Hit, Purpose, Term};
 pub use scope::{Observation, ObservationScope, ObservationStore, Origin};
 pub use working_set::{BoundedNames, WorkingSet, limits};

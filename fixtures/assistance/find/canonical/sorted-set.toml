@@ -1,0 +1,287 @@
+# V-F08 canonical phrasings — sorted-set group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "阻塞地从多个有序集合弹出",
+  "block and pop from several sorted sets",
+  "盯着几个排行榜等元素出现",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "阻塞等待弹出分数最高的",
+  "block until a highest-score member can be popped",
+  "等着取分数最高的那个",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "阻塞等待弹出分数最低的",
+  "block until a lowest-score member can be popped",
+  "没有就等着，有了取最小分",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "往有序集合里加带分数的成员",
+  "add a member with a score to a sorted set",
+  "给排行榜加一条带分数的记录",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "有序集合里有多少个成员",
+  "how many members a sorted set has",
+  "排行榜一共几个人",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "统计分数在某区间的成员数",
+  "count members whose score falls in a range",
+  "多少人的分数在这个区间",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "求有序集合的差集",
+  "members of the first sorted set not in the others",
+  "在这个 zset 里但不在那个里的",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "把有序集合差集存起来",
+  "store the difference of sorted sets",
+  "算 zset 差集并保存",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给某个成员的分数加上一个量",
+  "increase a member's score",
+  "给排行榜上的人加分",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "求有序集合的交集",
+  "members present in every sorted set",
+  "几个 zset 共有的成员",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "只要有序集合交集的个数",
+  "how many members several sorted sets share",
+  "zset 交集有多少个",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "把有序集合交集存起来",
+  "store the intersection of sorted sets",
+  "算 zset 交集并写入新 key",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "按字典序区间统计成员数",
+  "count members within a lexicographic range",
+  "字典序范围内有多少个",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "从多个有序集合中弹出",
+  "pop from the first sorted set that has members",
+  "同时看几个排行榜谁有就取谁",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "一次查多个成员的分数",
+  "read the scores of several members",
+  "批量取分数",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "弹出分数最高的成员",
+  "pop the member with the highest score",
+  "取走分数最大的那个",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "弹出分数最低的成员",
+  "pop the member with the lowest score",
+  "取走分数最小的那个",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "从有序集合里随机取成员",
+  "pick a random member of a sorted set",
+  "随便抽一个排行榜成员",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "按名次取出有序集合的一段",
+  "read a range out of a sorted set",
+  "取排行榜的前几名",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "按字典序区间取成员",
+  "read members within a lexicographic range",
+  "按名字排序取一段",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "按分数区间取成员",
+  "read members whose score is in a range",
+  "取分数在某段之间的人",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "把区间查询的结果存成新 key",
+  "store a sorted set range into another key",
+  "取一段排行榜并保存下来",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "查某个成员排第几",
+  "the rank of a member in a sorted set",
+  "这个人在排行榜第几名",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "从有序集合删掉成员",
+  "remove a member from a sorted set",
+  "把某个人从排行榜移除",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "按字典序区间删掉成员",
+  "remove members in a lexicographic range",
+  "字典序范围内的都删掉",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "按名次区间删掉成员",
+  "remove members by rank range",
+  "删掉排名第几到第几的",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "按分数区间删掉成员",
+  "remove members whose score is in a range",
+  "删掉分数在这段的成员",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "倒序取出有序集合的一段",
+  "read a range of a sorted set in reverse",
+  "从高到低取排行榜",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "按字典序倒序取成员",
+  "read a lexicographic range in reverse",
+  "字典序反向取一段",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "按分数区间倒序取成员",
+  "read members in a score range, highest first",
+  "分数区间内从高到低列出",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "倒序查某个成员排第几",
+  "the rank of a member counting from the top",
+  "从高到低算这个人第几",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "分批遍历有序集合",
+  "iterate over a sorted set a page at a time",
+  "游标方式扫描 zset",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "查某个成员的分数",
+  "read the score of one member",
+  "这个成员现在多少分",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "求有序集合的并集",
+  "all members across several sorted sets",
+  "把几个 zset 合并",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "把有序集合并集存起来",
+  "store the union of sorted sets",
+  "算 zset 并集并保存",
+]

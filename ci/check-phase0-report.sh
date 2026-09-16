@@ -23,23 +23,36 @@ if rows | grep -nE '\b(DEFERRED|SKIPPED|TODO|WONTFIX|N/?A)\b'; then
   fail=1
 fi
 
-# 2. Every FALLBACK-ADOPTED must name an ADR that exists and is accepted.
-while IFS= read -r line; do
-  adr=$(printf '%s' "$line" | sed -nE 's/.*FALLBACK-ADOPTED\((ADR-[0-9]{3})\).*/\1/p')
-  if [ -z "$adr" ]; then
-    echo "::error::FALLBACK-ADOPTED without an ADR reference: $line"
-    fail=1
-    continue
-  fi
-  f="docs/adr/${adr}.md"
-  if [ ! -f "$f" ]; then
-    echo "::error::$adr referenced by the report but $f does not exist"
-    fail=1
-  elif ! grep -q '^- \*\*状态\*\*：accepted' "$f"; then
-    echo "::error::$adr is referenced as an adopted fallback but is not accepted"
-    fail=1
-  fi
-done < <(rows | grep -F 'FALLBACK-ADOPTED' || true)
+# 2. Every FALLBACK-ADOPTED and every BLOCKED must name an ADR that exists and is accepted.
+#
+# Matched on the *status column*, not anywhere in the row: a note that mentions the word
+# FALLBACK-ADOPTED while explaining why an item is not one used to trip this check, which is
+# the sort of false positive that gets a rule deleted.
+#
+# BLOCKED is held to the same bar as FALLBACK-ADOPTED. An item blocked without a recorded
+# decision is indistinguishable from an item nobody finished, and the difference is the whole
+# point of having the state.
+check_adr_state() {
+  state="$1"
+  while IFS= read -r line; do
+    adr=$(printf '%s' "$line" | sed -nE "s/^\\| [A-Z0-9-]+ \\| ${state}\\((ADR-[0-9]{3})\\) \\|.*/\\1/p")
+    if [ -z "$adr" ]; then
+      echo "::error::${state} without an ADR reference in its status column: $line"
+      fail=1
+      continue
+    fi
+    f="docs/adr/${adr}.md"
+    if [ ! -f "$f" ]; then
+      echo "::error::$adr referenced by the report but $f does not exist"
+      fail=1
+    elif ! grep -q '^- \*\*状态\*\*：accepted' "$f"; then
+      echo "::error::$adr is referenced by a ${state} item but is not accepted"
+      fail=1
+    fi
+  done < <(rows | grep -E "^\\| [A-Z0-9-]+ \\| ${state}" || true)
+}
+check_adr_state 'FALLBACK-ADOPTED'
+check_adr_state 'BLOCKED'
 
 # 3. Every V-item in the plan appears in the report exactly once.
 plan="docs/penguin-redis-phase-plan.md"

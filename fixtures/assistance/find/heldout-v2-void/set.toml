@@ -1,0 +1,129 @@
+# V-F08 held-out v2 — VOID — set group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "SADD"
+phrases = [
+  "集合加",
+  "set add",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "集合大小",
+  "set size",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "集合差",
+  "set difference",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "集合差存",
+  "store set difference",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "集合交",
+  "set intersection",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "集合交数量",
+  "set intersection size",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "集合交存",
+  "store set intersection",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "集合判存在",
+  "set membership",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "集合全部",
+  "all set members",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "集合批量判存在",
+  "bulk set membership",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "集合间搬",
+  "move between sets",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "集合随机弹出",
+  "random pop from set",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "集合随机看",
+  "random peek in set",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "集合删",
+  "set remove",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "游标扫集合",
+  "cursor scan set",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "集合并",
+  "set union",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "集合并存",
+  "store set union",
+]

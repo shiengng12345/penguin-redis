@@ -1,0 +1,31 @@
+# V-F08 held-out v1 — VOID — hyperloglog group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "统计独立访客又不想存所有 id",
+  "count unique visitors cheaply",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "大概有多少个不重复的",
+  "roughly how many distinct things",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "把几天的独立访客合起来",
+  "combine several cheap distinct counts",
+]

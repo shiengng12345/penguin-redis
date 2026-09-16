@@ -1,0 +1,63 @@
+# V-F08 canonical phrasings — bitmap group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "BITCOUNT"
+phrases = [
+  "数一数位图里有多少个 1",
+  "count the set bits in a string",
+  "统计置位的数量",
+]
+
+[[case]]
+command = "BITFIELD"
+phrases = [
+  "在字符串里按位操作多个整数",
+  "treat a string as an array of packed integers",
+  "位域方式读写紧凑的数字",
+]
+
+[[case]]
+command = "BITFIELD_RO"
+phrases = [
+  "只读地按位读取整数",
+  "read packed integers without writing",
+  "位域只读访问",
+]
+
+[[case]]
+command = "BITOP"
+phrases = [
+  "对多个位图做按位运算",
+  "bitwise and, or, xor or not across strings",
+  "几个 bitmap 做与或非",
+]
+
+[[case]]
+command = "BITPOS"
+phrases = [
+  "找出第一个 0 或 1 在哪一位",
+  "find the first bit set to a given value",
+  "第一个为 1 的位置在哪",
+]
+
+[[case]]
+command = "GETBIT"
+phrases = [
+  "读取位图上某一位",
+  "read a single bit at an offset",
+  "看第几位是 0 还是 1",
+]
+
+[[case]]
+command = "SETBIT"
+phrases = [
+  "设置位图上某一位",
+  "set a single bit at an offset",
+  "把第几位置成 0 或 1",
+]

@@ -1,0 +1,164 @@
+# V-F08 held-out v3 — VOID — string group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "APPEND"
+phrases = [
+  "想不断往一个值后面加东西",
+  "I keep needing to add to the end of a value",
+]
+
+[[case]]
+command = "DECR"
+phrases = [
+  "每次请求把计数往下减一",
+  "every request should knock a number down by one",
+]
+
+[[case]]
+command = "DECRBY"
+phrases = [
+  "每次减的量不一定是一",
+  "the amount to subtract varies each time",
+]
+
+[[case]]
+command = "GET"
+phrases = [
+  "我要把刚才写的那个值读回来",
+  "I need to read back what I stored",
+]
+
+[[case]]
+command = "GETDEL"
+phrases = [
+  "读到之后不希望别人再读到",
+  "read it and make sure nobody else can",
+]
+
+[[case]]
+command = "GETEX"
+phrases = [
+  "读的同时把它的寿命重置",
+  "read it and reset how long it survives",
+]
+
+[[case]]
+command = "GETRANGE"
+phrases = [
+  "只想要值的中间一小段",
+  "I only want a slice from the middle of the value",
+]
+
+[[case]]
+command = "GETSET"
+phrases = [
+  "替换掉但不能丢掉原来的值",
+  "replace it without losing what was there",
+]
+
+[[case]]
+command = "INCR"
+phrases = [
+  "每次请求把计数往上加一",
+  "every request should bump a number by one",
+]
+
+[[case]]
+command = "INCRBY"
+phrases = [
+  "每次加的量不一定是一",
+  "the amount to add varies each time",
+]
+
+[[case]]
+command = "INCRBYFLOAT"
+phrases = [
+  "金额要带小数地累加",
+  "the amount has decimals and needs accumulating",
+]
+
+[[case]]
+command = "LCS"
+phrases = [
+  "想知道两段内容有多像",
+  "I want to know how alike two pieces of text are",
+]
+
+[[case]]
+command = "MGET"
+phrases = [
+  "有一百个 key 要读，不想发一百次",
+  "I have many keys to read and do not want many round trips",
+]
+
+[[case]]
+command = "MSET"
+phrases = [
+  "有一百个 key 要写，不想发一百次",
+  "I have many keys to write and do not want many round trips",
+]
+
+[[case]]
+command = "MSETNX"
+phrases = [
+  "这一批要么全写要么都别写",
+  "either all of them get written or none do",
+]
+
+[[case]]
+command = "PSETEX"
+phrases = [
+  "和上面一样但超时是毫秒级",
+  "same thing but the timeout is in milliseconds",
+]
+
+[[case]]
+command = "SET"
+phrases = [
+  "我想往 redis 里放一个普通的值",
+  "I need to store a plain value somewhere",
+]
+
+[[case]]
+command = "SETEX"
+phrases = [
+  "写进去之后过一阵子自己消失",
+  "store it and have it disappear later on its own",
+]
+
+[[case]]
+command = "SETNX"
+phrases = [
+  "想实现只有第一个请求能写进去",
+  "I want the first writer to win and the rest to fail",
+]
+
+[[case]]
+command = "SETRANGE"
+phrases = [
+  "想改值的中间一小段",
+  "I want to change a slice in the middle of the value",
+]
+
+[[case]]
+command = "STRLEN"
+phrases = [
+  "想知道这个值有多大再决定读不读",
+  "I want to know the size before deciding to read it",
+]
+
+[[case]]
+command = "SUBSTR"
+phrases = [
+  "老代码里用的那个取子串的",
+  "the old substring one that legacy code uses",
+]

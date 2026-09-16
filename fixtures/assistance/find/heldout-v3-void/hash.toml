@@ -1,0 +1,206 @@
+# V-F08 held-out v3 — VOID — hash group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "把记录里那一项去掉",
+  "get that item out of the record",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "先确认记录里有没有那一项",
+  "first confirm whether the record has that item",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "让记录里的一项几秒后自己没",
+  "make one item of a record disappear after some seconds",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "让那一项在指定时间点没掉",
+  "make that item disappear at a chosen moment",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "想知道那一项哪一刻会没",
+  "I want to know at what moment that item goes",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "一条记录里只读其中一项",
+  "I only want to read one item inside a record",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "把一条记录整个拿下来",
+  "I want the whole record in one go",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "读那一项然后让它消失",
+  "read that item and then make it gone",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "读那一项顺便重置它的寿命",
+  "read that item and reset how long it lives",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "记录里那个数字要往上加",
+  "the number inside the record needs to go up",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "记录里那个带小数的要往上加",
+  "the decimal inside the record needs to go up",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "只要项的名字不要内容",
+  "just the item names, not the contents",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "一条记录里有多少项",
+  "how many items does one record hold",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "一条记录里读其中几项",
+  "I want a few items out of one record",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "老代码里一次改好几项的那个",
+  "the legacy one that changes several items at once",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "不想让那一项再自己消失",
+  "I no longer want that item to disappear by itself",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "同样但精确到毫秒",
+  "the same but accurate to the millisecond",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "同样但时间点精确到毫秒",
+  "the same but the moment is millisecond-accurate",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "想知道那一刻的毫秒数",
+  "I want that moment down to the millisecond",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "那一项还能活几毫秒",
+  "how many milliseconds does that item have left",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "从记录里随便取一项来看看",
+  "show me any one item from the record",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "记录太大不敢一次全读",
+  "the record is too big to read in one go",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "一条记录里只改其中一项",
+  "I only want to change one item inside a record",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "改那一项并让它自己过期",
+  "change that item and let it expire by itself",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "只在那一项还空着时才填",
+  "fill that item in only while it is still empty",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "记录里那一项的内容多大",
+  "how big is the content of that one item",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "那一项还能活几秒",
+  "how many seconds does that item have left",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "只要内容不要项的名字",
+  "just the contents, not the item names",
+]

@@ -1,0 +1,108 @@
+# V-F08 held-out v3 — VOID — pubsub group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "想按通配符一次收一批主题",
+  "receive a whole family of topics by wildcard",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "想把一条消息推给在听的人",
+  "push one message to whoever is listening",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "想看看推送这块现在怎么样",
+  "see how the messaging side is doing",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "想知道现在哪些主题有人在听",
+  "which topics have someone listening",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "想知道通配符那种订阅有几个",
+  "how many of the wildcard kind exist",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "想知道某个主题几个人在听",
+  "how many are listening on one topic",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "想知道本分片哪些主题有人听",
+  "which shard topics have someone listening",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "想知道本分片某主题几个人听",
+  "how many are listening on one shard topic",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "不想再收那一批了",
+  "stop receiving that whole family",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "想只推给本分片在听的人",
+  "push only to listeners on this shard",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "集群里只想收本分片的主题",
+  "in a cluster, only the shard's own topics",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "想开始收某个主题的推送",
+  "start receiving pushes on a topic",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "不想再收本分片的了",
+  "stop receiving the shard's own topics",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "不想再收那个主题了",
+  "stop receiving on that topic",
+]

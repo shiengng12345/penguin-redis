@@ -1,0 +1,80 @@
+# V-F08 held-out v2 — VOID — geo group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "加地理坐标",
+  "add geo coordinates",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "地理距离",
+  "geo distance",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "地理编码串",
+  "geohash string",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "取地理坐标",
+  "read geo coordinates",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "旧的地理半径搜",
+  "legacy geo radius search",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "旧的按成员地理搜",
+  "legacy geo search around member",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "旧的按成员地理只读搜",
+  "legacy geo search around member read only",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "旧的地理半径只读搜",
+  "legacy geo radius read only",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "地理范围搜",
+  "geo range search",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "地理范围搜并存",
+  "geo range search and store",
+]

@@ -1,0 +1,206 @@
+# V-F08 held-out v2 — VOID — hash group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "删 hash 字段",
+  "delete hash field",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "hash 字段存在吗",
+  "hash field present",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "hash 字段设秒级过期",
+  "hash field expire seconds",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "hash 字段绝对过期",
+  "hash field expire at",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "hash 字段过期时刻",
+  "hash field expiry instant",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "读 hash 字段",
+  "read hash field",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "读整个 hash",
+  "read whole hash",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "读 hash 字段并删",
+  "read hash field then delete",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "读 hash 字段并续期",
+  "read hash field and renew",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "hash 字段自增",
+  "hash field plus n",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "hash 浮点自增",
+  "hash field float plus",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "hash 字段名列表",
+  "hash field names",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "hash 字段数",
+  "hash field count",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "批量读 hash 字段",
+  "bulk read hash fields",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "旧的批量写 hash",
+  "legacy bulk hash write",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "hash 字段去掉过期",
+  "hash field stop expiring",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "hash 字段设毫秒过期",
+  "hash field expire ms",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "hash 字段毫秒绝对过期",
+  "hash field expire at ms",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "hash 字段毫秒过期时刻",
+  "hash field expiry instant ms",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "hash 字段剩余毫秒",
+  "hash field ms left",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "随机 hash 字段",
+  "random hash field",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "游标扫 hash",
+  "cursor scan hash",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "写 hash 字段",
+  "write hash field",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "写 hash 字段带 ttl",
+  "hash field write with ttl",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "hash 字段占坑",
+  "hash field claim",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "hash 字段值长度",
+  "hash field value size",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "hash 字段剩余秒",
+  "hash field seconds left",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "hash 值列表",
+  "hash values",
+]

@@ -1,0 +1,241 @@
+# V-F08 held-out v3 — VOID — generic group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "COPY"
+phrases = [
+  "想在另一个名字下留一份一样的",
+  "I want an identical one under another name",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "这个东西不要了，立刻清掉",
+  "I do not need this any more, clear it now",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "想把它打包成一串二进制",
+  "I want it packaged into one binary blob",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "先确认一下有没有这个东西",
+  "first confirm whether the thing is there",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "希望它过一段时间自己消失",
+  "I want it to disappear on its own after a while",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "希望它到某一刻就消失",
+  "I want it gone at a particular moment",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "想知道它会在哪一刻消失",
+  "at which moment will it disappear",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "想一次列出所有符合的名字，知道有风险",
+  "list every matching name in one go, risks and all",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "想把它搬到另一台实例上",
+  "I want it moved onto a different instance",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "想把它挪到另一个编号的库",
+  "I want it in a differently numbered database",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "想看看它内部是怎么回事",
+  "I want to see what is going on inside it",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "想知道它内部是用什么结构存的",
+  "which internal structure is holding it",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "想知道它被用得频不频繁",
+  "how often it gets used",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "想知道它多久没被动过",
+  "how long since anything touched it",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "想知道有几个地方指着这个值",
+  "how many things point at this value",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "不想让它再自己消失了",
+  "I no longer want it disappearing by itself",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "同样但时间要精确到毫秒",
+  "the same but the delay is millisecond-accurate",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "同样但那一刻精确到毫秒",
+  "the same but that moment is millisecond-accurate",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "想知道那一刻的毫秒数",
+  "that moment down to the millisecond",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "想知道它还能存在多少毫秒",
+  "how many milliseconds can it still exist",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随便给我一个名字看看",
+  "just give me any name at all",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "想给它换个名字",
+  "I want to give it a different name",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "换名字但不能盖掉已有的",
+  "change the name but do not clobber an existing one",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "想把那串二进制装回去",
+  "I want that binary blob put back",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "想遍历所有名字但不能卡住服务",
+  "walk every name without stalling the service",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "想把里面的东西按顺序排好",
+  "I want the contents put in order",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "排好但保证一个字节都不写",
+  "order it while writing nothing at all",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "想让它显得刚刚被用过",
+  "make it look as though it was just used",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "想知道它还能存在多少秒",
+  "how many seconds can it still exist",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "拿到一个名字但不知道里面是什么",
+  "I have a name but not what is inside it",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "东西很大，怕清的时候卡住",
+  "it is large and I am worried clearing it will stall things",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "想确认写的东西已经到从库了",
+  "confirm what I wrote reached the replicas",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "想确认写的东西已经落到文件了",
+  "confirm what I wrote reached the file",
+]

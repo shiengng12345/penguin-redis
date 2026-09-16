@@ -1,0 +1,255 @@
+# V-F08 held-out v3 — VOID — sorted-set group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "守着好几个榜等",
+  "keep an eye on several boards and wait",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "没有就等，有了拿最大的",
+  "wait, then take whichever has the biggest number",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "没有就等，有了拿最小的",
+  "wait, then take whichever has the smallest number",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "把一个人和他的成绩一起放进榜",
+  "put a person and their number onto a board",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "榜上一共有多少人",
+  "how many people are on the board altogether",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "数字落在某个范围里的有几个",
+  "how many fall inside a numeric window",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "只在第一个榜上有的那些人",
+  "the people only the first board has",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "算出来之后留一份",
+  "work that out and keep a copy",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给某个人的数字往上加",
+  "push one person's number up",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "每个榜上都有的那些人",
+  "the people every board has",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "只关心几个榜重合多少人",
+  "I only care how many the boards share",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "算出共同的之后留一份",
+  "work out the common ones and keep a copy",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "名字落在某个范围里的有几个",
+  "how many fall inside an alphabetical window",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "同时看好几个榜有没有",
+  "check several boards for anything",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "一次知道好几个人的数字",
+  "several people's numbers at once",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "把数字最大的那个拿走",
+  "take away whichever has the biggest number",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "把数字最小的那个拿走",
+  "take away whichever has the smallest number",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "从榜上随便挑一个",
+  "pick anyone off the board at random",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "按顺序取出榜上的一段",
+  "take an ordered slice of the board",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "老代码里按名字范围取的",
+  "the legacy way of slicing alphabetically",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "老代码里按数字范围取的",
+  "the legacy way of slicing by number",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "取出一段之后要留一份",
+  "take a slice and keep a copy of it",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "某个人按顺序排在第几",
+  "where does a person sit in the order",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "把一个人从榜上拿掉",
+  "take a person off the board",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "把名字在某个范围的清掉",
+  "clear out everyone in an alphabetical window",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "把排在后面的那些清掉",
+  "clear out the ones sitting near the bottom",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "把数字低于某个值的清掉",
+  "clear out everyone under a certain number",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "老代码里从大往小取那一段",
+  "the legacy way of slicing from the top down",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "老代码里按名字范围倒着取",
+  "the legacy alphabetical slice, downwards",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "老代码里按数字范围倒着取",
+  "the legacy way of slicing by number, downwards",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "某个人从大往小排第几",
+  "where does a person sit counting downwards",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "榜太长不敢一次全列",
+  "the board is too long to list in one go",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "只想知道某个人的那个数字",
+  "I only want that one person's number",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "几个榜上的人合起来看",
+  "see everyone from several boards at once",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "合起来之后留一份",
+  "combine them and keep a copy",
+]

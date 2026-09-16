@@ -1168,6 +1168,7 @@ dependencies = [
 name = "pr-intelligence"
 version = "0.0.0"
 dependencies = [
+ "blake3",
  "bytes",
  "pr-catalog",
  "pr-core",
@@ -1177,6 +1178,7 @@ dependencies = [
  "pr-transport",
  "proptest",
  "thiserror 2.0.20",
+ "toml",
  "xtask",
 ]
 

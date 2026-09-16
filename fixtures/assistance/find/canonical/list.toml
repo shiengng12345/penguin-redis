@@ -1,0 +1,183 @@
+# V-F08 canonical phrasings — list group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "阻塞地在两个列表之间搬元素",
+  "block until an element can be moved between lists",
+  "等到有元素再搬到另一个队列",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "阻塞地从多个列表里弹出",
+  "block and pop from whichever of several lists has data",
+  "同时盯着几个队列，谁有就从谁那里取",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "阻塞等待从列表左边弹出",
+  "block until something can be popped from the head",
+  "队列为空就等着，来了就从头部取",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "阻塞等待从列表右边弹出",
+  "block until something can be popped from the tail",
+  "空就等，有了就从尾部取",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "阻塞版的列表之间转移",
+  "blocking pop from one list and push onto another",
+  "等着把元素从一个队列挪到另一个",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "按下标取列表中的一个元素",
+  "read the element at a given index in a list",
+  "列表里第 N 个是什么",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "在列表某个元素前后插入",
+  "insert before or after an existing element",
+  "插到某个元素的前面或后面",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "数一数列表有多少元素",
+  "how many elements a list holds",
+  "这个 list 的长度",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "把元素从一个列表移到另一个",
+  "move an element from one list to another atomically",
+  "原子地在两个队列之间搬一个元素",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "从多个列表中弹出元素",
+  "pop from the first of several lists that has data",
+  "一次看几个 list，哪个有就取哪个",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "从列表左边弹出元素",
+  "pop an element off the head of a list",
+  "取走列表最前面的一个",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "在列表里找某个元素的位置",
+  "find the index of a value in a list",
+  "这个值在列表的第几位",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "往列表左边插入元素",
+  "push an element onto the head of a list",
+  "从头部加进列表",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "列表存在时才往左边插",
+  "push onto the head only if the list exists",
+  "只有 list 已经存在才从头部加",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "取列表某个区间的元素",
+  "read a range of elements from a list",
+  "列表从第几个到第几个",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "从列表里删掉指定的元素",
+  "remove occurrences of a value from a list",
+  "把列表中等于某个值的项去掉",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "按下标覆盖列表中的一个元素",
+  "overwrite the element at a given index",
+  "把列表第 N 个换掉",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "把列表裁剪成只保留一段",
+  "trim a list down to a range",
+  "只留下列表的某一段其余丢掉",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "从列表右边弹出元素",
+  "pop an element off the tail of a list",
+  "取走列表最后面的一个",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "从一个列表尾部取出放到另一个头部",
+  "pop from one list and push onto another",
+  "做可靠队列的转移",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "往列表右边追加元素",
+  "push an element onto the tail of a list",
+  "从尾部加进列表",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "列表存在时才往右边加",
+  "push onto the tail only if the list exists",
+  "list 存在才追加到尾部",
+]

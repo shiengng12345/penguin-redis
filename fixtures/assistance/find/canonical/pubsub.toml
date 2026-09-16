@@ -1,0 +1,120 @@
+# V-F08 canonical phrasings — pubsub group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "按模式订阅多个频道",
+  "subscribe to channels matching a pattern",
+  "用通配符一次订阅一批",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "往频道发一条消息",
+  "publish a message to a channel",
+  "广播给所有订阅者",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "查看发布订阅的状态",
+  "inspect the pub/sub subsystem",
+  "看看订阅情况",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "列出当前有人订阅的频道",
+  "list channels with at least one subscriber",
+  "现在哪些频道是活的",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "查有多少个模式订阅",
+  "how many pattern subscriptions exist",
+  "通配符订阅的数量",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "查某个频道有多少订阅者",
+  "how many clients are subscribed to a channel",
+  "这个频道几个人在听",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "列出活跃的分片频道",
+  "list active shard channels",
+  "集群里哪些分片频道有人订阅",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "查分片频道的订阅人数",
+  "subscriber count for a shard channel",
+  "分片频道几个人在听",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "取消按模式的订阅",
+  "stop listening to a channel pattern",
+  "退掉通配符订阅",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "往分片频道发消息",
+  "publish a message to a shard channel",
+  "集群分片内广播",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "订阅分片频道",
+  "subscribe to a shard channel in a cluster",
+  "集群里按分片订阅",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "订阅一个频道",
+  "subscribe to a channel",
+  "开始接收某个频道的消息",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "取消分片频道订阅",
+  "stop listening to a shard channel",
+  "退掉分片订阅",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "取消订阅频道",
+  "stop listening to a channel",
+  "不再接收这个频道",
+  "unsubscribe from a channel",
+]

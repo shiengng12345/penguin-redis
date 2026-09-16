@@ -1,0 +1,129 @@
+# V-F08 held-out v1 — VOID — set group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "SADD"
+phrases = [
+  "把用户加进白名单",
+  "add someone to a group",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "白名单多少人",
+  "how big is the group",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "A 组有而 B 组没有的人",
+  "who is in the first group only",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "把只在 A 组的人算出来存好",
+  "work out the leftovers and keep them",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "两个群都在的人",
+  "who is in both groups",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "两个群重合多少人",
+  "how much do these groups overlap",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "两边都在的人存成新名单",
+  "keep the overlap as its own group",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "这个用户在不在白名单",
+  "is this person in the group",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "白名单里都有谁",
+  "who is in this group",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "这一批用户哪些在白名单",
+  "which of these people are in the group",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "把用户从灰名单转到白名单",
+  "shift someone from one group to another",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "抽奖，抽走一个",
+  "draw a winner and take them out",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "随机推荐一个但别拿走",
+  "show a random one, leave it there",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "把用户从白名单拿掉",
+  "take someone out of a group",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "名单太大，分页看",
+  "walk a huge group without loading it",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "两个群合起来有谁",
+  "everyone across both groups",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "合并成一个新名单",
+  "merge the groups into a new one",
+]

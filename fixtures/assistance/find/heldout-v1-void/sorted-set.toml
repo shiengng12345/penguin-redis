@@ -1,0 +1,255 @@
+# V-F08 held-out v1 — VOID — sorted-set group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "BZMPOP"
+phrases = [
+  "守着几个榜等",
+  "wait across several boards",
+]
+
+[[case]]
+command = "BZPOPMAX"
+phrases = [
+  "等着取第一名",
+  "wait for a top entry to appear",
+]
+
+[[case]]
+command = "BZPOPMIN"
+phrases = [
+  "等着，一有垫底的就取",
+  "wait for a lowest-scoring entry to appear",
+]
+
+[[case]]
+command = "ZADD"
+phrases = [
+  "给玩家记一个成绩",
+  "record a player's score",
+]
+
+[[case]]
+command = "ZCARD"
+phrases = [
+  "榜上一共多少人",
+  "how many players are on the board",
+]
+
+[[case]]
+command = "ZCOUNT"
+phrases = [
+  "60 到 80 分之间有多少人",
+  "how many score between these two numbers",
+]
+
+[[case]]
+command = "ZDIFF"
+phrases = [
+  "这个榜有而那个榜没有的人",
+  "players on the first board only",
+]
+
+[[case]]
+command = "ZDIFFSTORE"
+phrases = [
+  "算出差异并存一份",
+  "keep the difference as its own board",
+]
+
+[[case]]
+command = "ZINCRBY"
+phrases = [
+  "给他再加 50 分",
+  "bump a player's score",
+]
+
+[[case]]
+command = "ZINTER"
+phrases = [
+  "两个榜都上了的人",
+  "players on both boards",
+]
+
+[[case]]
+command = "ZINTERCARD"
+phrases = [
+  "两个榜重合多少人",
+  "how much do the boards overlap",
+]
+
+[[case]]
+command = "ZINTERSTORE"
+phrases = [
+  "两榜共有的存成新榜",
+  "keep the overlap as a new board",
+]
+
+[[case]]
+command = "ZLEXCOUNT"
+phrases = [
+  "名字在 a 到 m 之间有几个",
+  "how many entries fall between two names",
+]
+
+[[case]]
+command = "ZMPOP"
+phrases = [
+  "几个榜里谁有就取谁",
+  "take from whichever board has entries",
+]
+
+[[case]]
+command = "ZMSCORE"
+phrases = [
+  "这几个人的积分一起查",
+  "scores for a handful of players",
+]
+
+[[case]]
+command = "ZPOPMAX"
+phrases = [
+  "把冠军取出来",
+  "take the top one off",
+]
+
+[[case]]
+command = "ZPOPMIN"
+phrases = [
+  "把垫底的那个请出去",
+  "drop the worst one off",
+]
+
+[[case]]
+command = "ZRANDMEMBER"
+phrases = [
+  "随机挑一个玩家",
+  "sample a player at random",
+]
+
+[[case]]
+command = "ZRANGE"
+phrases = [
+  "前十名是谁",
+  "show me the top ten",
+]
+
+[[case]]
+command = "ZRANGEBYLEX"
+phrases = [
+  "按名字翻到 m 开头那一段",
+  "entries alphabetically between two names",
+]
+
+[[case]]
+command = "ZRANGEBYSCORE"
+phrases = [
+  "及格的人有哪些",
+  "which players are above a score threshold",
+]
+
+[[case]]
+command = "ZRANGESTORE"
+phrases = [
+  "把前一百名另存一份",
+  "snapshot the top hundred somewhere else",
+]
+
+[[case]]
+command = "ZRANK"
+phrases = [
+  "我排第几名",
+  "what position am I in",
+]
+
+[[case]]
+command = "ZREM"
+phrases = [
+  "把这个玩家从榜上撤掉",
+  "take a player off the board",
+]
+
+[[case]]
+command = "ZREMRANGEBYLEX"
+phrases = [
+  "按名字清掉一段",
+  "purge an alphabetical slice",
+]
+
+[[case]]
+command = "ZREMRANGEBYRANK"
+phrases = [
+  "只留前一百，后面的清掉",
+  "trim the board to the top hundred",
+]
+
+[[case]]
+command = "ZREMRANGEBYSCORE"
+phrases = [
+  "把不及格的都清掉",
+  "purge everyone below a score",
+]
+
+[[case]]
+command = "ZREVRANGE"
+phrases = [
+  "从第一名往下列",
+  "list them starting from the best",
+]
+
+[[case]]
+command = "ZREVRANGEBYLEX"
+phrases = [
+  "按名字倒着翻一段",
+  "alphabetical slice, backwards",
+]
+
+[[case]]
+command = "ZREVRANGEBYSCORE"
+phrases = [
+  "高分段的人从高往低列",
+  "top scorers, best first",
+]
+
+[[case]]
+command = "ZREVRANK"
+phrases = [
+  "从冠军往下我是第几",
+  "my position counting from the top",
+]
+
+[[case]]
+command = "ZSCAN"
+phrases = [
+  "榜太长分页看",
+  "walk a huge leaderboard page by page",
+]
+
+[[case]]
+command = "ZSCORE"
+phrases = [
+  "他现在多少积分",
+  "what score does this player have",
+]
+
+[[case]]
+command = "ZUNION"
+phrases = [
+  "两个榜合起来",
+  "everyone across both boards",
+]
+
+[[case]]
+command = "ZUNIONSTORE"
+phrases = [
+  "合并两个榜存起来",
+  "merge the boards and keep the result",
+]

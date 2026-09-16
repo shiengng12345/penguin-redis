@@ -1,0 +1,31 @@
+# V-F08 canonical phrasings — hyperloglog group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "PFADD"
+phrases = [
+  "往基数估计器里加元素",
+  "add elements to a HyperLogLog",
+  "用很小的空间记下见过哪些值",
+]
+
+[[case]]
+command = "PFCOUNT"
+phrases = [
+  "估算有多少个不重复的值",
+  "estimate the number of distinct elements",
+  "近似去重计数",
+]
+
+[[case]]
+command = "PFMERGE"
+phrases = [
+  "合并多个基数估计器",
+  "merge several HyperLogLogs into one",
+  "把几个去重计数合起来",
+]

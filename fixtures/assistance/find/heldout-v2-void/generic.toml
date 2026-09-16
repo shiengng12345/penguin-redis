@@ -1,0 +1,241 @@
+# V-F08 held-out v2 — VOID — generic group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "COPY"
+phrases = [
+  "键复制",
+  "copy key",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "删键",
+  "delete key",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "键序列化导出",
+  "serialise key",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "键存在吗",
+  "key present",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "键设秒级过期",
+  "key expire seconds",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "键绝对过期",
+  "key expire at",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "键过期时刻",
+  "key expiry instant",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "通配符列键",
+  "glob list keys",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "键跨实例迁移",
+  "migrate key to another instance",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "键换库",
+  "key to another db",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "键内省",
+  "key introspection",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "键内部编码",
+  "key internal encoding",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "键访问频率",
+  "key access frequency",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "键空闲时长",
+  "key idle time",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "键引用计数",
+  "key reference count",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "键去掉过期",
+  "key stop expiring",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "键设毫秒过期",
+  "key expire ms",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "键毫秒绝对过期",
+  "key expire at ms",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "键毫秒过期时刻",
+  "key expiry instant ms",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "键剩余毫秒",
+  "key ms left",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随机键",
+  "random key",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "键改名",
+  "rename key",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "键改名不覆盖",
+  "rename key if free",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "键反序列化导入",
+  "deserialise key",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "游标扫键",
+  "cursor scan keys",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "排序集合",
+  "sort a collection",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "只读排序",
+  "read-only sort",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "更新访问时间",
+  "bump access time",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "键剩余秒",
+  "key seconds left",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "键类型",
+  "key type",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "异步删键",
+  "async delete key",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "等副本确认",
+  "wait for replica acknowledgement",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "等 aof 落盘确认",
+  "wait for aof persistence",
+]

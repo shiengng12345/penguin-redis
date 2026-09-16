@@ -1,0 +1,231 @@
+# V-F08 canonical phrasings — hash group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "HDEL"
+phrases = [
+  "删掉哈希里的某个字段",
+  "delete a field from a hash",
+  "把 hash 的某个字段去掉",
+]
+
+[[case]]
+command = "HEXISTS"
+phrases = [
+  "判断哈希里有没有这个字段",
+  "check whether a hash has a given field",
+  "hash 里存不存在某个字段",
+]
+
+[[case]]
+command = "HEXPIRE"
+phrases = [
+  "给哈希的某个字段单独设过期",
+  "expire one field of a hash after some seconds",
+  "让 hash 里的某个字段几秒后消失",
+]
+
+[[case]]
+command = "HEXPIREAT"
+phrases = [
+  "让哈希字段在某个时间点过期",
+  "expire a hash field at a unix timestamp",
+  "指定绝对时间让字段失效",
+]
+
+[[case]]
+command = "HEXPIRETIME"
+phrases = [
+  "查哈希字段什么时候过期",
+  "when a hash field will expire, as a timestamp",
+  "看字段的过期时间点",
+]
+
+[[case]]
+command = "HGET"
+phrases = [
+  "读取哈希里的一个字段",
+  "read one field from a hash",
+  "取 hash 的某个字段值",
+]
+
+[[case]]
+command = "HGETALL"
+phrases = [
+  "把哈希的所有字段和值都取出来",
+  "read every field and value in a hash",
+  "整个 hash 全部读出来",
+]
+
+[[case]]
+command = "HGETDEL"
+phrases = [
+  "读出哈希字段同时删掉它",
+  "read a hash field and remove it atomically",
+  "取完这个字段就把它删了",
+]
+
+[[case]]
+command = "HGETEX"
+phrases = [
+  "读哈希字段并顺便改它的过期",
+  "read a hash field and set its expiry",
+  "取字段的同时给它续期",
+]
+
+[[case]]
+command = "HINCRBY"
+phrases = [
+  "给哈希字段里的数字加上一个量",
+  "increment a number stored in a hash field",
+  "hash 里的计数器加一个值",
+]
+
+[[case]]
+command = "HINCRBYFLOAT"
+phrases = [
+  "给哈希字段的小数加上一个量",
+  "increment a float stored in a hash field",
+  "hash 里的浮点余额增加",
+]
+
+[[case]]
+command = "HKEYS"
+phrases = [
+  "列出哈希的所有字段名",
+  "list every field name in a hash",
+  "只要 hash 的字段名不要值",
+]
+
+[[case]]
+command = "HLEN"
+phrases = [
+  "数一数哈希有几个字段",
+  "how many fields a hash has",
+  "这个 hash 一共多少个字段",
+]
+
+[[case]]
+command = "HMGET"
+phrases = [
+  "一次读哈希的多个字段",
+  "read several hash fields in one request",
+  "批量取 hash 里的几个字段",
+]
+
+[[case]]
+command = "HMSET"
+phrases = [
+  "一次给哈希写多个字段",
+  "set several hash fields at once",
+  "批量写 hash 的字段",
+]
+
+[[case]]
+command = "HPERSIST"
+phrases = [
+  "去掉哈希字段的过期时间",
+  "remove the expiry from a hash field",
+  "让 hash 字段不再自动过期",
+]
+
+[[case]]
+command = "HPEXPIRE"
+phrases = [
+  "按毫秒给哈希字段设过期",
+  "expire a hash field after some milliseconds",
+  "hash 字段的毫秒级过期",
+]
+
+[[case]]
+command = "HPEXPIREAT"
+phrases = [
+  "按毫秒时间戳让哈希字段过期",
+  "expire a hash field at a millisecond timestamp",
+  "用毫秒时间戳设定字段失效",
+]
+
+[[case]]
+command = "HPEXPIRETIME"
+phrases = [
+  "以毫秒查哈希字段的过期时间点",
+  "hash field expiry as a millisecond timestamp",
+  "字段过期时刻的毫秒值",
+]
+
+[[case]]
+command = "HPTTL"
+phrases = [
+  "以毫秒查哈希字段剩余时间",
+  "remaining milliseconds on a hash field",
+  "字段还有多少毫秒过期",
+]
+
+[[case]]
+command = "HRANDFIELD"
+phrases = [
+  "从哈希里随机取字段",
+  "pick a random field from a hash",
+  "随便抽一个 hash 字段",
+]
+
+[[case]]
+command = "HSCAN"
+phrases = [
+  "分批遍历哈希的字段",
+  "iterate over a hash a page at a time",
+  "游标方式扫描 hash",
+]
+
+[[case]]
+command = "HSET"
+phrases = [
+  "给哈希设置一个字段的值",
+  "set a field inside a hash",
+  "往 hash 里写一个字段",
+]
+
+[[case]]
+command = "HSETEX"
+phrases = [
+  "写哈希字段并给它一个过期时间",
+  "set a hash field with an expiry",
+  "hash 字段写入时同时设定过期",
+]
+
+[[case]]
+command = "HSETNX"
+phrases = [
+  "哈希字段不存在时才写入",
+  "set a hash field only if it is not there yet",
+  "hash 里没有这个字段才设置",
+]
+
+[[case]]
+command = "HSTRLEN"
+phrases = [
+  "哈希某个字段的值有多长",
+  "length of the value stored in a hash field",
+  "hash 字段内容的字节数",
+]
+
+[[case]]
+command = "HTTL"
+phrases = [
+  "查哈希字段还剩多久过期",
+  "remaining seconds before a hash field expires",
+  "hash 字段的剩余存活时间",
+]
+
+[[case]]
+command = "HVALS"
+phrases = [
+  "列出哈希的所有字段值",
+  "list every value in a hash",
+  "只要 hash 的值不要字段名",
+]

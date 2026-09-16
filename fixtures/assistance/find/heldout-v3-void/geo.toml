@@ -1,0 +1,80 @@
+# V-F08 held-out v3 — VOID — geo group.
+#
+# This corpus measured 42.9% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "想把一个地方的经纬度记下来",
+  "note down where a place is",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "想知道两个地方隔多远",
+  "how far apart are two places",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "想把地方变成一串短代码",
+  "turn a place into a short code",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "想知道某个地方在哪",
+  "where is a particular place",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "老代码里按半径找的那个",
+  "the legacy one that searches by radius",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "老代码里以某个地方为中心找的",
+  "the legacy one centred on an existing place",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "老代码里以某地为中心找且不写的",
+  "the legacy centred one that writes nothing",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "老代码里按半径找且不写的",
+  "the legacy radius one that writes nothing",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "想找出一定范围内的地方",
+  "find the places inside a given area",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "找出来之后要留一份",
+  "find them and keep a copy",
+]

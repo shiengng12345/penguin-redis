@@ -1,0 +1,108 @@
+# V-F08 held-out v1 — VOID — pubsub group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "所有 news.* 我都要收",
+  "receive from every topic matching a wildcard",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "给所有在线的人推一条",
+  "push a message out to listeners",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "看看现在推送系统什么情况",
+  "what is going on with the messaging",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "现在有哪些频道有人在收",
+  "which topics have listeners right now",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "通配符订阅有多少",
+  "how many wildcard subscriptions are live",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "这个频道几个人在收",
+  "how many listeners on this topic",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "本分片有哪些频道在用",
+  "which shard-scoped topics are live",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "分片频道几个人在收",
+  "how many listeners on a shard-scoped topic",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "通配符那批不要了",
+  "stop receiving from a wildcard set of topics",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "只推给本分片",
+  "push a message within one shard",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "集群里只收本分片的",
+  "receive from a topic scoped to one shard",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "我要收这个频道的推送",
+  "start receiving pushes from a topic",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "本分片的也不收了",
+  "stop receiving from a shard-scoped topic",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "不想再收这个频道了",
+  "stop receiving from a topic",
+]

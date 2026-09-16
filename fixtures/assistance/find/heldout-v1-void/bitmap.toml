@@ -1,0 +1,59 @@
+# V-F08 held-out v1 — VOID — bitmap group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "BITCOUNT"
+phrases = [
+  "这个月签到多少天",
+  "how many flags are on",
+]
+
+[[case]]
+command = "BITFIELD"
+phrases = [
+  "把几个小整数塞一个字符串里",
+  "pack small numbers into one value",
+]
+
+[[case]]
+command = "BITFIELD_RO"
+phrases = [
+  "只读地拿出塞好的整数",
+  "read packed numbers without changing them",
+]
+
+[[case]]
+command = "BITOP"
+phrases = [
+  "两个月的签到取交集",
+  "combine two flag arrays",
+]
+
+[[case]]
+command = "BITPOS"
+phrases = [
+  "第一次签到是哪天",
+  "where is the first flag that is on",
+]
+
+[[case]]
+command = "GETBIT"
+phrases = [
+  "看看今天签到没",
+  "check one flag in a compact bit array",
+]
+
+[[case]]
+command = "SETBIT"
+phrases = [
+  "用户签到打个标记",
+  "flip one flag in a compact bit array",
+]

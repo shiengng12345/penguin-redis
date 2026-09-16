@@ -1,0 +1,164 @@
+# V-F08 held-out v1 — VOID — list group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "等着把任务挪到处理中",
+  "wait, then move a job to the working list",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "同时守着几个队列等活干",
+  "wait across a few queues for whichever fires first",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "没任务就挂着等，有了立刻做",
+  "worker waits until a job shows up",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "从后面等任务",
+  "wait for a job at the back of the queue",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "阻塞版的可靠队列",
+  "blocking reliable queue handoff",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "队列里第三个是什么",
+  "what is sitting at position three",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "插到某条消息前面",
+  "slot one in before an existing entry",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "队列积压了多少",
+  "how deep is the backlog",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "从待办挪到处理中",
+  "move a job from pending to in-progress",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "看几个队列谁有活",
+  "take from whichever queue has something",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "取一个任务来做",
+  "take the next job off the front",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "这条消息排在第几",
+  "where in the queue is this value",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "新消息放到队列最前面",
+  "put a job at the front of the queue",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "队列在才往前面塞",
+  "only enqueue at the front if the queue is there",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "看最近十条消息",
+  "show me the latest few entries",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "把队列里所有这个任务去掉",
+  "purge a particular value out of the queue",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "把队列里某一项改掉",
+  "overwrite the entry sitting at a position",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "只保留最近一百条",
+  "keep only the most recent entries",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "从后面拿一个",
+  "take a job off the back",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "做个不丢任务的队列",
+  "reliable queue handoff",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "新任务排到队尾",
+  "put a job at the back of the queue",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "队列在才排到后面",
+  "only enqueue at the back if the queue is there",
+]

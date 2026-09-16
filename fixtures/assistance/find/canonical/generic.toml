@@ -1,0 +1,274 @@
+# V-F08 canonical phrasings — generic group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "COPY"
+phrases = [
+  "复制一个 key",
+  "copy a key to another name",
+  "把这个键整个拷一份",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "删掉一个 key",
+  "delete a key",
+  "把这个键从库里去掉",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "把 key 序列化导出",
+  "serialise a key's value into a blob",
+  "导出这个键的二进制表示",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "判断 key 存不存在",
+  "check whether a key exists",
+  "这个键在不在",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "给 key 设置多少秒后过期",
+  "make a key expire after some seconds",
+  "让这个键几秒后自动删除",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "让 key 在某个时间点过期",
+  "expire a key at a unix timestamp",
+  "指定绝对时间让键失效",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "查 key 的过期时间点",
+  "the unix timestamp at which a key expires",
+  "这个键什么时候到期",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "按模式列出所有匹配的 key",
+  "list every key matching a pattern",
+  "找出所有符合通配符的键",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "把 key 迁移到另一台服务器",
+  "move a key to another Redis instance",
+  "跨实例搬运键",
+  "migrate a key to another node",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "把 key 移到另一个数据库",
+  "move a key to a different database",
+  "换到别的 db 去",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "查看一个 key 的内部信息",
+  "inspect internal details of a key",
+  "看键的底层情况",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "查 key 用的是哪种内部编码",
+  "which internal encoding a key uses",
+  "这个值底层是 ziplist 还是别的",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "查 key 的访问频率计数",
+  "access frequency counter of a key",
+  "LFU 淘汰用的频率值",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "查 key 多久没被访问了",
+  "how long a key has been idle",
+  "这个键闲置了多久",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "查 key 的引用计数",
+  "reference count of a key's value",
+  "这个值被引用了几次",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "去掉 key 的过期时间",
+  "remove the expiry from a key",
+  "让这个键不再自动过期",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "按毫秒给 key 设过期",
+  "make a key expire after some milliseconds",
+  "毫秒级的自动过期",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "用毫秒时间戳设定 key 过期",
+  "expire a key at a millisecond timestamp",
+  "按毫秒时间点让键消失",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "以毫秒查 key 的过期时间点",
+  "key expiry as a millisecond timestamp",
+  "到期时刻的毫秒值",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "以毫秒查 key 的剩余时间",
+  "remaining milliseconds before a key expires",
+  "键还剩多少毫秒",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随便取一个 key",
+  "return a random key from the database",
+  "随机看看库里有什么键",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "给 key 改名",
+  "rename a key",
+  "把键换个名字",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "目标名不存在时才改名",
+  "rename a key only if the new name is free",
+  "改名但不能覆盖已有的键",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "从序列化数据恢复 key",
+  "restore a key from a serialised blob",
+  "把导出的数据再写回去",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "分批遍历整个键空间",
+  "iterate over the keyspace a page at a time",
+  "游标方式扫 key 不阻塞",
+  "scan through keys without blocking the server",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "对列表或集合排序",
+  "sort the elements of a list or set",
+  "把集合里的东西排个序",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "只读地对集合排序",
+  "sort a collection without writing anything",
+  "排序但保证不写入",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "碰一下 key 更新它的访问时间",
+  "update the last access time of keys",
+  "刷新键的空闲计时",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "查 key 还剩多少秒过期",
+  "how many seconds until a key expires",
+  "这个键还能活多久",
+  "how long is the ttl left on this key",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "查一个 key 是什么类型",
+  "what data type a key holds",
+  "这个键存的是 hash 还是 list",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "异步删除 key 不阻塞",
+  "delete a key without blocking the server",
+  "后台回收内存的删除方式",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "等待写入被从库确认",
+  "wait until replicas acknowledge the writes",
+  "确认数据已经同步到副本",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "等待写入落到 AOF 文件",
+  "wait until writes are fsynced to the AOF",
+  "确认数据已经写进持久化文件",
+]

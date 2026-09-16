@@ -1,0 +1,87 @@
+# V-F08 canonical phrasings — geo group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "GEOADD"
+phrases = [
+  "记录一个地点的经纬度",
+  "add a location with its coordinates",
+  "把坐标存进去",
+]
+
+[[case]]
+command = "GEODIST"
+phrases = [
+  "算两个地点之间的距离",
+  "how far apart two stored locations are",
+  "这两个点相隔多远",
+]
+
+[[case]]
+command = "GEOHASH"
+phrases = [
+  "取地点的 geohash 字符串",
+  "geohash string for a stored location",
+  "把坐标编码成短字符串",
+]
+
+[[case]]
+command = "GEOPOS"
+phrases = [
+  "取出某个地点的经纬度",
+  "read the coordinates of a member",
+  "查这个点在哪",
+]
+
+[[case]]
+command = "GEORADIUS"
+phrases = [
+  "按半径搜索附近的地点",
+  "find members within a radius of a point",
+  "以某个坐标为中心找附近",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER"
+phrases = [
+  "以某个成员为中心搜附近",
+  "find members near an existing member",
+  "以已存的点为圆心找周边",
+]
+
+[[case]]
+command = "GEORADIUSBYMEMBER_RO"
+phrases = [
+  "只读地以成员为中心搜附近",
+  "read-only radius search around a member",
+  "以成员为中心搜索且不写入",
+]
+
+[[case]]
+command = "GEORADIUS_RO"
+phrases = [
+  "只读地按半径搜索",
+  "radius search without writing anything",
+  "半径搜索但保证不写",
+]
+
+[[case]]
+command = "GEOSEARCH"
+phrases = [
+  "搜索某个范围内的地点",
+  "find members within a radius or box",
+  "附近有哪些点",
+]
+
+[[case]]
+command = "GEOSEARCHSTORE"
+phrases = [
+  "把范围搜索结果存起来",
+  "store the result of a geo search",
+  "搜附近并把结果写到新 key",
+]

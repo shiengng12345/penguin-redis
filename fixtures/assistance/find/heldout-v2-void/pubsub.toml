@@ -1,0 +1,108 @@
+# V-F08 held-out v2 — VOID — pubsub group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "PSUBSCRIBE"
+phrases = [
+  "模式订阅",
+  "pattern subscribe",
+]
+
+[[case]]
+command = "PUBLISH"
+phrases = [
+  "发布消息",
+  "publish message",
+]
+
+[[case]]
+command = "PUBSUB"
+phrases = [
+  "发布订阅内省",
+  "pubsub introspection",
+]
+
+[[case]]
+command = "PUBSUB|CHANNELS"
+phrases = [
+  "活跃频道列表",
+  "active channel list",
+]
+
+[[case]]
+command = "PUBSUB|NUMPAT"
+phrases = [
+  "模式订阅数",
+  "pattern subscription count",
+]
+
+[[case]]
+command = "PUBSUB|NUMSUB"
+phrases = [
+  "频道订阅数",
+  "channel subscriber count",
+]
+
+[[case]]
+command = "PUBSUB|SHARDCHANNELS"
+phrases = [
+  "活跃分片频道列表",
+  "active shard channel list",
+]
+
+[[case]]
+command = "PUBSUB|SHARDNUMSUB"
+phrases = [
+  "分片频道订阅数",
+  "shard channel subscriber count",
+]
+
+[[case]]
+command = "PUNSUBSCRIBE"
+phrases = [
+  "模式退订",
+  "pattern unsubscribe",
+]
+
+[[case]]
+command = "SPUBLISH"
+phrases = [
+  "分片发布",
+  "shard publish",
+]
+
+[[case]]
+command = "SSUBSCRIBE"
+phrases = [
+  "分片订阅",
+  "shard subscribe",
+]
+
+[[case]]
+command = "SUBSCRIBE"
+phrases = [
+  "订阅频道",
+  "subscribe channel",
+]
+
+[[case]]
+command = "SUNSUBSCRIBE"
+phrases = [
+  "分片退订",
+  "shard unsubscribe",
+]
+
+[[case]]
+command = "UNSUBSCRIBE"
+phrases = [
+  "退订频道",
+  "unsubscribe channel",
+]

@@ -1,0 +1,164 @@
+# V-F08 held-out v2 — VOID — list group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "BLMOVE"
+phrases = [
+  "列表间阻塞搬",
+  "blocking move between lists",
+]
+
+[[case]]
+command = "BLMPOP"
+phrases = [
+  "多列表阻塞出",
+  "blocking pop across lists",
+]
+
+[[case]]
+command = "BLPOP"
+phrases = [
+  "左出阻塞",
+  "blocking pop left",
+]
+
+[[case]]
+command = "BRPOP"
+phrases = [
+  "右出阻塞",
+  "blocking pop right",
+]
+
+[[case]]
+command = "BRPOPLPUSH"
+phrases = [
+  "旧的阻塞右出左进",
+  "legacy blocking rotate",
+]
+
+[[case]]
+command = "LINDEX"
+phrases = [
+  "列表下标取值",
+  "list element at index",
+]
+
+[[case]]
+command = "LINSERT"
+phrases = [
+  "列表中间插入",
+  "insert into list",
+]
+
+[[case]]
+command = "LLEN"
+phrases = [
+  "列表长度",
+  "list length",
+]
+
+[[case]]
+command = "LMOVE"
+phrases = [
+  "列表间原子搬",
+  "atomic move between lists",
+]
+
+[[case]]
+command = "LMPOP"
+phrases = [
+  "多列表出",
+  "pop across lists",
+]
+
+[[case]]
+command = "LPOP"
+phrases = [
+  "左出",
+  "pop left",
+]
+
+[[case]]
+command = "LPOS"
+phrases = [
+  "列表查下标",
+  "index of value in list",
+]
+
+[[case]]
+command = "LPUSH"
+phrases = [
+  "左进",
+  "push left",
+]
+
+[[case]]
+command = "LPUSHX"
+phrases = [
+  "左进但要求存在",
+  "push left if exists",
+]
+
+[[case]]
+command = "LRANGE"
+phrases = [
+  "列表区间",
+  "list range",
+]
+
+[[case]]
+command = "LREM"
+phrases = [
+  "列表删值",
+  "remove value from list",
+]
+
+[[case]]
+command = "LSET"
+phrases = [
+  "列表下标赋值",
+  "set list element at index",
+]
+
+[[case]]
+command = "LTRIM"
+phrases = [
+  "列表裁剪",
+  "trim list",
+]
+
+[[case]]
+command = "RPOP"
+phrases = [
+  "右出",
+  "pop right",
+]
+
+[[case]]
+command = "RPOPLPUSH"
+phrases = [
+  "旧的右出左进",
+  "legacy rotate between lists",
+]
+
+[[case]]
+command = "RPUSH"
+phrases = [
+  "右进",
+  "push right",
+]
+
+[[case]]
+command = "RPUSHX"
+phrases = [
+  "右进但要求存在",
+  "push right if exists",
+]

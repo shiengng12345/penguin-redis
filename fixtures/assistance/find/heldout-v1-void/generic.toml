@@ -1,0 +1,241 @@
+# V-F08 held-out v1 — VOID — generic group.
+#
+# This corpus measured 22.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "COPY"
+phrases = [
+  "复刻一份出来改着玩",
+  "duplicate an entry to experiment on",
+]
+
+[[case]]
+command = "DEL"
+phrases = [
+  "这个缓存不要了",
+  "get rid of this entry",
+]
+
+[[case]]
+command = "DUMP"
+phrases = [
+  "把这个键打包带走",
+  "package an entry up to carry elsewhere",
+]
+
+[[case]]
+command = "EXISTS"
+phrases = [
+  "先看看有没有再决定",
+  "is there anything under this name",
+]
+
+[[case]]
+command = "EXPIRE"
+phrases = [
+  "让这个缓存半小时后失效",
+  "make this cache entry go away after a while",
+]
+
+[[case]]
+command = "EXPIREAT"
+phrases = [
+  "到今晚零点就作废",
+  "expire it at a particular moment",
+]
+
+[[case]]
+command = "EXPIRETIME"
+phrases = [
+  "它哪天会没",
+  "on what date does this go away",
+]
+
+[[case]]
+command = "KEYS"
+phrases = [
+  "线上千万别用的那个全表扫",
+  "the one that scans everything and locks up production",
+]
+
+[[case]]
+command = "MIGRATE"
+phrases = [
+  "搬到另一个 redis 上去",
+  "shift an entry onto a different server",
+]
+
+[[case]]
+command = "MOVE"
+phrases = [
+  "挪到 db1 去",
+  "shift it into another database",
+]
+
+[[case]]
+command = "OBJECT"
+phrases = [
+  "看看这个键的内部细节",
+  "peek under the hood of an entry",
+]
+
+[[case]]
+command = "OBJECT|ENCODING"
+phrases = [
+  "它底层用的什么结构存的",
+  "which internal representation is in use",
+]
+
+[[case]]
+command = "OBJECT|FREQ"
+phrases = [
+  "它被访问得频不频繁",
+  "how hot is this entry",
+]
+
+[[case]]
+command = "OBJECT|IDLETIME"
+phrases = [
+  "多久没人碰它了",
+  "how long since anyone touched this",
+]
+
+[[case]]
+command = "OBJECT|REFCOUNT"
+phrases = [
+  "有多少地方在用这个值",
+  "how many references to this value",
+]
+
+[[case]]
+command = "PERSIST"
+phrases = [
+  "别让它再自动没了",
+  "stop this entry from timing out",
+]
+
+[[case]]
+command = "PEXPIRE"
+phrases = [
+  "超时要精确到毫秒",
+  "timeout with millisecond precision",
+]
+
+[[case]]
+command = "PEXPIREAT"
+phrases = [
+  "精确到毫秒的作废时刻",
+  "expire at a precise instant",
+]
+
+[[case]]
+command = "PEXPIRETIME"
+phrases = [
+  "失效的精确时刻",
+  "the exact instant it lapses",
+]
+
+[[case]]
+command = "PTTL"
+phrases = [
+  "还剩几毫秒",
+  "milliseconds of life left",
+]
+
+[[case]]
+command = "RANDOMKEY"
+phrases = [
+  "随手看一个库里的键",
+  "show me any key at all",
+]
+
+[[case]]
+command = "RENAME"
+phrases = [
+  "把这个缓存改个名字",
+  "give this entry a different name",
+]
+
+[[case]]
+command = "RENAMENX"
+phrases = [
+  "改名但不能盖掉别人",
+  "rename without clobbering an existing name",
+]
+
+[[case]]
+command = "RESTORE"
+phrases = [
+  "把打包的数据装回去",
+  "unpack an entry back into the database",
+]
+
+[[case]]
+command = "SCAN"
+phrases = [
+  "安全地翻一遍所有键",
+  "walk every key safely",
+]
+
+[[case]]
+command = "SORT"
+phrases = [
+  "把这堆东西排一下",
+  "order this collection",
+]
+
+[[case]]
+command = "SORT_RO"
+phrases = [
+  "排序但别动数据",
+  "order it without touching anything",
+]
+
+[[case]]
+command = "TOUCH"
+phrases = [
+  "让它看起来刚被用过",
+  "mark entries as recently used",
+]
+
+[[case]]
+command = "TTL"
+phrases = [
+  "这个缓存还能撑多久",
+  "how much life is left on this",
+]
+
+[[case]]
+command = "TYPE"
+phrases = [
+  "我不知道这是什么结构",
+  "what kind of thing is stored here",
+]
+
+[[case]]
+command = "UNLINK"
+phrases = [
+  "删大 key 又怕卡住",
+  "drop a huge entry without stalling the server",
+]
+
+[[case]]
+command = "WAIT"
+phrases = [
+  "确保写到从库了再继续",
+  "make sure replicas caught up before carrying on",
+]
+
+[[case]]
+command = "WAITAOF"
+phrases = [
+  "确保真的落盘了",
+  "make sure it really hit disk",
+]

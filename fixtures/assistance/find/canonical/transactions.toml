@@ -1,0 +1,47 @@
+# V-F08 canonical phrasings — transactions group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "DISCARD"
+phrases = [
+  "取消这个事务",
+  "abandon a transaction without running it",
+  "排队的命令全部不要了",
+]
+
+[[case]]
+command = "EXEC"
+phrases = [
+  "提交事务里排队的命令",
+  "execute the queued transaction",
+  "把事务真正执行掉",
+]
+
+[[case]]
+command = "MULTI"
+phrases = [
+  "开启一个事务",
+  "start a transaction",
+  "把接下来几条命令打包",
+]
+
+[[case]]
+command = "UNWATCH"
+phrases = [
+  "取消对 key 的监视",
+  "stop watching keys",
+  "把之前的乐观锁解除",
+]
+
+[[case]]
+command = "WATCH"
+phrases = [
+  "监视 key 做乐观锁",
+  "watch keys for optimistic locking",
+  "如果这个键被别人改了事务就失败",
+]

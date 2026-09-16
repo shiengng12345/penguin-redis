@@ -1,0 +1,164 @@
+# V-F08 held-out v2 — VOID — string group.
+#
+# This corpus measured 74.7% top-3 against the vocabulary as it stood, and was then
+# used to extend that vocabulary. §16.4: 「未达标 → 扩词表后 held-out 集换新（旧集作废，
+# 防止泄漏）」. It is void as a measurement and kept here so the extension can be
+# audited: deleting it would leave the vocabulary looking as though it had always
+# known these words.
+#
+# It is NOT part of the canonical corpus either. Canonical is the 规范 register, and
+# folding another register into it would change what the 95% gate measures.
+
+[[case]]
+command = "APPEND"
+phrases = [
+  "字符串拼接",
+  "string concat",
+]
+
+[[case]]
+command = "DECR"
+phrases = [
+  "自减 1",
+  "minus one",
+]
+
+[[case]]
+command = "DECRBY"
+phrases = [
+  "自减 n",
+  "minus n",
+]
+
+[[case]]
+command = "GET"
+phrases = [
+  "读字符串",
+  "fetch string",
+]
+
+[[case]]
+command = "GETDEL"
+phrases = [
+  "读完删",
+  "read then delete",
+]
+
+[[case]]
+command = "GETEX"
+phrases = [
+  "读并续期",
+  "read and renew",
+]
+
+[[case]]
+command = "GETRANGE"
+phrases = [
+  "取子串",
+  "substring by offset",
+]
+
+[[case]]
+command = "GETSET"
+phrases = [
+  "原子替换",
+  "atomic swap",
+]
+
+[[case]]
+command = "INCR"
+phrases = [
+  "自增 1",
+  "plus one",
+]
+
+[[case]]
+command = "INCRBY"
+phrases = [
+  "自增 n",
+  "plus n",
+]
+
+[[case]]
+command = "INCRBYFLOAT"
+phrases = [
+  "浮点自增",
+  "float plus",
+]
+
+[[case]]
+command = "LCS"
+phrases = [
+  "最长公共子序列",
+  "longest common subsequence",
+]
+
+[[case]]
+command = "MGET"
+phrases = [
+  "批量读",
+  "bulk read",
+]
+
+[[case]]
+command = "MSET"
+phrases = [
+  "批量写",
+  "bulk write",
+]
+
+[[case]]
+command = "MSETNX"
+phrases = [
+  "批量占坑",
+  "bulk claim",
+]
+
+[[case]]
+command = "PSETEX"
+phrases = [
+  "毫秒 ttl 写入",
+  "ms ttl write",
+]
+
+[[case]]
+command = "SET"
+phrases = [
+  "写字符串",
+  "save a string",
+]
+
+[[case]]
+command = "SETEX"
+phrases = [
+  "带 ttl 的写",
+  "write with ttl",
+]
+
+[[case]]
+command = "SETNX"
+phrases = [
+  "占坑不覆盖",
+  "claim if free",
+]
+
+[[case]]
+command = "SETRANGE"
+phrases = [
+  "改子串",
+  "patch at offset",
+]
+
+[[case]]
+command = "STRLEN"
+phrases = [
+  "字符串长度",
+  "string size",
+]
+
+[[case]]
+command = "SUBSTR"
+phrases = [
+  "旧的取子串",
+  "legacy substring",
+]

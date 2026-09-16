@@ -1,0 +1,143 @@
+# V-F08 canonical phrasings — set group.
+#
+# Hand-written, one command at a time: how a person actually asks for this thing.
+# §16.4 requires at least three per command, in Chinese and English, and this corpus
+# is ALSO what the synonym vocabulary was built from -- which is why its recall number
+# only proves the vocabulary is complete. See ../heldout/ for the measurement that
+# means something.
+
+[[case]]
+command = "SADD"
+phrases = [
+  "往集合里加成员",
+  "add a member to a set",
+  "把元素放进 set",
+]
+
+[[case]]
+command = "SCARD"
+phrases = [
+  "数一数集合有几个成员",
+  "how many members a set has",
+  "集合的大小",
+]
+
+[[case]]
+command = "SDIFF"
+phrases = [
+  "求两个集合的差集",
+  "elements in the first set but not the others",
+  "在 A 里但不在 B 里的",
+]
+
+[[case]]
+command = "SDIFFSTORE"
+phrases = [
+  "把差集结果存到一个新 key",
+  "store the difference of sets into a key",
+  "算差集并保存结果",
+]
+
+[[case]]
+command = "SINTER"
+phrases = [
+  "求集合的交集",
+  "elements present in every set",
+  "几个集合都有的元素",
+]
+
+[[case]]
+command = "SINTERCARD"
+phrases = [
+  "只要交集的数量不要内容",
+  "how many elements the sets have in common",
+  "交集有多少个元素",
+]
+
+[[case]]
+command = "SINTERSTORE"
+phrases = [
+  "把交集结果存起来",
+  "store the intersection of sets into a key",
+  "算交集并写入新 key",
+]
+
+[[case]]
+command = "SISMEMBER"
+phrases = [
+  "判断某个值在不在集合里",
+  "check whether a value is in a set",
+  "这个元素属不属于这个集合",
+]
+
+[[case]]
+command = "SMEMBERS"
+phrases = [
+  "列出集合的全部成员",
+  "list every member of a set",
+  "把 set 里的东西全部取出来",
+]
+
+[[case]]
+command = "SMISMEMBER"
+phrases = [
+  "一次判断多个值在不在集合里",
+  "check several values against a set at once",
+  "批量看这些元素是否在集合中",
+]
+
+[[case]]
+command = "SMOVE"
+phrases = [
+  "把成员从一个集合移到另一个",
+  "move a member between two sets atomically",
+  "原子地在两个集合间搬元素",
+]
+
+[[case]]
+command = "SPOP"
+phrases = [
+  "从集合里随机弹出成员",
+  "pop a random member out of a set",
+  "随机取走一个并删掉",
+]
+
+[[case]]
+command = "SRANDMEMBER"
+phrases = [
+  "从集合里随机看一个成员",
+  "pick a random member without removing it",
+  "随便看一个但不删",
+]
+
+[[case]]
+command = "SREM"
+phrases = [
+  "从集合里删掉成员",
+  "remove a member from a set",
+  "把元素从 set 里去掉",
+]
+
+[[case]]
+command = "SSCAN"
+phrases = [
+  "分批遍历集合",
+  "iterate over a set a page at a time",
+  "游标方式扫描 set",
+]
+
+[[case]]
+command = "SUNION"
+phrases = [
+  "求集合的并集",
+  "all elements across several sets",
+  "把几个集合合起来",
+]
+
+[[case]]
+command = "SUNIONSTORE"
+phrases = [
+  "把并集结果存起来",
+  "store the union of sets into a key",
+  "算并集并保存",
+]
