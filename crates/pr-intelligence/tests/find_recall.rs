@@ -565,3 +565,93 @@ fn the_vocabulary_is_sealed_against_the_corpora_that_built_it() {
          gate can be read from"
     );
 }
+
+// =============================================================================================
+// The embedded phrase index (V-F08, the lexical half of the ranking)
+// =============================================================================================
+
+/// Exactly the corpora that are allowed into the index: the canonical one and every retired
+/// held-out one. The live independent corpus is deliberately absent, and the next test is the
+/// one that matters.
+fn indexable_corpora() -> Vec<&'static str> {
+    let mut v = vec!["canonical"];
+    v.extend_from_slice(VOID_CORPORA);
+    v
+}
+
+#[test]
+fn the_embedded_phrase_index_is_exactly_the_corpora_it_claims() {
+    let mut expected: BTreeSet<(String, String)> = BTreeSet::new();
+    for dir in indexable_corpora() {
+        for c in load(dir) {
+            expected.insert((c.command.clone(), c.phrase.clone()));
+        }
+    }
+    let embedded: BTreeSet<(String, String)> = pr_intelligence::phrases::PHRASES
+        .iter()
+        .map(|(c, p)| ((*c).to_owned(), (*p).to_owned()))
+        .collect();
+
+    let missing: Vec<&(String, String)> = expected.difference(&embedded).take(5).collect();
+    let extra: Vec<&(String, String)> = embedded.difference(&expected).take(5).collect();
+    assert!(
+        missing.is_empty() && extra.is_empty(),
+        "src/phrases.rs has drifted from the corpora. missing {} (e.g. {missing:?}), \
+         extra {} (e.g. {extra:?}). Regenerate it from fixtures/assistance/find/.",
+        expected.difference(&embedded).count(),
+        embedded.difference(&expected).count()
+    );
+}
+
+#[test]
+fn the_index_contains_nothing_from_the_live_independent_corpus() {
+    // The whole measurement rests on this. A phrase that is both in the index and in the
+    // held-out corpus is a question the search has already been given the answer to, and the
+    // recall number would be reporting memory rather than generalisation.
+    //
+    // Checked as a *set*, not by trusting the generator: the generator is one edit away from
+    // sweeping the wrong directory, and that edit would not look wrong.
+    let dir = fixtures().join("heldout-independent");
+    if !dir.exists() {
+        return;
+    }
+    let indexed: BTreeSet<String> = pr_intelligence::phrases::PHRASES
+        .iter()
+        .map(|(_, p)| (*p).to_lowercase())
+        .collect();
+    let leaked: Vec<String> = load("heldout-independent")
+        .into_iter()
+        .map(|c| c.phrase)
+        .filter(|p| indexed.contains(&p.to_lowercase()))
+        .collect();
+    assert!(
+        leaked.is_empty(),
+        "the phrase index contains {} phrase(s) from the live held-out corpus: {leaked:?}",
+        leaked.len()
+    );
+}
+
+#[test]
+fn the_lexical_half_can_answer_on_its_own() {
+    // A phrasing whose words the vocabulary does not know at all. Before the phrase index this
+    // returned nothing, because an empty concept set is an empty result.
+    let bare = pr_intelligence::find::Finder::from_parts(
+        pr_intelligence::vocabulary::TERMS,
+        pr_intelligence::vocabulary::PURPOSES,
+    );
+    let with = pr_intelligence::find::Finder::new();
+    let q = "count the set bits in a string";
+    assert!(
+        !with.search(q, 3).is_empty(),
+        "the fused search must answer a phrasing the corpus contains"
+    );
+    // And the two halves are really two: the concept-only index must still work on its own.
+    assert!(!bare.search("删除一个 key", 3).is_empty());
+}
+
+#[test]
+fn a_query_that_matches_nothing_at_all_returns_nothing() {
+    let f = pr_intelligence::find::Finder::new();
+    assert!(f.search("", 5).is_empty());
+    assert!(f.search("   ", 5).is_empty());
+}

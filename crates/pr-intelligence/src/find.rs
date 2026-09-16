@@ -144,6 +144,19 @@ pub struct Finder {
     terms: Vec<Term>,
     /// How many commands are indexed.
     commands: usize,
+    /// One entry per indexed phrase: which command it belongs to, and how many grams it has.
+    ///
+    /// Grams are stored as 32-bit hashes, not as `String`s. The corpus is 2,285 phrases and
+    /// roughly 35,000 gram occurrences; keeping those as owned strings costs several megabytes
+    /// against an assistance budget of twelve (§24.6, ADR-029), and nothing here needs to read
+    /// a gram back — only to ask whether two phrases share one. A 32-bit collision perturbs one
+    /// score slightly and is worth several megabytes.
+    phrases: Vec<(u16, u16)>,
+    /// Inverted index: gram -> the phrases that contain it. Scoring touches only the phrases
+    /// that share something with the query rather than all of them.
+    postings: BTreeMap<u32, Vec<u32>>,
+    /// Command names, indexed by the `u16` in `phrases`.
+    phrase_commands: Vec<&'static str>,
 }
 
 impl Finder {
@@ -151,6 +164,7 @@ impl Finder {
     #[must_use]
     pub fn new() -> Self {
         Self::from_parts(crate::vocabulary::TERMS, crate::vocabulary::PURPOSES)
+            .with_phrases(crate::phrases::PHRASES)
     }
 
     /// The implications this index applies.
@@ -191,7 +205,48 @@ impl Finder {
             containers_of,
             terms,
             commands: purposes.len(),
+            phrases: Vec::new(),
+            postings: BTreeMap::new(),
+            phrase_commands: Vec::new(),
         }
+    }
+
+    /// Add the canonical corpus as a second, lexical way to reach a command.
+    ///
+    /// Two independent measurements say why this exists. Extending the synonym table from one
+    /// held-out corpus was worth +19.2 points on that corpus and +2.3 points on the next one;
+    /// the table had learnt one author's wording, not the language. Matching against the corpus
+    /// itself generalises along an axis a word list cannot: shared content words and shared
+    /// character runs. `scoring` reaches `score` and 「按分数」 reaches 「分数」 with nothing
+    /// enumerating either.
+    ///
+    /// It is a *second* route, not a replacement. The concept layer knows things no string
+    /// comparison can — that a score belongs to a sorted set, that removing a key is deleting
+    /// it — and the two are combined by rank rather than by score so neither has to be
+    /// calibrated against the other.
+    #[must_use]
+    pub fn with_phrases(mut self, phrases: &'static [(&'static str, &'static str)]) -> Self {
+        let mut commands: Vec<&'static str> = Vec::new();
+        let mut index_of: BTreeMap<&'static str, u16> = BTreeMap::new();
+        let mut postings: BTreeMap<u32, Vec<u32>> = BTreeMap::new();
+        let mut rows: Vec<(u16, u16)> = Vec::new();
+        for (cmd, phrase) in phrases {
+            let next = u16::try_from(commands.len()).unwrap_or(u16::MAX);
+            let cid = *index_of.entry(cmd).or_insert_with(|| {
+                commands.push(*cmd);
+                next
+            });
+            let g = grams(phrase);
+            let pid = u32::try_from(rows.len()).unwrap_or(u32::MAX);
+            for k in &g {
+                postings.entry(*k).or_default().push(pid);
+            }
+            rows.push((cid, u16::try_from(g.len()).unwrap_or(u16::MAX)));
+        }
+        self.phrases = rows;
+        self.postings = postings;
+        self.phrase_commands = commands;
+        self
     }
 
     /// How many commands the index covers.
@@ -268,8 +323,90 @@ impl Finder {
     }
 
     /// Search, returning at most `limit` commands, best first.
+    ///
+    /// Two rankings, fused. See [`Finder::with_phrases`] for why there are two.
     #[must_use]
     pub fn search(&self, query: &str, limit: usize) -> Vec<Hit> {
+        let by_concept = self.rank_by_concept(query);
+        let by_phrase = self.rank_by_phrase(query);
+        if by_phrase.is_empty() {
+            let mut hits = by_concept;
+            hits.truncate(limit);
+            return hits;
+        }
+        if by_concept.is_empty() {
+            let mut hits = by_phrase;
+            hits.truncate(limit);
+            return hits;
+        }
+        fuse(&by_concept, &by_phrase, limit)
+    }
+
+    /// The lexical ranking: how much of the query's vocabulary a command's canonical phrasings
+    /// already contain, weighted so a gram half the corpus uses counts for little.
+    fn rank_by_phrase(&self, query: &str) -> Vec<Hit> {
+        if self.phrases.is_empty() {
+            return Vec::new();
+        }
+        let q = grams(query);
+        if q.is_empty() {
+            return Vec::new();
+        }
+        let n = self.phrases.len() as f64;
+        // Inverse document frequency over the corpus, so 「的」 and "the key" weigh almost
+        // nothing while 「位域」 weighs a lot. Without it the longest phrases win every query.
+        let mut matched: BTreeMap<u32, f64> = BTreeMap::new();
+        let mut query_weight = 0.0;
+        for k in &q {
+            let posting = self.postings.get(k);
+            let df = posting.map_or(0, Vec::len) as f64;
+            let idf = (n / (1.0 + df)).ln().max(0.0);
+            query_weight += idf;
+            if let Some(ps) = posting {
+                for pid in ps {
+                    *matched.entry(*pid).or_insert(0.0) += idf;
+                }
+            }
+        }
+        if query_weight <= 0.0 {
+            return Vec::new();
+        }
+        let mut best: BTreeMap<&'static str, f64> = BTreeMap::new();
+        for (pid, num) in matched {
+            let Some((cid, len)) = self.phrases.get(pid as usize).copied() else {
+                continue;
+            };
+            let Some(cmd) = self.phrase_commands.get(cid as usize).copied() else {
+                continue;
+            };
+            // Divided by the phrase's own size as well, so a long phrase that happens to
+            // contain the query's words does not beat a short one that is about them.
+            let score = num / query_weight * (num / (num + f64::from(len).sqrt()));
+            let e = best.entry(cmd).or_insert(0.0);
+            if score > *e {
+                *e = score;
+            }
+        }
+        let mut hits: Vec<Hit> = best
+            .into_iter()
+            .map(|(command, score)| Hit {
+                command: command.to_owned(),
+                score,
+                matched: Vec::new(),
+            })
+            .collect();
+        hits.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(std::cmp::Ordering::Equal)
+                .then_with(|| a.command.cmp(&b.command))
+        });
+        hits.truncate(32);
+        hits
+    }
+
+    /// The concept ranking -- what `search` used to be, unchanged.
+    fn rank_by_concept(&self, query: &str) -> Vec<Hit> {
         let mut concepts = self.concepts_of(query);
         if concepts.is_empty() {
             return Vec::new();
@@ -382,7 +519,6 @@ impl Finder {
                 // depend on hash iteration order.
                 .then_with(|| a.command.cmp(&b.command))
         });
-        hits.truncate(limit);
         hits
     }
 }
@@ -407,4 +543,110 @@ fn is_word_boundary(chars: &[char], at: usize, len: usize) -> bool {
         || at + len == chars.len()
         || !chars[at + len].is_ascii_alphanumeric();
     start_ok && end_ok
+}
+
+/// Split a phrase into the units the lexical ranking compares.
+///
+/// Latin runs become words plus a five-character prefix, which is a stemmer poor enough to be
+/// predictable: `scoring`, `scores` and `scored` all yield `score`, and nothing has to know
+/// English morphology. CJK runs become character bigrams, because Chinese has no spaces and a
+/// bigram is the shortest unit that carries meaning — 「分数」 and 「按分数取」 share one.
+///
+/// Digits are kept: `0` and `1` are the whole content of several bitmap phrasings.
+fn grams(s: &str) -> BTreeSet<u32> {
+    fn flush_latin(buf: &mut String, out: &mut BTreeSet<u32>) {
+        if buf.len() >= 2 {
+            out.insert(hash_gram(buf));
+            if buf.chars().count() > 5 {
+                let stem: String = buf.chars().take(5).collect();
+                out.insert(hash_gram(&stem));
+            }
+        }
+        buf.clear();
+    }
+    fn flush_cjk(buf: &mut Vec<char>, out: &mut BTreeSet<u32>) {
+        if buf.len() == 1 {
+            out.insert(hash_gram(&buf[0].to_string()));
+        }
+        for w in buf.windows(2) {
+            let g: String = w.iter().collect();
+            out.insert(hash_gram(&g));
+        }
+        buf.clear();
+    }
+
+    let mut out = BTreeSet::new();
+    let lower = s.to_lowercase();
+    let mut latin = String::new();
+    let mut cjk: Vec<char> = Vec::new();
+    for ch in lower.chars() {
+        if ch.is_ascii_alphanumeric() {
+            flush_cjk(&mut cjk, &mut out);
+            latin.push(ch);
+        } else if is_cjk(ch) {
+            flush_latin(&mut latin, &mut out);
+            cjk.push(ch);
+        } else {
+            flush_latin(&mut latin, &mut out);
+            flush_cjk(&mut cjk, &mut out);
+        }
+    }
+    flush_latin(&mut latin, &mut out);
+    flush_cjk(&mut cjk, &mut out);
+    out
+}
+
+/// CJK ideographs, which is all this needs to tell apart from Latin.
+fn is_cjk(c: char) -> bool {
+    matches!(c as u32, 0x4E00..=0x9FFF | 0x3400..=0x4DBF | 0xF900..=0xFAFF)
+}
+
+/// Reciprocal rank fusion of the two rankings.
+///
+/// By rank, not by score. The two numbers are not on the same scale and never will be, and a
+/// weight tuned to make one corpus come out well is exactly the kind of tuning §16.4's
+/// held-out rule exists to catch. RRF needs only the orders.
+///
+/// `K` damps the top: without it first place in either list would win outright, and a command
+/// that is second in both — usually the right answer — would lose to one that is first in one
+/// and nowhere in the other.
+fn fuse(a: &[Hit], b: &[Hit], limit: usize) -> Vec<Hit> {
+    const K: f64 = 12.0;
+    let mut acc: BTreeMap<&str, (f64, Vec<String>)> = BTreeMap::new();
+    for (rank, h) in a.iter().enumerate() {
+        let e = acc.entry(&h.command).or_insert((0.0, Vec::new()));
+        e.0 += 1.0 / (K + rank as f64);
+        e.1.clone_from(&h.matched);
+    }
+    for (rank, h) in b.iter().enumerate() {
+        let e = acc.entry(&h.command).or_insert((0.0, Vec::new()));
+        e.0 += 1.0 / (K + rank as f64);
+    }
+    let mut hits: Vec<Hit> = acc
+        .into_iter()
+        .map(|(command, (score, matched))| Hit {
+            command: command.to_owned(),
+            score,
+            matched,
+        })
+        .collect();
+    hits.sort_by(|x, y| {
+        y.score
+            .partial_cmp(&x.score)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| x.command.cmp(&y.command))
+    });
+    hits.truncate(limit);
+    hits
+}
+
+/// FNV-1a, 32 bits. Chosen for being three lines and stable across runs; the index is rebuilt
+/// in-process every time, so nothing depends on the value beyond this program's lifetime.
+fn hash_gram(s: &str) -> u32 {
+    let mut h: u32 = 0x811c_9dc5;
+    for b in s.as_bytes() {
+        h ^= u32::from(*b);
+        h = h.wrapping_mul(0x0100_0193);
+    }
+    h
 }

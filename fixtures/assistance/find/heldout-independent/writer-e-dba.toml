@@ -57,7 +57,7 @@ phrases = [
 [[case]]
 command = "MIGRATE"
 phrases = [
-  "把 key 搬到另一个实例上去",
+  "跨机器把某个 key 转移到目标节点，源端删掉",
   "transfer a key across to a different redis server",
 ]
 
@@ -65,7 +65,7 @@ phrases = [
 command = "MOVE"
 phrases = [
   "把 key 挪到同一个实例的别的 db",
-  "shift a key into another database number",
+  "relocate a key from db 0 into db 3 locally",
 ]
 
 [[case]]
@@ -79,7 +79,7 @@ phrases = [
 command = "OBJECT|ENCODING"
 phrases = [
   "这个 hash 底层到底是 listpack 还是 hashtable",
-  "which internal representation is this value using",
+  "check if a value got promoted off its compact layout",
 ]
 
 [[case]]

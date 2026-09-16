@@ -9,6 +9,7 @@ pub mod broker;
 pub mod contract;
 pub mod discovery;
 pub mod find;
+pub mod phrases;
 pub mod scope;
 pub mod vocabulary;
 pub mod working_set;
